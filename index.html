@@ -1,148 +1,244 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bom Sabor Mini Salgados</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=dark2">
 </head>
+
 <body>
 
-<!-- TOGGLE DE MODO -->
-<div class="mode-toggle">
-  <button class="active" data-view="menu">🛒 Cardápio</button>
-  <button data-view="dash">⚙️ Painel</button>
-</div>
-
-<!-- CARRINHO: OVERLAY + DRAWER -->
-<div class="cart-overlay" id="cartOverlay"></div>
-<aside class="cart-drawer" id="cartDrawer" aria-label="Carrinho">
-  <div class="cart-drawer-header">
-    <h2 class="cart-drawer-title">Seu Pedido</h2>
-    <button class="cart-close" id="cartClose" aria-label="Fechar carrinho">✕</button>
-  </div>
-  <div class="cart-items" id="cartItems"></div>
-  <div class="cart-empty" id="cartEmpty">
-    <span>🛒</span>
-    <p>Seu carrinho está vazio</p>
-  </div>
-  <div class="cart-footer" id="cartFooter">
-    <div class="cart-minimum" id="cartMinimum"></div>
-    <div class="cart-subtotal-row">
-      <span>Subtotal</span>
-      <span class="cart-subtotal-value" id="cartSubtotal">R$ 0,00</span>
-    </div>
-    <button class="checkout-btn" id="checkoutBtn">
-      <span>📲</span> Fazer Pedido via WhatsApp
+  <!-- TOGGLE DE MODO -->
+  <div class="mode-toggle">
+    <button class="active" data-view="menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+        <path d="M3 6h18" />
+        <path d="M16 10a4 4 0 0 1-8 0" />
+      </svg>
+      Cardápio
+    </button>
+    <button data-view="dash">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <rect width="7" height="9" x="3" y="3" rx="1" />
+        <rect width="7" height="5" x="14" y="3" rx="1" />
+        <rect width="7" height="9" x="14" y="12" rx="1" />
+        <rect width="7" height="5" x="3" y="16" rx="1" />
+      </svg>
+      Painel
     </button>
   </div>
-</aside>
 
-<!-- ══════════════════════════════
+  <!-- CARRINHO: OVERLAY + DRAWER -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Carrinho">
+    <div class="cart-drawer-header">
+      <h2 class="cart-drawer-title">Seu Pedido</h2>
+      <button class="cart-close" id="cartClose" aria-label="Fechar carrinho">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-empty" id="cartEmpty">
+      <span>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5; margin-bottom: 12px;">
+          <circle cx="8" cy="21" r="1" />
+          <circle cx="19" cy="21" r="1" />
+          <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+        </svg>
+      </span>
+      <p>Seu carrinho está vazio</p>
+    </div>
+    <div class="cart-footer" id="cartFooter">
+      <div class="cart-minimum" id="cartMinimum"></div>
+      <div class="cart-subtotal-row">
+        <span>Subtotal</span>
+        <span class="cart-subtotal-value" id="cartSubtotal">R$ 0,00</span>
+      </div>
+      <button class="checkout-btn" id="checkoutBtn">
+        <span style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+          </svg>
+          Fazer Pedido via WhatsApp
+        </span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════
      VIEW: CARDÁPIO PÚBLICO
 ══════════════════════════════ -->
-<div class="view active" id="view-menu">
+  <div class="view active" id="view-menu">
 
-  <header class="menu-hero">
-    <div class="store-badge">
-      <span class="badge-dot"></span> Apenas agendamento
-    </div>
-    <h1 class="store-name">Bom Sabor<br>Mini Salgados</h1>
-    <p class="store-sub">R. João de Oliveira Machado, 454 · Jardim Ypê I · Mogi Guaçu</p>
-    <nav class="menu-nav" id="menuNav" aria-label="Categorias"></nav>
-  </header>
+    <header class="menu-hero">
 
-  <div class="menu-body" id="menuBody"></div>
+      <h1 class="store-name">Bom Sabor<br>Mini Salgados</h1>
+      <p class="store-sub">R. João de Oliveira Machado, 454 · Jardim Ypê I · Mogi Guaçu</p>
+      <nav class="menu-nav" id="menuNav" aria-label="Categorias"></nav>
+    </header>
 
-  <button class="cart-fab hidden" id="cartFab" aria-label="Ver carrinho">
-    🛒 Ver pedido
-    <span class="cart-count" id="cartCount">0 itens</span>
-    <span class="cart-sep">·</span>
-    <span class="cart-fab-total" id="cartFabTotal">R$ 0,00</span>
-  </button>
+    <div class="menu-body" id="menuBody"></div>
 
-</div>
+    <button class="cart-fab hidden" id="cartFab" aria-label="Ver carrinho">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+        <circle cx="8" cy="21" r="1" />
+        <circle cx="19" cy="21" r="1" />
+        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+      </svg>
+      Ver pedido
+      <span class="cart-count" id="cartCount">0 itens</span>
+      <span class="cart-sep">·</span>
+      <span class="cart-fab-total" id="cartFabTotal">R$ 0,00</span>
+    </button>
 
-<!-- ══════════════════════════════
+  </div>
+
+  <!-- ══════════════════════════════
      VIEW: PAINEL DE GESTÃO
 ══════════════════════════════ -->
-<div class="view" id="view-dash">
-  <div class="dashboard">
+  <div class="view" id="view-dash">
+    <div class="dashboard">
 
-    <aside class="sidebar">
-      <div class="sidebar-logo">cardápio<span>ágil</span></div>
-      <div class="sidebar-store">
-        <div class="sidebar-store-name">Bom Sabor Mini Salgados</div>
-        <div class="sidebar-store-loc">Jardim Ypê I · Mogi Guaçu</div>
-        <div class="open-badge">● Aberto</div>
-      </div>
-      <div class="nav-section-title">Principal</div>
-      <div class="nav-item active" data-panel="pedidos"><span class="nav-icon">📋</span> Pedidos</div>
-      <div class="nav-item" data-panel="cardapio"><span class="nav-icon">🍽️</span> Cardápio</div>
-      <div class="nav-item" data-panel="desempenho"><span class="nav-icon">📊</span> Desempenho</div>
-      <div class="nav-item" data-panel="caixa"><span class="nav-icon">💰</span> Caixa</div>
-      <div class="nav-section-title">Configurações</div>
-      <div class="nav-item" data-panel="loja"><span class="nav-icon">🏪</span> Minha Loja</div>
-      <div class="nav-item" data-panel="notificacoes"><span class="nav-icon">🔔</span> Notificações</div>
-      <div class="nav-item" data-panel="links"><span class="nav-icon">🔗</span> Meus Links</div>
-    </aside>
-
-    <main class="dash-content">
-
-      <!-- PANEL: PEDIDOS -->
-      <div id="panel-pedidos" class="dash-panel">
-        <div class="dash-header">
-          <div class="dash-title">Pedidos de hoje</div>
-          <button class="new-order-btn" id="newOrderBtn">+ Novo Pedido</button>
+      <aside class="sidebar">
+        <div class="sidebar-logo">cardápio<span>ágil</span></div>
+        <div class="sidebar-store">
+          <div class="sidebar-store-name">Bom Sabor Mini Salgados</div>
+          <div class="sidebar-store-loc">Jardim Ypê I · Mogi Guaçu</div>
+          <div class="open-badge">● Aberto</div>
         </div>
-        <div class="stats-row">
-          <div class="stat-card">
-            <div class="stat-label">Pedidos hoje</div>
-            <div class="stat-value" id="statTotal">12</div>
-            <div class="stat-sub"><span class="stat-up">↑ 4</span> vs ontem</div>
+        <div class="nav-section-title">Principal</div>
+        <div class="nav-item active" data-panel="pedidos">
+          <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 6h13" />
+              <path d="M8 12h13" />
+              <path d="M8 18h13" />
+              <path d="M3 6h.01" />
+              <path d="M3 12h.01" />
+              <path d="M3 18h.01" />
+            </svg></span> Pedidos
+        </div>
+        <div class="nav-item" data-panel="cardapio">
+          <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+              <path d="M7 2v20" />
+              <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
+            </svg></span> Cardápio
+        </div>
+        <div class="nav-item" data-panel="desempenho">
+          <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+              <polyline points="16 7 22 7 22 13" />
+            </svg></span> Desempenho
+        </div>
+        <div class="nav-item" data-panel="caixa">
+          <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" x2="12" y1="2" y2="22" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg></span> Caixa
+        </div>
+        <div class="nav-section-title">Configurações</div>
+        <div class="nav-item" data-panel="loja">
+          <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
+              <path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9" />
+              <path d="M12 3v6" />
+            </svg></span> Minha Loja
+        </div>
+        <div class="nav-item" data-panel="notificacoes">
+          <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+            </svg></span> Notificações
+        </div>
+        <div class="nav-item" data-panel="links">
+          <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+            </svg></span> Meus Links
+        </div>
+      </aside>
+
+      <main class="dash-content">
+
+        <!-- PANEL: PEDIDOS -->
+        <div id="panel-pedidos" class="dash-panel">
+          <div class="dash-header">
+            <div class="dash-title">Pedidos de hoje</div>
+            <button class="new-order-btn" id="newOrderBtn">+ Novo Pedido</button>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Faturamento</div>
-            <div class="stat-value">R$ 487</div>
-            <div class="stat-sub"><span class="stat-up">↑ 18%</span> esta semana</div>
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-label">Pedidos hoje</div>
+              <div class="stat-value" id="statTotal">12</div>
+              <div class="stat-sub"><span class="stat-up">↑ 4</span> vs ontem</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Faturamento</div>
+              <div class="stat-value">R$ 487</div>
+              <div class="stat-sub"><span class="stat-up">↑ 18%</span> esta semana</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Em preparo</div>
+              <div class="stat-value" id="statPrep">3</div>
+              <div class="stat-sub">Tempo médio <span class="amber">22 min</span></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Ticket médio</div>
+              <div class="stat-value">R$ 40</div>
+              <div class="stat-sub"><span class="stat-down">↓ 2%</span> vs ontem</div>
+            </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Em preparo</div>
-            <div class="stat-value" id="statPrep">3</div>
-            <div class="stat-sub">Tempo médio <span class="amber">22 min</span></div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Ticket médio</div>
-            <div class="stat-value">R$ 40</div>
-            <div class="stat-sub"><span class="stat-down">↓ 2%</span> vs ontem</div>
+          <div class="kanban" id="kanban"></div>
+          <div class="history-table">
+            <div class="history-header">
+              <div class="history-title">Histórico recente</div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Pedido</th>
+                  <th>Cliente</th>
+                  <th>Itens</th>
+                  <th>Tipo</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody"></tbody>
+            </table>
           </div>
         </div>
-        <div class="kanban" id="kanban"></div>
-        <div class="history-table">
-          <div class="history-header"><div class="history-title">Histórico recente</div></div>
-          <table>
-            <thead>
-              <tr><th>Pedido</th><th>Cliente</th><th>Itens</th><th>Tipo</th><th>Total</th><th>Status</th></tr>
-            </thead>
-            <tbody id="historyBody"></tbody>
-          </table>
-        </div>
-      </div>
 
-      <!-- OUTROS PANELS (preenchidos pelo JS) -->
-      <div id="panel-cardapio"    class="dash-panel" hidden></div>
-      <div id="panel-desempenho"  class="dash-panel" hidden></div>
-      <div id="panel-caixa"       class="dash-panel" hidden></div>
-      <div id="panel-loja"        class="dash-panel" hidden></div>
-      <div id="panel-notificacoes" class="dash-panel" hidden></div>
-      <div id="panel-links"       class="dash-panel" hidden></div>
+        <!-- OUTROS PANELS (preenchidos pelo JS) -->
+        <div id="panel-cardapio" class="dash-panel" hidden></div>
+        <div id="panel-desempenho" class="dash-panel" hidden></div>
+        <div id="panel-caixa" class="dash-panel" hidden></div>
+        <div id="panel-loja" class="dash-panel" hidden></div>
+        <div id="panel-notificacoes" class="dash-panel" hidden></div>
+        <div id="panel-links" class="dash-panel" hidden></div>
 
-    </main>
+      </main>
+    </div>
   </div>
-</div>
 
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
+
 </html>

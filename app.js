@@ -64,21 +64,21 @@ const WHATSAPP_NUMBER = '5519996952066'; // (19) 99695-2066 — Bom Sabor Mini S
    DADOS DOS PEDIDOS (KANBAN)
 ══════════════════════════════════════════════════════ */
 const COLUMNS = [
-  { id: 'novo',      label: 'Novos',      dot: 'dot-pending', next: 'Iniciar Preparo' },
-  { id: 'preparando',label: 'Preparando', dot: 'dot-prep',    next: 'Marcar Pronto' },
-  { id: 'pronto',    label: 'Pronto',     dot: 'dot-ready',   next: 'Concluir' },
-  { id: 'concluido', label: 'Concluídos', dot: 'dot-done',    next: null },
+  { id: 'novo', label: 'Novos', dot: 'dot-pending', next: 'Iniciar Preparo' },
+  { id: 'preparando', label: 'Preparando', dot: 'dot-prep', next: 'Marcar Pronto' },
+  { id: 'pronto', label: 'Pronto', dot: 'dot-ready', next: 'Concluir' },
+  { id: 'concluido', label: 'Concluídos', dot: 'dot-done', next: null },
 ];
 
 let orders = [
-  { id: '#535', client: 'Fernanda Lima',   items: '50 coxinhas + 30 bolinhas',     time: 'há 3 min',     price: 35.00, type: 'retirada', status: 0 },
-  { id: '#536', client: 'Carlos Eduardo',  items: 'Combo Cento + Refri',           time: 'há 1 min',     price: 49.90, type: 'entrega',  status: 0 },
-  { id: '#514', client: 'Alexandra St.',   items: 'Agendado 22:00 – 22:30',        time: '⚠️ 26h 28min', price: 68.00, type: 'entrega',  status: 1, highlight: true },
-  { id: '#530', client: 'João Pedro',      items: '80 mini salgados mix',           time: 'há 18 min',    price: 40.00, type: 'retirada', status: 1 },
-  { id: '#531', client: 'Beatriz Souza',   items: '50 mini pastéis pizza',          time: 'há 12 min',    price: 55.00, type: 'entrega',  status: 1 },
-  { id: '#532', client: 'Marcos Vinícius', items: '30 coxinhas + 20 quibes',        time: 'há 5 min',     price: 28.00, type: 'retirada', status: 2 },
-  { id: '#533', client: 'Matheus',         items: '50 Mini Salgados – Coxinha',     time: '17h 40min',    price: 23.00, type: 'retirada', status: 3 },
-  { id: '#528', client: 'Patrícia Alves',  items: 'Combo Cento + Refri',           time: 'há 2h',        price: 49.90, type: 'entrega',  status: 3 },
+  { id: '#535', client: 'Fernanda Lima', items: '50 coxinhas + 30 bolinhas', time: 'há 3 min', price: 35.00, type: 'retirada', status: 0 },
+  { id: '#536', client: 'Carlos Eduardo', items: 'Combo Cento + Refri', time: 'há 1 min', price: 49.90, type: 'entrega', status: 0 },
+  { id: '#514', client: 'Alexandra St.', items: 'Agendado 22:00 – 22:30', time: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px;vertical-align:-2px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> 26h 28min', price: 68.00, type: 'entrega', status: 1, highlight: true },
+  { id: '#530', client: 'João Pedro', items: '80 mini salgados mix', time: 'há 18 min', price: 40.00, type: 'retirada', status: 1 },
+  { id: '#531', client: 'Beatriz Souza', items: '50 mini pastéis pizza', time: 'há 12 min', price: 55.00, type: 'entrega', status: 1 },
+  { id: '#532', client: 'Marcos Vinícius', items: '30 coxinhas + 20 quibes', time: 'há 5 min', price: 28.00, type: 'retirada', status: 2 },
+  { id: '#533', client: 'Matheus', items: '50 Mini Salgados – Coxinha', time: '17h 40min', price: 23.00, type: 'retirada', status: 3 },
+  { id: '#528', client: 'Patrícia Alves', items: 'Combo Cento + Refri', time: 'há 2h', price: 49.90, type: 'entrega', status: 3 },
 ];
 
 /* ══════════════════════════════════════════════════════
@@ -135,10 +135,10 @@ function updateCartUI() {
 }
 
 function updateFab() {
-  const fab     = document.getElementById('cartFab');
+  const fab = document.getElementById('cartFab');
   const countEl = document.getElementById('cartCount');
   const totalEl = document.getElementById('cartFabTotal');
-  const total   = cartTotalItems();
+  const total = cartTotalItems();
 
   if (total === 0) {
     fab.classList.add('hidden');
@@ -150,11 +150,11 @@ function updateFab() {
 }
 
 function renderCartDrawer() {
-  const itemsEl  = document.getElementById('cartItems');
-  const emptyEl  = document.getElementById('cartEmpty');
+  const itemsEl = document.getElementById('cartItems');
+  const emptyEl = document.getElementById('cartEmpty');
   const footerEl = document.getElementById('cartFooter');
   const subtotal = document.getElementById('cartSubtotal');
-  const minimum  = document.getElementById('cartMinimum');
+  const minimum = document.getElementById('cartMinimum');
   const checkout = document.getElementById('checkoutBtn');
 
   if (cart.length === 0) {
@@ -245,7 +245,7 @@ function checkout() {
    RENDERIZAÇÃO DO CARDÁPIO
 ══════════════════════════════════════════════════════ */
 function renderMenu() {
-  const nav  = document.getElementById('menuNav');
+  const nav = document.getElementById('menuNav');
   const body = document.getElementById('menuBody');
 
   nav.innerHTML = MENU_DATA.map((cat, i) => `
@@ -413,8 +413,8 @@ function renderHistoryTable() {
       <td>${o.client}</td>
       <td>${o.items}</td>
       <td>${o.type === 'retirada'
-        ? '<span class="order-type-badge badge-retirada">Retirada</span>'
-        : '<span class="order-type-badge badge-entrega">Entrega</span>'}</td>
+      ? '<span class="order-type-badge badge-retirada">Retirada</span>'
+      : '<span class="order-type-badge badge-entrega">Entrega</span>'}</td>
       <td class="td-price">${fmt(o.price)}</td>
       <td>${statusMap[o.status]}</td>
     </tr>
@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ══════════════════════════════════════════
    NAVEGAÇÃO DE PAINÉIS
 ══════════════════════════════════════════ */
-const PANELS = ['pedidos','cardapio','desempenho','caixa','loja','notificacoes','links'];
+const PANELS = ['pedidos', 'cardapio', 'desempenho', 'caixa', 'loja', 'notificacoes', 'links'];
 
 function switchPanel(id) {
   document.querySelectorAll('.nav-item[data-panel]').forEach(el =>
@@ -496,12 +496,12 @@ function switchPanel(id) {
 
 function renderPanel(id, el) {
   const renders = {
-    cardapio:     renderCardapioPanel,
-    desempenho:   renderDesempenhoPanel,
-    caixa:        renderCaixaPanel,
-    loja:         renderLojaPanel,
+    cardapio: renderCardapioPanel,
+    desempenho: renderDesempenhoPanel,
+    caixa: renderCaixaPanel,
+    loja: renderLojaPanel,
     notificacoes: renderNotificacoesPanel,
-    links:        renderLinksPanel,
+    links: renderLinksPanel,
   };
   if (renders[id]) renders[id](el);
 }
@@ -527,12 +527,15 @@ function renderCardapioPanel(el) {
             <div class="ci-name">${p.name}</div>
             <div class="ci-cat">${p.catLabel}</div>
           </div>
-          <div class="ci-price">R$ ${p.price.toFixed(2).replace('.',',')}</div>
-          <label class="toggle-switch">
-            <input type="checkbox" ${p.available ? 'checked' : ''}
-              onchange="toggleProductAvail(${p.id}, this.checked)">
-            <span class="toggle-slider"></span>
-          </label>
+          <div class="ci-price">R$ ${p.price.toFixed(2).replace('.', ',')}</div>
+          <div class="ci-toggle-wrap">
+            <span class="ci-toggle-label" id="ci-lbl-${p.id}">${p.available ? 'Ativo' : 'Inativo'}</span>
+            <label class="toggle-switch">
+              <input type="checkbox" ${p.available ? 'checked' : ''}
+                onchange="toggleProductAvail(${p.id}, this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
         </div>
       `).join('')}
     </div>`;
@@ -543,6 +546,11 @@ function toggleProductAvail(id, val) {
     const p = cat.products.find(p => p.id === id);
     if (p) { p.available = val; break; }
   }
+  const lbl = document.getElementById('ci-lbl-' + id);
+  if (lbl) {
+    lbl.textContent = val ? 'Ativo' : 'Inativo';
+    lbl.className = 'ci-toggle-label ' + (val ? 'ci-lbl-on' : 'ci-lbl-off');
+  }
   showToast(val ? 'Produto ativado' : 'Produto desativado');
   renderMenu();
 }
@@ -550,9 +558,9 @@ function toggleProductAvail(id, val) {
 /* ── Desempenho ── */
 function renderDesempenhoPanel(el) {
   const week = [
-    { day:'Seg', val:120 }, { day:'Ter', val:210 },
-    { day:'Qua', val:175 }, { day:'Qui', val:305 },
-    { day:'Sex', val:412 }, { day:'Sáb', val:548 }, { day:'Dom', val:350 },
+    { day: 'Seg', val: 120 }, { day: 'Ter', val: 210 },
+    { day: 'Qua', val: 175 }, { day: 'Qui', val: 305 },
+    { day: 'Sex', val: 412 }, { day: 'Sáb', val: 548 }, { day: 'Dom', val: 350 },
   ];
   const max = Math.max(...week.map(d => d.val));
   el.innerHTML = `
@@ -586,7 +594,7 @@ function renderDesempenhoPanel(el) {
           <div class="bar-col">
             <div class="bar-val">R$&nbsp;${d.val}</div>
             <div class="bar-wrap">
-              <div class="bar-fill" style="height:${Math.round(d.val/max*100)}%"></div>
+              <div class="bar-fill" style="height:${Math.round(d.val / max * 100)}%"></div>
             </div>
             <div class="bar-day">${d.day}</div>
           </div>`).join('')}
@@ -597,13 +605,13 @@ function renderDesempenhoPanel(el) {
 /* ── Caixa ── */
 function renderCaixaPanel(el) {
   const movs = [
-    { num:'#533', client:'Matheus',  pay:'Pix',      val:23.00 },
-    { num:'#532', client:'Ana Paula',pay:'Cartão',   val:49.90 },
-    { num:'#531', client:'Roberto',  pay:'Pix',      val:44.99 },
-    { num:'#530', client:'Fernanda', pay:'Dinheiro', val:25.00 },
-    { num:'#529', client:'Carlos',   pay:'Pix',      val:49.99 },
+    { num: '#533', client: 'Matheus', pay: 'Pix', val: 23.00 },
+    { num: '#532', client: 'Ana Paula', pay: 'Cartão', val: 49.90 },
+    { num: '#531', client: 'Roberto', pay: 'Pix', val: 44.99 },
+    { num: '#530', client: 'Fernanda', pay: 'Dinheiro', val: 25.00 },
+    { num: '#529', client: 'Carlos', pay: 'Pix', val: 49.99 },
   ];
-  const total = movs.reduce((s,o) => s + o.val, 0);
+  const total = movs.reduce((s, o) => s + o.val, 0);
   el.innerHTML = `
     <div class="dash-header">
       <div class="dash-title">Caixa</div>
@@ -613,7 +621,7 @@ function renderCaixaPanel(el) {
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-label">Entradas hoje</div>
-        <div class="stat-value" style="color:var(--green)">R$ ${total.toFixed(2).replace('.',',')}</div>
+        <div class="stat-value" style="color:var(--green)">R$ ${total.toFixed(2).replace('.', ',')}</div>
         <div class="stat-sub">${movs.length} pedidos pagos</div>
       </div>
       <div class="stat-card">
@@ -642,7 +650,7 @@ function renderCaixaPanel(el) {
               <td class="td-num">${o.num}</td>
               <td>${o.client}</td>
               <td><span class="status-pill pill-done">${o.pay}</span></td>
-              <td class="td-price">R$ ${o.val.toFixed(2).replace('.',',')}</td>
+              <td class="td-price">R$ ${o.val.toFixed(2).replace('.', ',')}</td>
             </tr>`).join('')}
         </tbody>
       </table>
@@ -702,11 +710,11 @@ function renderLojaPanel(el) {
 /* ── Notificações ── */
 function renderNotificacoesPanel(el) {
   const items = [
-    { label:'Novo pedido recebido',      desc:'Notificar quando chegar um novo pedido', on:true  },
-    { label:'Pedido em atraso',           desc:'Alertar quando pedido passar do tempo estimado', on:true  },
-    { label:'Cancelamento de pedido',     desc:'Notificar quando cliente cancelar', on:false },
-    { label:'Som de notificação',         desc:'Tocar áudio ao receber novo pedido', on:true  },
-    { label:'Resumo diário via WhatsApp', desc:'Receber resumo no fim do dia', on:false },
+    { label: 'Novo pedido recebido', desc: 'Notificar quando chegar um novo pedido', on: true },
+    { label: 'Pedido em atraso', desc: 'Alertar quando pedido passar do tempo estimado', on: true },
+    { label: 'Cancelamento de pedido', desc: 'Notificar quando cliente cancelar', on: false },
+    { label: 'Som de notificação', desc: 'Tocar áudio ao receber novo pedido', on: true },
+    { label: 'Resumo diário via WhatsApp', desc: 'Receber resumo no fim do dia', on: false },
   ];
   el.innerHTML = `
     <div class="dash-header"><div class="dash-title">Notificações</div></div>
@@ -726,7 +734,7 @@ function renderNotificacoesPanel(el) {
 /* ── Meus Links ── */
 function renderLinksPanel(el) {
   const menuUrl = 'https://app.cardapioweb.com/bomsaborminisalgados';
-  const waUrl   = 'https://wa.me/5519996952066';
+  const waUrl = 'https://wa.me/5519996952066';
   el.innerHTML = `
     <div class="dash-header"><div class="dash-title">Meus Links</div></div>
     <div class="settings-card">
@@ -747,7 +755,7 @@ function renderLinksPanel(el) {
     <div class="settings-card" style="text-align:center">
       <div class="settings-section-title">QR Code do cardápio</div>
       <div class="qr-box">
-        <div style="font-size:72px;line-height:1">📱</div>
+        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.7"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
         <p style="font-size:13px;color:var(--muted);margin-top:12px">Disponível na versão completa</p>
       </div>
     </div>`;
