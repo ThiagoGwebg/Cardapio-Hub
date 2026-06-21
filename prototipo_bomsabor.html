@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bom Sabor Mini Salgados</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F0D0B;
+    --surface: #1A1713;
+    --surface2: #231F1A;
+    --orange: #FF6B2B;
+    --amber: #F5A623;
+    --cream: #F2EDE6;
+    --muted: #8A8178;
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --border: rgba(255,107,43,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--cream);
+    min-height: 100vh;
+  }
+
+  /* ── TOGGLE DE MODO ── */
+  .mode-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 999;
+    display: flex;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 6px;
+  }
+  .mode-toggle button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--muted);
+  }
+  .mode-toggle button.active {
+    background: var(--orange);
+    color: #fff;
+  }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ════════════════════════════════
+     CARDÁPIO PÚBLICO
+  ════════════════════════════════ */
+  .menu-hero {
+    background: linear-gradient(135deg, #1A1713 0%, #2A1F14 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 24px 0;
+    text-align: center;
+  }
+  .store-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,107,43,0.12);
+    border: 1px solid rgba(255,107,43,0.3);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--orange);
+    margin-bottom: 16px;
+  }
+  .store-badge span { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .store-name {
+    font-family: 'Nunito', sans-serif;
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(135deg, var(--cream) 0%, var(--amber) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  .store-sub {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .menu-nav {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .menu-nav::-webkit-scrollbar { display: none; }
+  .menu-nav-item {
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .menu-nav-item.active {
+    color: var(--orange);
+    border-bottom-color: var(--orange);
+  }
+
+  .menu-body { padding: 24px 16px; max-width: 900px; margin: 0 auto; }
+
+  .section-label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--cream);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+
+  .product-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+  }
+  .product-card:hover {
+    border-color: var(--orange);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(255,107,43,0.15);
+  }
+  .product-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+  }
+  .product-info { padding: 14px; }
+  .product-name {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .product-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .product-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .product-price {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    color: var(--amber);
+  }
+  .add-btn {
+    width: 36px;
+    height: 36px;
+    background: var(--orange);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .add-btn:hover { background: #e55a1f; transform: scale(1.1); }
+
+  .tag-em-falta {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(231,76,60,0.9);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Carrinho flutuante */
+  .cart-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--orange);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 24px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(255,107,43,0.4);
+    transition: all 0.2s;
+    z-index: 100;
+  }
+  .cart-fab:hover { transform: scale(1.04); box-shadow: 0 12px 32px rgba(255,107,43,0.5); }
+  .cart-count {
+    background: rgba(255,255,255,0.25);
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 13px;
+  }
+
+  /* ════════════════════════════════
+     PAINEL DE GESTÃO
+  ════════════════════════════════ */
+  .dashboard {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-logo {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+    color: var(--cream);
+  }
+  .sidebar-logo span { color: var(--orange); }
+
+  .sidebar-store {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .sidebar-store-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cream);
+    margin-bottom: 2px;
+  }
+  .sidebar-store-loc {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .open-badge {
+    display: inline-block;
+    margin-top: 8px;
+    background: rgba(46,204,113,0.15);
+    border: 1px solid rgba(46,204,113,0.3);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .nav-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 20px 6px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover { color: var(--cream); background: rgba(255,255,255,0.03); }
+  .nav-item.active { color: var(--orange); border-left-color: var(--orange); background: rgba(255,107,43,0.06); }
+  .nav-icon { width: 18px; text-align: center; font-size: 15px; }
+
+  .dash-content {
+    margin-left: 220px;
+    flex: 1;
+    padding: 28px;
+    min-height: 100vh;
+  }
+
+  .dash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .dash-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 26px;
+  }
+  .new-order-btn {
+    background: var(--orange);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .new-order-btn:hover { background: #e55a1f; }
+
+  /* Stats */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-family: 'Nunito', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--cream);
+    margin-bottom: 4px;
+  }
+  .stat-sub { font-size: 12px; color: var(--muted); }
+  .stat-up { color: var(--green); }
+  .stat-down { color: var(--red); }
+
+  /* Kanban */
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .kanban-col {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .kanban-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .kanban-title {
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .dot-pending { background: var(--amber); }
+  .dot-prep { background: #3498DB; }
+  .dot-ready { background: var(--orange); }
+  .dot-done { background: var(--green); }
+
+  .kanban-count {
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .kanban-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; min-height: 200px; }
+
+  .order-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .order-card:hover { border-color: var(--orange); }
+  .order-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .order-num {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 14px;
+  }
+  .order-time {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .order-client { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .order-items { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .order-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .order-price {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--amber);
+  }
+  .order-type-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .badge-retirada { background: rgba(245,166,35,0.15); color: var(--amber); }
+  .badge-entrega { background: rgba(52,152,219,0.15); color: #3498DB; }
+
+  /* Pedido destacado */
+  .highlighted-card {
+    border-color: rgba(255,107,43,0.5) !important;
+    box-shadow: 0 0 0 1px rgba(255,107,43,0.2);
+  }
+
+  /* Tabela de histórico */
+  .history-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .history-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .history-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th {
+    text-align: left;
+    padding: 12px 20px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 14px 20px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .pill-done { background: rgba(46,204,113,0.12); color: var(--green); }
+  .pill-prep { background: rgba(52,152,219,0.12); color: #3498DB; }
+  .pill-cancel { background: rgba(231,76,60,0.12); color: var(--red); }
+
+  /* Responsivo básico */
+  @media (max-width: 1100px) {
+    .stats-row { grid-template-columns: repeat(2,1fr); }
+    .kanban { grid-template-columns: repeat(2,1fr); }
+  }
+  @media (max-width: 700px) {
+    .sidebar { display: none; }
+    .dash-content { margin-left: 0; padding: 16px; }
+    .stats-row { grid-template-columns: repeat(2,1fr); }
+    .kanban { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOGGLE -->
+<div class="mode-toggle">
+  <button class="active" onclick="showView('menu')">🛒 Cardápio</button>
+  <button onclick="showView('dash')">⚙️ Painel</button>
+</div>
+
+<!-- ══════════════════════════════
+     VIEW: CARDÁPIO PÚBLICO
+══════════════════════════════ -->
+<div class="view active" id="view-menu">
+
+  <div class="menu-hero">
+    <div class="store-badge">
+      <span></span> Aberto agora
+    </div>
+    <div class="store-name">Bom Sabor<br>Mini Salgados</div>
+    <div class="store-sub">Jardim Ype I · Mogi Guaçu · Pedido mínimo R$ 20,00</div>
+
+    <div class="menu-nav">
+      <div class="menu-nav-item active">Mini Salgados</div>
+      <div class="menu-nav-item">Mini Pastéis</div>
+      <div class="menu-nav-item">Pastéis</div>
+      <div class="menu-nav-item">Combos</div>
+      <div class="menu-nav-item">Doces</div>
+      <div class="menu-nav-item">Bebidas</div>
+    </div>
+  </div>
+
+  <div class="menu-body">
+
+    <div class="section-label">🥟 Mini Salgados</div>
+    <div class="products-grid">
+
+      <div class="product-card">
+        <div class="product-img">🍗</div>
+        <div class="product-info">
+          <div class="product-name">Coxinha de Frango</div>
+          <div class="product-desc">Massa macia recheada com frango desfiado temperado. Unidade ou pacote.</div>
+          <div class="product-footer">
+            <div class="product-price">R$ 2,50</div>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">🧀</div>
+        <div class="product-info">
+          <div class="product-name">Bolinha de Queijo</div>
+          <div class="product-desc">Recheio cremoso de queijo, massa crocante por fora. Um vício.</div>
+          <div class="product-footer">
+            <div class="product-price">R$ 2,50</div>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card" style="opacity:0.65; pointer-events:none;">
+        <div class="tag-em-falta">Em falta</div>
+        <div class="product-img">🥩</div>
+        <div class="product-info">
+          <div class="product-name">Croquete</div>
+          <div class="product-desc">Croquete de carne moída, empanado e frito na hora.</div>
+          <div class="product-footer">
+            <div class="product-price">R$ 2,80</div>
+            <button class="add-btn" disabled>+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">🌾</div>
+        <div class="product-info">
+          <div class="product-name">Quibe</div>
+          <div class="product-desc">Quibe frito tradicional com trigo e carne temperada.</div>
+          <div class="product-footer">
+            <div class="product-price">R$ 2,80</div>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img">🌭</div>
+        <div class="product-info">
+          <div class="product-name">Salsicha</div>
+          <div class="product-desc">Mini salgado envolto em massa leve com salsicha no centro.</div>
+          <div class="product-footer">
+            <div class="product-price">R$ 2,50</div>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card" style="opacity:0.65; pointer-events:none;">
+        <div class="tag-em-falta">Em falta</div>
+        <div class="product-img">🥐</div>
+        <div class="product-info">
+          <div class="product-name">Risole de Carne</div>
+          <div class="product-desc">Risole empanado recheado com carne moída e temperos.</div>
+          <div class="product-footer">
+            <div class="product-price">R$ 3,00</div>
+            <button class="add-btn" disabled>+</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-label">🔥 Combos</div>
+    <div class="products-grid">
+
+      <div class="product-card">
+        <div class="product-img" style="background:linear-gradient(135deg,#2A1F14,#3D2810); font-size:36px; flex-direction:column; gap:4px;">
+          🍗🧀🥩
+          <span style="font-size:13px; font-family:'Nunito',sans-serif; font-weight:900; color:var(--amber);">100 uni</span>
+        </div>
+        <div class="product-info">
+          <div class="product-name">Combo Cento + Refri</div>
+          <div class="product-desc">100 mini salgados à sua escolha + 1 refrigerante 2L. Perfeito pra festa.</div>
+          <div class="product-footer">
+            <div class="product-price">R$ 49,90</div>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-img" style="font-size:36px;">🎉</div>
+        <div class="product-info">
+          <div class="product-name">50 Mini Salgados</div>
+          <div class="product-desc">50 unidades de mini salgados à sua escolha. Ideal pra reuniões.</div>
+          <div class="product-footer">
+            <div class="product-price">R$ 23,00</div>
+            <button class="add-btn">+</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <button class="cart-fab">
+    🛒 Ver pedido <span class="cart-count">2 itens</span>
+  </button>
+</div>
+
+
+<!-- ══════════════════════════════
+     VIEW: PAINEL DE GESTÃO
+══════════════════════════════ -->
+<div class="view" id="view-dash">
+  <div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-logo">mesa<span>certa</span></div>
+
+      <div class="sidebar-store">
+        <div class="sidebar-store-name">Bom Sabor Mini Salgados</div>
+        <div class="sidebar-store-loc">Jardim Ype I · Mogi Guaçu</div>
+        <div class="open-badge">● Aberto</div>
+      </div>
+
+      <div class="nav-section-title">Principal</div>
+      <div class="nav-item active"><span class="nav-icon">📋</span> Pedidos</div>
+      <div class="nav-item"><span class="nav-icon">🍽️</span> Cardápio</div>
+      <div class="nav-item"><span class="nav-icon">📊</span> Desempenho</div>
+      <div class="nav-item"><span class="nav-icon">💰</span> Caixa</div>
+
+      <div class="nav-section-title">Configurações</div>
+      <div class="nav-item"><span class="nav-icon">🏪</span> Minha Loja</div>
+      <div class="nav-item"><span class="nav-icon">🔔</span> Notificações</div>
+      <div class="nav-item"><span class="nav-icon">🔗</span> Meus Links</div>
+    </div>
+
+    <!-- CONTEÚDO -->
+    <div class="dash-content">
+
+      <div class="dash-header">
+        <div class="dash-title">Pedidos de hoje</div>
+        <button class="new-order-btn">+ Novo Pedido</button>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Pedidos hoje</div>
+          <div class="stat-value">12</div>
+          <div class="stat-sub"><span class="stat-up">↑ 4</span> vs ontem</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Faturamento</div>
+          <div class="stat-value">R$ 487</div>
+          <div class="stat-sub"><span class="stat-up">↑ 18%</span> esta semana</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Em preparo</div>
+          <div class="stat-value">3</div>
+          <div class="stat-sub">Tempo médio <span style="color:var(--amber)">22 min</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Ticket médio</div>
+          <div class="stat-value">R$ 40</div>
+          <div class="stat-sub"><span class="stat-down">↓ 2%</span> vs ontem</div>
+        </div>
+      </div>
+
+      <!-- KANBAN -->
+      <div class="kanban">
+
+        <div class="kanban-col">
+          <div class="kanban-header">
+            <div class="kanban-title"><span class="status-dot dot-pending"></span> Novos</div>
+            <div class="kanban-count">2</div>
+          </div>
+          <div class="kanban-body">
+            <div class="order-card">
+              <div class="order-card-top">
+                <div class="order-num">#535</div>
+                <div class="order-time">há 3 min</div>
+              </div>
+              <div class="order-client">Fernanda Lima</div>
+              <div class="order-items">50 coxinhas + 30 bolinhas</div>
+              <div class="order-footer">
+                <div class="order-price">R$ 35,00</div>
+                <span class="order-type-badge badge-retirada">Retirada</span>
+              </div>
+            </div>
+            <div class="order-card">
+              <div class="order-card-top">
+                <div class="order-num">#536</div>
+                <div class="order-time">há 1 min</div>
+              </div>
+              <div class="order-client">Carlos Eduardo</div>
+              <div class="order-items">Combo Cento + Refri</div>
+              <div class="order-footer">
+                <div class="order-price">R$ 49,90</div>
+                <span class="order-type-badge badge-entrega">Entrega</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-header">
+            <div class="kanban-title"><span class="status-dot dot-prep"></span> Preparando</div>
+            <div class="kanban-count">3</div>
+          </div>
+          <div class="kanban-body">
+            <div class="order-card highlighted-card">
+              <div class="order-card-top">
+                <div class="order-num">#514</div>
+                <div class="order-time">26h 28min ⚠️</div>
+              </div>
+              <div class="order-client">Alexandra St.</div>
+              <div class="order-items">Agendado 22:00–22:30</div>
+              <div class="order-footer">
+                <div class="order-price">R$ 68,00</div>
+                <span class="order-type-badge badge-entrega">Entrega</span>
+              </div>
+            </div>
+            <div class="order-card">
+              <div class="order-card-top">
+                <div class="order-num">#530</div>
+                <div class="order-time">há 18 min</div>
+              </div>
+              <div class="order-client">João Pedro</div>
+              <div class="order-items">80 mini salgados mix</div>
+              <div class="order-footer">
+                <div class="order-price">R$ 40,00</div>
+                <span class="order-type-badge badge-retirada">Retirada</span>
+              </div>
+            </div>
+            <div class="order-card">
+              <div class="order-card-top">
+                <div class="order-num">#531</div>
+                <div class="order-time">há 12 min</div>
+              </div>
+              <div class="order-client">Beatriz Souza</div>
+              <div class="order-items">50 pastéis pizza</div>
+              <div class="order-footer">
+                <div class="order-price">R$ 55,00</div>
+                <span class="order-type-badge badge-entrega">Entrega</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-header">
+            <div class="kanban-title"><span class="status-dot dot-ready"></span> Pronto</div>
+            <div class="kanban-count">1</div>
+          </div>
+          <div class="kanban-body">
+            <div class="order-card">
+              <div class="order-card-top">
+                <div class="order-num">#532</div>
+                <div class="order-time">há 5 min</div>
+              </div>
+              <div class="order-client">Marcos Vinícius</div>
+              <div class="order-items">30 coxinhas + 20 quibes</div>
+              <div class="order-footer">
+                <div class="order-price">R$ 28,00</div>
+                <span class="order-type-badge badge-retirada">Retirada</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="kanban-header">
+            <div class="kanban-title"><span class="status-dot dot-done"></span> Concluídos</div>
+            <div class="kanban-count">6</div>
+          </div>
+          <div class="kanban-body">
+            <div class="order-card" style="opacity:0.6;">
+              <div class="order-card-top">
+                <div class="order-num">#533</div>
+                <div class="order-time">17h 40min</div>
+              </div>
+              <div class="order-client">Matheus</div>
+              <div class="order-items">50 Mini Salgados – Coxinha</div>
+              <div class="order-footer">
+                <div class="order-price">R$ 23,00</div>
+                <span class="order-type-badge badge-retirada">Retirada</span>
+              </div>
+            </div>
+            <div class="order-card" style="opacity:0.6;">
+              <div class="order-card-top">
+                <div class="order-num">#528</div>
+                <div class="order-time">há 2h</div>
+              </div>
+              <div class="order-client">Patrícia Alves</div>
+              <div class="order-items">Combo Cento + Refri</div>
+              <div class="order-footer">
+                <div class="order-price">R$ 49,90</div>
+                <span class="order-type-badge badge-entrega">Entrega</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- HISTÓRICO -->
+      <div class="history-table">
+        <div class="history-header">
+          <div class="history-title">Histórico recente</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Pedido</th>
+              <th>Cliente</th>
+              <th>Itens</th>
+              <th>Tipo</th>
+              <th>Total</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:700;">#533</td>
+              <td>Matheus</td>
+              <td>50 Mini Salgados</td>
+              <td><span class="order-type-badge badge-retirada">Retirada</span></td>
+              <td style="font-family:'Nunito',sans-serif;font-weight:800;color:var(--amber);">R$ 23,00</td>
+              <td><span class="status-pill pill-done">● Concluído</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">#532</td>
+              <td>Marcos Vinícius</td>
+              <td>30 coxinhas + 20 quibes</td>
+              <td><span class="order-type-badge badge-retirada">Retirada</span></td>
+              <td style="font-family:'Nunito',sans-serif;font-weight:800;color:var(--amber);">R$ 28,00</td>
+              <td><span class="status-pill pill-done">● Concluído</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">#531</td>
+              <td>Beatriz Souza</td>
+              <td>50 pastéis pizza</td>
+              <td><span class="order-type-badge badge-entrega">Entrega</span></td>
+              <td style="font-family:'Nunito',sans-serif;font-weight:800;color:var(--amber);">R$ 55,00</td>
+              <td><span class="status-pill pill-prep">● Preparando</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:700;">#528</td>
+              <td>Patrícia Alves</td>
+              <td>Combo Cento + Refri</td>
+              <td><span class="order-type-badge badge-entrega">Entrega</span></td>
+              <td style="font-family:'Nunito',sans-serif;font-weight:800;color:var(--amber);">R$ 49,90</td>
+              <td><span class="status-pill pill-done">● Concluído</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function showView(v) {
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-' + v).classList.add('active');
+    document.querySelectorAll('.mode-toggle button').forEach((btn, i) => {
+      btn.classList.toggle('active', (v === 'menu' && i === 0) || (v === 'dash' && i === 1));
+    });
+  }
+</script>
+</body>
+</html>

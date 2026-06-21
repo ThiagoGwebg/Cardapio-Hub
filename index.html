@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bom Sabor Mini Salgados</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- TOGGLE DE MODO -->
+<div class="mode-toggle">
+  <button class="active" data-view="menu">🛒 Cardápio</button>
+  <button data-view="dash">⚙️ Painel</button>
+</div>
+
+<!-- CARRINHO: OVERLAY + DRAWER -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer" aria-label="Carrinho">
+  <div class="cart-drawer-header">
+    <h2 class="cart-drawer-title">Seu Pedido</h2>
+    <button class="cart-close" id="cartClose" aria-label="Fechar carrinho">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-empty" id="cartEmpty">
+    <span>🛒</span>
+    <p>Seu carrinho está vazio</p>
+  </div>
+  <div class="cart-footer" id="cartFooter">
+    <div class="cart-minimum" id="cartMinimum"></div>
+    <div class="cart-subtotal-row">
+      <span>Subtotal</span>
+      <span class="cart-subtotal-value" id="cartSubtotal">R$ 0,00</span>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn">
+      <span>📲</span> Fazer Pedido via WhatsApp
+    </button>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════
+     VIEW: CARDÁPIO PÚBLICO
+══════════════════════════════ -->
+<div class="view active" id="view-menu">
+
+  <header class="menu-hero">
+    <div class="store-badge">
+      <span class="badge-dot"></span> Apenas agendamento
+    </div>
+    <h1 class="store-name">Bom Sabor<br>Mini Salgados</h1>
+    <p class="store-sub">R. João de Oliveira Machado, 454 · Jardim Ypê I · Mogi Guaçu</p>
+    <nav class="menu-nav" id="menuNav" aria-label="Categorias"></nav>
+  </header>
+
+  <div class="menu-body" id="menuBody"></div>
+
+  <button class="cart-fab hidden" id="cartFab" aria-label="Ver carrinho">
+    🛒 Ver pedido
+    <span class="cart-count" id="cartCount">0 itens</span>
+    <span class="cart-sep">·</span>
+    <span class="cart-fab-total" id="cartFabTotal">R$ 0,00</span>
+  </button>
+
+</div>
+
+<!-- ══════════════════════════════
+     VIEW: PAINEL DE GESTÃO
+══════════════════════════════ -->
+<div class="view" id="view-dash">
+  <div class="dashboard">
+
+    <aside class="sidebar">
+      <div class="sidebar-logo">cardápio<span>ágil</span></div>
+      <div class="sidebar-store">
+        <div class="sidebar-store-name">Bom Sabor Mini Salgados</div>
+        <div class="sidebar-store-loc">Jardim Ypê I · Mogi Guaçu</div>
+        <div class="open-badge">● Aberto</div>
+      </div>
+      <div class="nav-section-title">Principal</div>
+      <div class="nav-item active" data-panel="pedidos"><span class="nav-icon">📋</span> Pedidos</div>
+      <div class="nav-item" data-panel="cardapio"><span class="nav-icon">🍽️</span> Cardápio</div>
+      <div class="nav-item" data-panel="desempenho"><span class="nav-icon">📊</span> Desempenho</div>
+      <div class="nav-item" data-panel="caixa"><span class="nav-icon">💰</span> Caixa</div>
+      <div class="nav-section-title">Configurações</div>
+      <div class="nav-item" data-panel="loja"><span class="nav-icon">🏪</span> Minha Loja</div>
+      <div class="nav-item" data-panel="notificacoes"><span class="nav-icon">🔔</span> Notificações</div>
+      <div class="nav-item" data-panel="links"><span class="nav-icon">🔗</span> Meus Links</div>
+    </aside>
+
+    <main class="dash-content">
+
+      <!-- PANEL: PEDIDOS -->
+      <div id="panel-pedidos" class="dash-panel">
+        <div class="dash-header">
+          <div class="dash-title">Pedidos de hoje</div>
+          <button class="new-order-btn" id="newOrderBtn">+ Novo Pedido</button>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Pedidos hoje</div>
+            <div class="stat-value" id="statTotal">12</div>
+            <div class="stat-sub"><span class="stat-up">↑ 4</span> vs ontem</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Faturamento</div>
+            <div class="stat-value">R$ 487</div>
+            <div class="stat-sub"><span class="stat-up">↑ 18%</span> esta semana</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Em preparo</div>
+            <div class="stat-value" id="statPrep">3</div>
+            <div class="stat-sub">Tempo médio <span class="amber">22 min</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Ticket médio</div>
+            <div class="stat-value">R$ 40</div>
+            <div class="stat-sub"><span class="stat-down">↓ 2%</span> vs ontem</div>
+          </div>
+        </div>
+        <div class="kanban" id="kanban"></div>
+        <div class="history-table">
+          <div class="history-header"><div class="history-title">Histórico recente</div></div>
+          <table>
+            <thead>
+              <tr><th>Pedido</th><th>Cliente</th><th>Itens</th><th>Tipo</th><th>Total</th><th>Status</th></tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- OUTROS PANELS (preenchidos pelo JS) -->
+      <div id="panel-cardapio"    class="dash-panel" hidden></div>
+      <div id="panel-desempenho"  class="dash-panel" hidden></div>
+      <div id="panel-caixa"       class="dash-panel" hidden></div>
+      <div id="panel-loja"        class="dash-panel" hidden></div>
+      <div id="panel-notificacoes" class="dash-panel" hidden></div>
+      <div id="panel-links"       class="dash-panel" hidden></div>
+
+    </main>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
