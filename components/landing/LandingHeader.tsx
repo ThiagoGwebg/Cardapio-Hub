@@ -1,0 +1,27 @@
+import Link from 'next/link'
+
+export default function LandingHeader() {
+  return (
+    <header className="l-nav">
+      <Link href="/" className="l-logo">
+        cardápio<em>ágil</em>
+      </Link>
+
+      <input type="checkbox" id="l-nav-toggle" className="l-nav-toggle-input" />
+
+      <nav className="l-nav-links">
+        <a href="#features">Funcionalidades</a>
+        <a href="#pricing">Planos</a>
+        <a href="#faq">Dúvidas</a>
+        <div className="l-nav-cta">
+          <Link href="/login" className="l-btn-ghost">Entrar</Link>
+          <Link href="/signup" className="l-btn-primary">Criar minha loja</Link>
+        </div>
+      </nav>
+
+      <label htmlFor="l-nav-toggle" className="l-nav-toggle-label" aria-label="Abrir menu">
+        ☰
+      </label>
+    </header>
+  )
+}
