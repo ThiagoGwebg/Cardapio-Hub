@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents } from '@/lib/format'
 
@@ -34,9 +34,49 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
+  const [search, setSearch] = useState('')
+  const [activeCategory, setActiveCategory] = useState(menu[0]?.id ?? '')
 
   const theme = store.theme ?? {}
   const allProducts = useMemo(() => menu.flatMap((c) => c.products), [menu])
+
+  const filteredMenu = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return menu
+    return menu
+      .map((cat) => ({
+        ...cat,
+        products: cat.products.filter((p) => p.name.toLowerCase().includes(q)),
+      }))
+      .filter((cat) => cat.products.length > 0)
+  }, [menu, search])
+
+  useEffect(() => {
+    const sections = menu
+      .map((cat) => document.getElementById(`section-${cat.id}`))
+      .filter((el): el is HTMLElement => !!el)
+    if (sections.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveCategory(entry.target.id.replace('section-', ''))
+          }
+        })
+      },
+      { rootMargin: '-30% 0px -60% 0px' }
+    )
+    sections.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
+  }, [menu])
+
+  function scrollToSection(id: string) {
+    const el = document.getElementById(`section-${id}`)
+    if (!el) return
+    const offset = el.getBoundingClientRect().top + window.scrollY - 96
+    window.scrollTo({ top: offset, behavior: 'smooth' })
+  }
 
   const total = cart.reduce((s, i) => s + i.price_cents * i.qty, 0)
   const totalItems = cart.reduce((s, i) => s + i.qty, 0)
@@ -97,15 +137,122 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
 
   return (
     <div
+      className="storefront"
       style={
         {
           '--primary': theme.primaryColor || undefined,
         } as React.CSSProperties
       }
     >
+      <div className="storefront-topbar">
+        {theme.logoUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={theme.logoUrl} alt="" style={{ width: 24, height: 24, borderRadius: 6, objectFit: 'cover' }} />
+        )}
+        <span className="storefront-topbar-name">{store.name}</span>
+      </div>
+
       <div className="cart-overlay" style={{ opacity: cartOpen ? 1 : 0, pointerEvents: cartOpen ? 'all' : 'none' }} onClick={() => setCartOpen(false)} />
 
-      <aside className={`cart-drawer ${cartOpen ? 'open' : ''}`} aria-label="Carrinho">
+      <header className="storefront-header">
+        {theme.logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={theme.logoUrl} alt={store.name} className="storefront-logo" />
+        ) : (
+          <div className="storefront-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
+            🍽️
+          </div>
+        )}
+        <div className="storefront-info">
+          <h1 className="storefront-name">{store.name}</h1>
+          <div className="storefront-meta-row">
+            <span className={`storefront-status ${store.is_open ? 'is-open' : 'is-closed'}`}>
+              <span className="storefront-status-dot" />
+              {store.is_open ? 'Aberto agora' : 'Fechado no momento'}
+            </span>
+            {store.address && <span>📍 {store.address}</span>}
+          </div>
+        </div>
+      </header>
+
+      <div className="storefront-search-row">
+        <input
+          className="form-input"
+          placeholder="Busque por um produto"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
+      <div className="storefront-layout">
+        <div className="storefront-main">
+          <nav className="menu-nav" style={{ justifyContent: 'flex-start', borderTop: 'none', marginBottom: 20 }}>
+            {menu.map((cat) => (
+              <span
+                key={cat.id}
+                className={`menu-nav-item ${activeCategory === cat.id ? 'active' : ''}`}
+                onClick={() => scrollToSection(cat.id)}
+                style={{ cursor: 'pointer' }}
+              >
+                {cat.emoji} {cat.name}
+              </span>
+            ))}
+          </nav>
+
+          <div className="menu-body" style={{ padding: 0 }}>
+            {filteredMenu.map((cat) => (
+              <section className="menu-section" id={`section-${cat.id}`} key={cat.id}>
+                <div className="section-label">{cat.emoji} {cat.name}</div>
+                <div className="products-grid">
+                  {cat.products.map((p) => {
+                    const inCart = cart.find((i) => i.id === p.id)
+                    return (
+                      <div className="product-card" key={p.id}>
+                        <div className="product-img">
+                          {p.image_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={p.image_url} alt={p.name} />
+                          ) : (
+                            <span className="p-emoji">🍽️</span>
+                          )}
+                        </div>
+                        <div className="product-info">
+                          <div className="product-name">{p.name}</div>
+                          <div className="product-desc">{p.description}</div>
+                          <div className="product-footer">
+                            <div className="product-price">{fmtCents(p.price_cents)}</div>
+                            {inCart ? (
+                              <div className="qty-controls">
+                                <button className="qty-ctrl-btn" onClick={() => changeQty(p.id, -1)}>−</button>
+                                <span className="qty-display">{inCart.qty}</span>
+                                <button className="qty-ctrl-btn" onClick={() => changeQty(p.id, 1)}>+</button>
+                              </div>
+                            ) : (
+                              <button
+                                className="add-btn"
+                                disabled={!store.is_open}
+                                onClick={() => addToCart(p.id)}
+                              >
+                                +
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </section>
+            ))}
+            {filteredMenu.length === 0 && (
+              <p style={{ textAlign: 'center', color: 'var(--muted)', padding: '40px 0' }}>
+                {search ? 'Nenhum produto encontrado.' : 'Nenhum produto disponível no momento.'}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <aside className={`cart-drawer ${cartOpen ? 'open' : ''}`} aria-label="Carrinho">
         <div className="cart-drawer-header">
           <h2 className="cart-drawer-title">Seu Pedido</h2>
           <button className="cart-close" onClick={() => setCartOpen(false)}>✕</button>
@@ -175,92 +322,18 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
             </div>
           </>
         )}
-      </aside>
-
-      <div className="view active">
-        <header className="menu-hero">
-          {theme.logoUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={theme.logoUrl} alt={store.name} style={{ width: 64, height: 64, borderRadius: 12, marginBottom: 12 }} />
-          )}
-          <h1 className="store-name">{store.name}</h1>
-          {store.address && <p className="store-sub">{store.address}</p>}
-          {!store.is_open && (
-            <p style={{ color: 'var(--red)', fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
-              Loja fechada no momento
-            </p>
-          )}
-          <nav className="menu-nav">
-            {menu.map((cat) => (
-              <a key={cat.id} className="menu-nav-item" href={`#section-${cat.id}`}>
-                {cat.emoji} {cat.name}
-              </a>
-            ))}
-          </nav>
-        </header>
-
-        <div className="menu-body">
-          {menu.map((cat) => (
-            <section className="menu-section" id={`section-${cat.id}`} key={cat.id}>
-              <div className="section-label">{cat.emoji} {cat.name}</div>
-              <div className="products-grid">
-                {cat.products.map((p) => {
-                  const inCart = cart.find((i) => i.id === p.id)
-                  return (
-                    <div className="product-card" key={p.id}>
-                      <div className="product-img">
-                        {p.image_url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={p.image_url} alt={p.name} />
-                        ) : (
-                          <span className="p-emoji">🍽️</span>
-                        )}
-                      </div>
-                      <div className="product-info">
-                        <div className="product-name">{p.name}</div>
-                        <div className="product-desc">{p.description}</div>
-                        <div className="product-footer">
-                          <div className="product-price">{fmtCents(p.price_cents)}</div>
-                          {inCart ? (
-                            <div className="qty-controls">
-                              <button className="qty-ctrl-btn" onClick={() => changeQty(p.id, -1)}>−</button>
-                              <span className="qty-display">{inCart.qty}</span>
-                              <button className="qty-ctrl-btn" onClick={() => changeQty(p.id, 1)}>+</button>
-                            </div>
-                          ) : (
-                            <button
-                              className="add-btn"
-                              disabled={!store.is_open}
-                              onClick={() => addToCart(p.id)}
-                            >
-                              +
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </section>
-          ))}
-          {menu.length === 0 && (
-            <p style={{ textAlign: 'center', color: 'var(--muted)' }}>
-              Nenhum produto disponível no momento.
-            </p>
-          )}
-        </div>
-
-        <button
-          className={`cart-fab ${totalItems === 0 ? 'hidden' : ''}`}
-          onClick={() => setCartOpen(true)}
-        >
-          Ver pedido
-          <span className="cart-count">{totalItems} {totalItems === 1 ? 'item' : 'itens'}</span>
-          <span className="cart-sep">·</span>
-          <span className="cart-fab-total">{fmtCents(total)}</span>
-        </button>
+        </aside>
       </div>
+
+      <button
+        className={`cart-fab ${totalItems === 0 ? 'hidden' : ''}`}
+        onClick={() => setCartOpen(true)}
+      >
+        Ver pedido
+        <span className="cart-count">{totalItems} {totalItems === 1 ? 'item' : 'itens'}</span>
+        <span className="cart-sep">·</span>
+        <span className="cart-fab-total">{fmtCents(total)}</span>
+      </button>
     </div>
   )
 }
