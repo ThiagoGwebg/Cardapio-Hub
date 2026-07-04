@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents } from '@/lib/format'
+import { IconPin, IconUtensils, IconClose } from '@/components/icons'
 
 type Product = {
   id: string
@@ -159,8 +160,8 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
           // eslint-disable-next-line @next/next/no-img-element
           <img src={theme.logoUrl} alt={store.name} className="storefront-logo" />
         ) : (
-          <div className="storefront-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
-            🍽️
+          <div className="storefront-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>
+            <IconUtensils size={30} />
           </div>
         )}
         <div className="storefront-info">
@@ -170,7 +171,11 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
               <span className="storefront-status-dot" />
               {store.is_open ? 'Aberto agora' : 'Fechado no momento'}
             </span>
-            {store.address && <span>📍 {store.address}</span>}
+            {store.address && (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <IconPin size={12} /> {store.address}
+              </span>
+            )}
           </div>
         </div>
       </header>
@@ -194,7 +199,7 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
                 onClick={() => scrollToSection(cat.id)}
                 style={{ cursor: 'pointer' }}
               >
-                {cat.emoji} {cat.name}
+                {cat.name}
               </span>
             ))}
           </nav>
@@ -202,7 +207,7 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
           <div className="menu-body" style={{ padding: 0 }}>
             {filteredMenu.map((cat) => (
               <section className="menu-section" id={`section-${cat.id}`} key={cat.id}>
-                <div className="section-label">{cat.emoji} {cat.name}</div>
+                <div className="section-label">{cat.name}</div>
                 <div className="products-grid">
                   {cat.products.map((p) => {
                     const inCart = cart.find((i) => i.id === p.id)
@@ -213,7 +218,9 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={p.image_url} alt={p.name} />
                           ) : (
-                            <span className="p-emoji">🍽️</span>
+                            <span className="p-emoji" style={{ color: 'var(--muted)' }}>
+                              <IconUtensils size={36} />
+                            </span>
                           )}
                         </div>
                         <div className="product-info">
@@ -255,7 +262,7 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
         <aside className={`cart-drawer ${cartOpen ? 'open' : ''}`} aria-label="Carrinho">
         <div className="cart-drawer-header">
           <h2 className="cart-drawer-title">Seu Pedido</h2>
-          <button className="cart-close" onClick={() => setCartOpen(false)}>✕</button>
+          <button className="cart-close" onClick={() => setCartOpen(false)}><IconClose /></button>
         </div>
 
         {done ? (

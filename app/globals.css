@@ -208,10 +208,6 @@ body {
   gap: 6px;
 }
 
-.store-sub::before {
-  content: '📍';
-}
-
 /* ── Nav ── */
 .menu-nav {
   display: flex;
@@ -1500,9 +1496,11 @@ tr:hover td {
 }
 
 .ci-emoji {
-  font-size: 28px;
   width: 52px;
-  text-align: center;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { IconMenu } from '@/components/icons'
 
 export default function LandingHeader() {
   return (
@@ -20,7 +21,7 @@ export default function LandingHeader() {
       </nav>
 
       <label htmlFor="l-nav-toggle" className="l-nav-toggle-label" aria-label="Abrir menu">
-        ☰
+        <IconMenu />
       </label>
     </header>
   )

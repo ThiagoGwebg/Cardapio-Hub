@@ -1,5 +1,6 @@
 import { getCurrentStore } from '@/lib/store'
 import { fmtCents } from '@/lib/format'
+import { IconUtensils } from '@/components/icons'
 import ProductToggle from './ProductToggle'
 import { createProduct } from './actions'
 
@@ -61,7 +62,9 @@ export default async function CardapioPage() {
               // eslint-disable-next-line @next/next/no-img-element
               <img className="ci-thumb" src={p.image_url} alt={p.name} />
             ) : (
-              <span className="ci-emoji">🍽️</span>
+              <span className="ci-emoji" style={{ color: 'var(--muted)' }}>
+                <IconUtensils size={26} />
+              </span>
             )}
             <div className="ci-info">
               <div className="ci-name">{p.name}</div>
