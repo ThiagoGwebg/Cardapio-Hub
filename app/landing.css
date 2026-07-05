@@ -212,6 +212,7 @@
 .l-mockup-wrap {
   position: relative;
   padding-top: 20px;
+  perspective: 1400px;
 }
 
 .l-mockup-wrap::before {
@@ -233,6 +234,30 @@
   margin-right: -20px;
   display: block;
   filter: drop-shadow(0 20px 32px rgba(0, 0, 0, 0.5));
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  animation: l-phone-spin 8s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* giro/flutuação 3D em loop — sensação de o celular rodando em perspectiva */
+@keyframes l-phone-spin {
+  0% {
+    transform: rotateY(-18deg) rotateX(5deg) translateY(0);
+  }
+  50% {
+    transform: rotateY(18deg) rotateX(-3deg) translateY(-16px);
+  }
+  100% {
+    transform: rotateY(-18deg) rotateX(5deg) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .l-mockup-photo {
+    animation: none;
+    transform: rotateY(-8deg) rotateX(3deg);
+  }
 }
 
 @media (min-width: 1180px) {
@@ -900,10 +925,6 @@
     flex-direction: column;
     text-align: center;
   }
-
-  .l-lead-section-inner {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ── Lead form (teste agora) ── */
@@ -1072,4 +1093,18 @@
   color: var(--muted);
   font-size: 13.5px;
   line-height: 1.6;
+}
+
+@media (max-width: 860px) {
+  .l-lead-section-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .l-lead-section {
+    padding: 56px 20px;
+  }
+
+  .l-lead-card {
+    padding: 22px;
+  }
 }

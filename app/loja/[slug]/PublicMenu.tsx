@@ -1,10 +1,22 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents } from '@/lib/format'
 import { IconPin, IconUtensils, IconClose } from '@/components/icons'
+import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } from '@/lib/orderHistory'
+import InstallPwaButton from '@/components/InstallPwaButton'
 
+type Option = { id: string; name: string; price_delta_cents: number }
+type Group = {
+  id: string
+  name: string
+  min_select: number
+  max_select: number
+  required: boolean
+  options: Option[]
+}
 type Product = {
   id: string
   name: string
@@ -12,8 +24,10 @@ type Product = {
   price_cents: number
   image_url: string | null
   is_active: boolean
+  groups: Group[]
 }
 type Category = { id: string; name: string; emoji: string | null; products: Product[] }
+type Zone = { neighborhood: string; fee_cents: number; min_order_cents: number }
 type Store = {
   id: string
   slug: string
@@ -23,32 +37,136 @@ type Store = {
   min_order_cents: number
   is_open: boolean
   theme: { primaryColor?: string; logoUrl?: string; bannerUrl?: string } | null
+  delivery_enabled: boolean
+  pickup_enabled: boolean
+  dine_in_enabled: boolean
+  delivery_fee_cents: number
+  estimated_prep_min: number
+  estimated_delivery_min: number
+  accepts_cash: boolean
+  accepts_card: boolean
+  accepts_pix: boolean
+  checkout_mode: 'whatsapp' | 'system'
 }
 
-type CartItem = { id: string; name: string; price_cents: number; qty: number }
+type SelectedOption = { option_id: string; name: string; price_delta_cents: number }
+type CartItem = {
+  lineId: string
+  productId: string
+  name: string
+  base_cents: number
+  options: SelectedOption[]
+  qty: number
+}
 
-export default function PublicMenu({ store, menu }: { store: Store; menu: Category[] }) {
+type OrderType = 'delivery' | 'pickup' | 'dine_in'
+type Payment = 'cash' | 'card' | 'pix'
+
+function unitOf(item: CartItem) {
+  return item.base_cents + item.options.reduce((s, o) => s + o.price_delta_cents, 0)
+}
+
+export default function PublicMenu({
+  store,
+  menu,
+  zones,
+}: {
+  store: Store
+  menu: Category[]
+  zones: Zone[]
+}) {
+  const router = useRouter()
   const [cart, setCart] = useState<CartItem[]>([])
   const [cartOpen, setCartOpen] = useState(false)
+  const [modalProduct, setModalProduct] = useState<Product | null>(null)
+  const [modalSel, setModalSel] = useState<Record<string, Option[]>>({})
+
   const [customerName, setCustomerName] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
+  const [note, setNote] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [done, setDone] = useState(false)
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState(menu[0]?.id ?? '')
+  const [myOrders, setMyOrders] = useState<OrderHistoryEntry[]>([])
+  const [myOrdersOpen, setMyOrdersOpen] = useState(false)
+
+  useEffect(() => {
+    setMyOrders(getOrderHistoryForStore(store.slug))
+  }, [store.slug])
+
+  const enabledTypes = useMemo(() => {
+    const t: OrderType[] = []
+    if (store.delivery_enabled) t.push('delivery')
+    if (store.pickup_enabled) t.push('pickup')
+    if (store.dine_in_enabled) t.push('dine_in')
+    return t
+  }, [store])
+  const [orderType, setOrderType] = useState<OrderType>(enabledTypes[0] ?? 'pickup')
+
+  const [addr, setAddr] = useState({ cep: '', street: '', number: '', complement: '', neighborhood: '', reference: '' })
+  const [cepManual, setCepManual] = useState(false)
+  const [cepLoading, setCepLoading] = useState(false)
+  const [cepMsg, setCepMsg] = useState<string | null>(null)
+  const [tableNumber, setTableNumber] = useState('')
+
+  async function lookupCep(raw: string) {
+    const cep = raw.replace(/\D/g, '')
+    if (cep.length !== 8) return
+    setCepLoading(true)
+    setCepMsg(null)
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
+      const data = await res.json()
+      if (data.erro) {
+        setCepMsg('CEP não encontrado. Preencha o endereço manualmente.')
+        setCepManual(true)
+        return
+      }
+      setAddr((a) => {
+        let nb = a.neighborhood
+        if (zones.length > 0) {
+          const match = zones.find(
+            (z) => z.neighborhood.trim().toLowerCase() === String(data.bairro || '').trim().toLowerCase()
+          )
+          if (match) nb = match.neighborhood
+        } else {
+          nb = data.bairro || a.neighborhood
+        }
+        return { ...a, cep, street: data.logradouro || a.street, neighborhood: nb }
+      })
+      if (zones.length > 0 && data.bairro) {
+        const match = zones.find(
+          (z) => z.neighborhood.trim().toLowerCase() === String(data.bairro).trim().toLowerCase()
+        )
+        if (!match) setCepMsg(`Seu bairro (${data.bairro}) não está na lista de entrega — selecione um bairro atendido.`)
+      }
+    } catch {
+      setCepMsg('Não deu pra buscar o CEP agora. Preencha manualmente.')
+      setCepManual(true)
+    } finally {
+      setCepLoading(false)
+    }
+  }
+  const [coupon, setCoupon] = useState('')
+
+  const payments = useMemo(() => {
+    const p: Payment[] = []
+    if (store.accepts_pix) p.push('pix')
+    if (store.accepts_cash) p.push('cash')
+    if (store.accepts_card) p.push('card')
+    return p
+  }, [store])
+  const [payment, setPayment] = useState<Payment | ''>('')
+  const [changeFor, setChangeFor] = useState('')
 
   const theme = store.theme ?? {}
-  const allProducts = useMemo(() => menu.flatMap((c) => c.products), [menu])
 
   const filteredMenu = useMemo(() => {
     const q = search.trim().toLowerCase()
     if (!q) return menu
     return menu
-      .map((cat) => ({
-        ...cat,
-        products: cat.products.filter((p) => p.name.toLowerCase().includes(q)),
-      }))
+      .map((cat) => ({ ...cat, products: cat.products.filter((p) => p.name.toLowerCase().includes(q)) }))
       .filter((cat) => cat.products.length > 0)
   }, [menu, search])
 
@@ -57,13 +175,10 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
       .map((cat) => document.getElementById(`section-${cat.id}`))
       .filter((el): el is HTMLElement => !!el)
     if (sections.length === 0) return
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveCategory(entry.target.id.replace('section-', ''))
-          }
+          if (entry.isIntersecting) setActiveCategory(entry.target.id.replace('section-', ''))
         })
       },
       { rootMargin: '-30% 0px -60% 0px' }
@@ -79,81 +194,219 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
     window.scrollTo({ top: offset, behavior: 'smooth' })
   }
 
-  const total = cart.reduce((s, i) => s + i.price_cents * i.qty, 0)
+  const subtotal = cart.reduce((s, i) => s + unitOf(i) * i.qty, 0)
   const totalItems = cart.reduce((s, i) => s + i.qty, 0)
 
-  function addToCart(productId: string) {
-    const product = allProducts.find((p) => p.id === productId)
-    if (!product) return
-    setCart((prev) => {
-      const existing = prev.find((i) => i.id === productId)
-      if (existing) {
-        return prev.map((i) => (i.id === productId ? { ...i, qty: i.qty + 1 } : i))
+  const zone = useMemo(
+    () => zones.find((z) => z.neighborhood.trim().toLowerCase() === addr.neighborhood.trim().toLowerCase()),
+    [zones, addr.neighborhood]
+  )
+  const deliveryFee = orderType === 'delivery' ? (zone ? zone.fee_cents : store.delivery_fee_cents) : 0
+  const total = subtotal + deliveryFee
+  const etaMin = orderType === 'delivery' ? store.estimated_delivery_min : store.estimated_prep_min
+
+  // ---- Product modal ----
+  function openProduct(p: Product) {
+    if (p.groups.length === 0) {
+      addToCart(p, [])
+      return
+    }
+    setModalProduct(p)
+    setModalSel({})
+  }
+
+  function toggleOption(group: Group, option: Option) {
+    setModalSel((prev) => {
+      const cur = prev[group.id] ?? []
+      const exists = cur.find((o) => o.id === option.id)
+      let next: Option[]
+      if (group.max_select === 1) {
+        next = exists ? [] : [option]
+      } else if (exists) {
+        next = cur.filter((o) => o.id !== option.id)
+      } else {
+        if (group.max_select > 0 && cur.length >= group.max_select) return prev
+        next = [...cur, option]
       }
-      return [...prev, { id: product.id, name: product.name, price_cents: product.price_cents, qty: 1 }]
+      return { ...prev, [group.id]: next }
     })
   }
 
-  function changeQty(productId: string, delta: number) {
+  const modalValid = useMemo(() => {
+    if (!modalProduct) return false
+    return modalProduct.groups.every((g) => {
+      const sel = modalSel[g.id] ?? []
+      if (g.required && sel.length < Math.max(1, g.min_select)) return false
+      if (g.max_select > 0 && sel.length > g.max_select) return false
+      return true
+    })
+  }, [modalProduct, modalSel])
+
+  const modalUnit = useMemo(() => {
+    if (!modalProduct) return 0
+    const extra = Object.values(modalSel).flat().reduce((s, o) => s + o.price_delta_cents, 0)
+    return modalProduct.price_cents + extra
+  }, [modalProduct, modalSel])
+
+  function confirmModal() {
+    if (!modalProduct || !modalValid) return
+    const selected: SelectedOption[] = Object.values(modalSel).flat().map((o) => ({
+      option_id: o.id,
+      name: o.name,
+      price_delta_cents: o.price_delta_cents,
+    }))
+    addToCart(modalProduct, selected)
+    setModalProduct(null)
+  }
+
+  function addToCart(p: Product, options: SelectedOption[]) {
+    const key = p.id + '|' + options.map((o) => o.option_id).sort().join(',')
+    setCart((prev) => {
+      const existing = prev.find((i) => i.lineId === key)
+      if (existing) return prev.map((i) => (i.lineId === key ? { ...i, qty: i.qty + 1 } : i))
+      return [...prev, { lineId: key, productId: p.id, name: p.name, base_cents: p.price_cents, options, qty: 1 }]
+    })
+  }
+
+  function changeQty(lineId: string, delta: number) {
     setCart((prev) =>
-      prev
-        .map((i) => (i.id === productId ? { ...i, qty: i.qty + delta } : i))
-        .filter((i) => i.qty > 0)
+      prev.map((i) => (i.lineId === lineId ? { ...i, qty: i.qty + delta } : i)).filter((i) => i.qty > 0)
     )
   }
 
   async function checkout() {
-    if (!customerName.trim()) {
-      setError('Informe seu nome pra continuar.')
-      return
-    }
-    setSubmitting(true)
     setError(null)
+    if (!customerName.trim()) return setError('Informe seu nome pra continuar.')
+    if (orderType === 'delivery' && !addr.neighborhood.trim()) return setError('Informe o bairro de entrega.')
+    if (orderType === 'delivery' && !addr.street.trim()) return setError('Informe a rua de entrega.')
+    if (orderType === 'dine_in' && !tableNumber.trim()) return setError('Informe o número da mesa.')
+    if (payments.length > 0 && !payment) return setError('Escolha a forma de pagamento.')
 
+    setSubmitting(true)
     const supabase = createClient()
+    const payload = {
+      customer_name: customerName,
+      customer_phone: customerPhone || null,
+      customer_note: note || null,
+      order_type: orderType,
+      payment_method: payment || null,
+      change_for_cents: payment === 'cash' && changeFor ? Math.round(Number(changeFor) * 100) : null,
+      table_number: orderType === 'dine_in' ? tableNumber : null,
+      coupon_code: coupon || null,
+      address:
+        orderType === 'delivery'
+          ? {
+              cep: addr.cep,
+              street: addr.street,
+              number: addr.number,
+              complement: addr.complement,
+              neighborhood: addr.neighborhood,
+              reference: addr.reference,
+            }
+          : null,
+      items: cart.map((i) => ({
+        product_id: i.productId,
+        quantity: i.qty,
+        options: i.options.map((o) => ({ option_id: o.option_id })),
+      })),
+    }
+
     const { data: orderId, error: rpcError } = await supabase.rpc('create_order', {
       p_store_id: store.id,
-      p_customer_name: customerName,
-      p_customer_phone: customerPhone || null,
-      p_customer_note: null,
-      p_items: cart.map((i) => ({ product_id: i.id, quantity: i.qty })),
+      p_payload: payload,
+    })
+    setSubmitting(false)
+    if (rpcError) return setError(rpcError.message)
+
+    if (store.whatsapp_number && store.checkout_mode !== 'system') {
+      const lines = cart
+        .map((i) => {
+          const opts = i.options.length ? ` (${i.options.map((o) => o.name).join(', ')})` : ''
+          return `• ${i.qty}x ${i.name}${opts} = ${fmtCents(unitOf(i) * i.qty)}`
+        })
+        .join('\n')
+      const parts = [
+        `Olá! Pedido #${String(orderId).slice(0, 8)}:`,
+        '',
+        lines,
+        '',
+        `Subtotal: ${fmtCents(subtotal)}`,
+        deliveryFee ? `Entrega: ${fmtCents(deliveryFee)}` : '',
+        `*Total: ${fmtCents(total)}*`,
+        '',
+        orderType === 'delivery'
+          ? `Entrega: ${addr.street}, ${addr.number} - ${addr.neighborhood}`
+          : orderType === 'pickup'
+            ? 'Retirada no local'
+            : `Mesa ${tableNumber}`,
+        payment ? `Pagamento: ${payment === 'cash' ? 'Dinheiro' : payment === 'card' ? 'Cartão' : 'Pix'}` : '',
+      ].filter(Boolean)
+      window.open(
+        `https://wa.me/${store.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(parts.join('\n'))}`,
+        '_blank'
+      )
+    }
+
+    saveOrderToHistory({
+      id: String(orderId),
+      storeSlug: store.slug,
+      storeName: store.name,
+      createdAt: new Date().toISOString(),
     })
 
-    setSubmitting(false)
-
-    if (rpcError) {
-      setError(rpcError.message)
-      return
-    }
-
-    if (store.whatsapp_number) {
-      const lines = cart.map((i) => `• ${i.qty}x ${i.name} = ${fmtCents(i.price_cents * i.qty)}`).join('\n')
-      const msg = `Olá! Acabei de fazer o pedido #${String(orderId).slice(0, 8)}:\n\n${lines}\n\n*Total: ${fmtCents(total)}*`
-      window.open(`https://wa.me/${store.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank')
-    }
-
-    setDone(true)
-    setCart([])
+    router.push(`/pedido/${orderId}`)
   }
 
+  const minToReach = store.min_order_cents - subtotal
+
   return (
-    <div
-      className="storefront"
-      style={
-        {
-          '--primary': theme.primaryColor || undefined,
-        } as React.CSSProperties
-      }
-    >
+    <div className="storefront" style={{ '--primary': theme.primaryColor || undefined } as React.CSSProperties}>
+      <link rel="manifest" href={`/loja/${store.slug}/manifest.webmanifest`} />
+      <meta name="theme-color" content={theme.primaryColor || '#FF5722'} />
+      <link rel="apple-touch-icon" href={theme.logoUrl || '/icons/icon-fallback.svg'} />
+
       <div className="storefront-topbar">
         {theme.logoUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={theme.logoUrl} alt="" style={{ width: 24, height: 24, borderRadius: 6, objectFit: 'cover' }} />
         )}
         <span className="storefront-topbar-name">{store.name}</span>
+        <div className="storefront-topbar-actions">
+          <InstallPwaButton storeName={store.name} />
+          {myOrders.length > 0 && (
+            <button className="my-orders-btn" onClick={() => setMyOrdersOpen(true)}>
+              Meus pedidos {myOrders.length > 1 ? `(${myOrders.length})` : ''}
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="cart-overlay" style={{ opacity: cartOpen ? 1 : 0, pointerEvents: cartOpen ? 'all' : 'none' }} onClick={() => setCartOpen(false)} />
+      {myOrdersOpen && (
+        <div className="option-modal-overlay" onClick={() => setMyOrdersOpen(false)}>
+          <div className="option-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 380 }}>
+            <div className="option-modal-header">
+              <div className="option-modal-title">Meus pedidos</div>
+              <button className="cart-close" onClick={() => setMyOrdersOpen(false)}><IconClose /></button>
+            </div>
+            <div className="option-modal-body">
+              {myOrders.map((o) => (
+                <a key={o.id} href={`/pedido/${o.id}`} className="my-order-row">
+                  <span>Pedido #{o.id.slice(0, 8)}</span>
+                  <span className="my-order-date">
+                    {new Date(o.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div
+        className="cart-overlay"
+        style={{ opacity: cartOpen ? 1 : 0, pointerEvents: cartOpen ? 'all' : 'none' }}
+        onClick={() => setCartOpen(false)}
+      />
 
       <header className="storefront-header">
         {theme.logoUrl ? (
@@ -176,17 +429,13 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
                 <IconPin size={12} /> {store.address}
               </span>
             )}
+            <span>⏱ ~{etaMin} min</span>
           </div>
         </div>
       </header>
 
       <div className="storefront-search-row">
-        <input
-          className="form-input"
-          placeholder="Busque por um produto"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <input className="form-input" placeholder="Busque por um produto" value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
       <div className="storefront-layout">
@@ -209,45 +458,33 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
               <section className="menu-section" id={`section-${cat.id}`} key={cat.id}>
                 <div className="section-label">{cat.name}</div>
                 <div className="products-grid">
-                  {cat.products.map((p) => {
-                    const inCart = cart.find((i) => i.id === p.id)
-                    return (
-                      <div className="product-card" key={p.id}>
-                        <div className="product-img">
-                          {p.image_url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={p.image_url} alt={p.name} />
-                          ) : (
-                            <span className="p-emoji" style={{ color: 'var(--muted)' }}>
-                              <IconUtensils size={36} />
-                            </span>
-                          )}
-                        </div>
-                        <div className="product-info">
-                          <div className="product-name">{p.name}</div>
-                          <div className="product-desc">{p.description}</div>
-                          <div className="product-footer">
-                            <div className="product-price">{fmtCents(p.price_cents)}</div>
-                            {inCart ? (
-                              <div className="qty-controls">
-                                <button className="qty-ctrl-btn" onClick={() => changeQty(p.id, -1)}>−</button>
-                                <span className="qty-display">{inCart.qty}</span>
-                                <button className="qty-ctrl-btn" onClick={() => changeQty(p.id, 1)}>+</button>
-                              </div>
-                            ) : (
-                              <button
-                                className="add-btn"
-                                disabled={!store.is_open}
-                                onClick={() => addToCart(p.id)}
-                              >
-                                +
-                              </button>
-                            )}
+                  {cat.products.map((p) => (
+                    <div className="product-card" key={p.id} onClick={() => store.is_open && openProduct(p)} style={{ cursor: store.is_open ? 'pointer' : 'default' }}>
+                      <div className="product-img">
+                        {p.image_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={p.image_url} alt={p.name} />
+                        ) : (
+                          <span className="p-emoji" style={{ color: 'var(--muted)' }}>
+                            <IconUtensils size={36} />
+                          </span>
+                        )}
+                      </div>
+                      <div className="product-info">
+                        <div className="product-name">{p.name}</div>
+                        <div className="product-desc">{p.description}</div>
+                        <div className="product-footer">
+                          <div className="product-price">
+                            {p.groups.length > 0 ? 'a partir de ' : ''}
+                            {fmtCents(p.price_cents)}
                           </div>
+                          <button className="add-btn" disabled={!store.is_open} onClick={(e) => { e.stopPropagation(); openProduct(p) }}>
+                            +
+                          </button>
                         </div>
                       </div>
-                    )
-                  })}
+                    </div>
+                  ))}
                 </div>
               </section>
             ))}
@@ -260,82 +497,237 @@ export default function PublicMenu({ store, menu }: { store: Store; menu: Catego
         </div>
 
         <aside className={`cart-drawer ${cartOpen ? 'open' : ''}`} aria-label="Carrinho">
-        <div className="cart-drawer-header">
-          <h2 className="cart-drawer-title">Seu Pedido</h2>
-          <button className="cart-close" onClick={() => setCartOpen(false)}><IconClose /></button>
-        </div>
+          <div className="cart-drawer-header">
+            <h2 className="cart-drawer-title">Seu Pedido</h2>
+            <button className="cart-close" onClick={() => setCartOpen(false)}><IconClose /></button>
+          </div>
 
-        {done ? (
-          <div style={{ padding: 24, textAlign: 'center' }}>
-            <p style={{ color: 'var(--green)', fontWeight: 700, marginBottom: 8 }}>Pedido enviado!</p>
-            <p style={{ fontSize: 13, color: 'var(--muted)' }}>A loja vai confirmar em breve.</p>
-          </div>
-        ) : cart.length === 0 ? (
-          <div className="cart-empty" style={{ display: 'flex' }}>
-            <p>Seu carrinho está vazio</p>
-          </div>
-        ) : (
-          <>
-            <div className="cart-items" style={{ display: 'flex' }}>
-              {cart.map((item) => (
-                <div className="cart-item" key={item.id}>
-                  <div className="cart-item-info">
-                    <div className="cart-item-name">{item.name}</div>
-                    <div className="cart-item-unit">{fmtCents(item.price_cents)} / un.</div>
+          {cart.length === 0 ? (
+            <div className="cart-empty" style={{ display: 'flex' }}>
+              <p>Seu carrinho está vazio</p>
+            </div>
+          ) : (
+            <>
+              <div className="cart-items" style={{ display: 'flex' }}>
+                {cart.map((item) => (
+                  <div className="cart-item" key={item.lineId}>
+                    <div className="cart-item-info">
+                      <div className="cart-item-name">{item.name}</div>
+                      {item.options.length > 0 && (
+                        <div className="cart-item-unit" style={{ fontSize: 11 }}>
+                          {item.options.map((o) => o.name).join(', ')}
+                        </div>
+                      )}
+                      <div className="cart-item-unit">{fmtCents(unitOf(item))} / un.</div>
+                    </div>
+                    <div className="cart-item-controls">
+                      <button className="cart-qty-btn" onClick={() => changeQty(item.lineId, -1)}>−</button>
+                      <span className="cart-qty-num">{item.qty}</span>
+                      <button className="cart-qty-btn" onClick={() => changeQty(item.lineId, 1)}>+</button>
+                    </div>
+                    <span className="cart-item-total">{fmtCents(unitOf(item) * item.qty)}</span>
                   </div>
-                  <div className="cart-item-controls">
-                    <button className="cart-qty-btn" onClick={() => changeQty(item.id, -1)}>−</button>
-                    <span className="cart-qty-num">{item.qty}</span>
-                    <button className="cart-qty-btn" onClick={() => changeQty(item.id, 1)}>+</button>
+                ))}
+              </div>
+
+              <div className="cart-footer" style={{ display: 'flex' }}>
+                {/* Tipo de pedido */}
+                {enabledTypes.length > 1 && (
+                  <div className="ordertype-row">
+                    {enabledTypes.map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        className={`ordertype-btn ${orderType === t ? 'active' : ''}`}
+                        onClick={() => setOrderType(t)}
+                      >
+                        {t === 'delivery' ? 'Entrega' : t === 'pickup' ? 'Retirada' : 'Na mesa'}
+                      </button>
+                    ))}
                   </div>
-                  <span className="cart-item-total">{fmtCents(item.price_cents * item.qty)}</span>
+                )}
+
+                <div className="form-group">
+                  <input className="form-input" placeholder="Seu nome" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
                 </div>
-              ))}
-            </div>
-            <div className="cart-footer" style={{ display: 'flex' }}>
-              <div className="form-group">
-                <input
-                  className="form-input"
-                  placeholder="Seu nome"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                />
+                <div className="form-group">
+                  <input className="form-input" placeholder="Telefone (WhatsApp)" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
+                </div>
+
+                {orderType === 'delivery' && (
+                  <>
+                    {!cepManual ? (
+                      <div className="form-group">
+                        <input
+                          className="form-input"
+                          placeholder="CEP"
+                          inputMode="numeric"
+                          value={addr.cep}
+                          onChange={(e) => {
+                            const v = e.target.value.replace(/\D/g, '').slice(0, 8)
+                            setAddr({ ...addr, cep: v })
+                            if (v.length === 8) lookupCep(v)
+                          }}
+                          onBlur={(e) => lookupCep(e.target.value)}
+                        />
+                        <div className="cep-help">
+                          {cepLoading ? (
+                            <span style={{ color: 'var(--muted)' }}>Buscando endereço...</span>
+                          ) : (
+                            <span className="cep-link" onClick={() => { setCepManual(true); setCepMsg(null) }}>
+                              Não sei meu CEP
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="cep-help" style={{ marginBottom: 4 }}>
+                        <span className="cep-link" onClick={() => setCepManual(false)}>← Buscar por CEP</span>
+                      </div>
+                    )}
+                    {cepMsg && <p style={{ color: 'var(--yellow)', fontSize: 12, marginTop: -4 }}>{cepMsg}</p>}
+                    <div className="form-row">
+                      <div className="form-group" style={{ flex: 3 }}>
+                        <input className="form-input" placeholder="Rua" value={addr.street} onChange={(e) => setAddr({ ...addr, street: e.target.value })} />
+                      </div>
+                      <div className="form-group" style={{ flex: 1 }}>
+                        <input className="form-input" placeholder="Nº" value={addr.number} onChange={(e) => setAddr({ ...addr, number: e.target.value })} />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      {zones.length > 0 ? (
+                        <select className="form-input" value={addr.neighborhood} onChange={(e) => setAddr({ ...addr, neighborhood: e.target.value })}>
+                          <option value="">Selecione o bairro</option>
+                          {zones.map((z) => (
+                            <option key={z.neighborhood} value={z.neighborhood}>
+                              {z.neighborhood} — {z.fee_cents ? fmtCents(z.fee_cents) : 'grátis'}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input className="form-input" placeholder="Bairro" value={addr.neighborhood} onChange={(e) => setAddr({ ...addr, neighborhood: e.target.value })} />
+                      )}
+                    </div>
+                    <div className="form-group">
+                      <input className="form-input" placeholder="Complemento / referência" value={addr.reference} onChange={(e) => setAddr({ ...addr, reference: e.target.value })} />
+                    </div>
+                  </>
+                )}
+
+                {orderType === 'dine_in' && (
+                  <div className="form-group">
+                    <input className="form-input" placeholder="Número da mesa" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} />
+                  </div>
+                )}
+
+                {/* Pagamento */}
+                {payments.length > 0 && (
+                  <div className="ordertype-row">
+                    {payments.map((p) => (
+                      <button key={p} type="button" className={`ordertype-btn ${payment === p ? 'active' : ''}`} onClick={() => setPayment(p)}>
+                        {p === 'cash' ? 'Dinheiro' : p === 'card' ? 'Cartão' : 'Pix'}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {payment === 'cash' && (
+                  <div className="form-group">
+                    <input className="form-input" type="number" step="0.01" placeholder="Troco para quanto? (opcional)" value={changeFor} onChange={(e) => setChangeFor(e.target.value)} />
+                  </div>
+                )}
+
+                <div className="form-group">
+                  <input className="form-input" placeholder="Cupom (opcional)" value={coupon} onChange={(e) => setCoupon(e.target.value.toUpperCase())} />
+                </div>
+                <div className="form-group">
+                  <input className="form-input" placeholder="Observação (opcional)" value={note} onChange={(e) => setNote(e.target.value)} />
+                </div>
+
+                {error && <p style={{ color: 'var(--red)', fontSize: 12 }}>{error}</p>}
+                {minToReach > 0 && <div className="cart-minimum">Faltam {fmtCents(minToReach)} para o pedido mínimo</div>}
+
+                <div className="cart-subtotal-row">
+                  <span>Subtotal</span>
+                  <span className="cart-subtotal-value">{fmtCents(subtotal)}</span>
+                </div>
+                {orderType === 'delivery' && (
+                  <div className="cart-subtotal-row">
+                    <span>Entrega{zone ? ` (${zone.neighborhood})` : ''}</span>
+                    <span className="cart-subtotal-value">{deliveryFee ? fmtCents(deliveryFee) : 'Grátis'}</span>
+                  </div>
+                )}
+                <div className="cart-subtotal-row" style={{ fontWeight: 700 }}>
+                  <span>Total</span>
+                  <span className="cart-subtotal-value">{fmtCents(total)}</span>
+                </div>
+
+                <button className="checkout-btn" disabled={subtotal < store.min_order_cents || submitting} onClick={checkout}>
+                  {submitting
+                    ? 'Enviando...'
+                    : store.whatsapp_number && store.checkout_mode !== 'system'
+                      ? 'Fazer Pedido via WhatsApp'
+                      : 'Confirmar Pedido'}
+                </button>
               </div>
-              <div className="form-group">
-                <input
-                  className="form-input"
-                  placeholder="Telefone (opcional)"
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value)}
-                />
-              </div>
-              {error && <p style={{ color: 'var(--red)', fontSize: 12 }}>{error}</p>}
-              <div className="cart-minimum">
-                {total < store.min_order_cents
-                  ? `Faltam ${fmtCents(store.min_order_cents - total)} para o pedido mínimo`
-                  : ''}
-              </div>
-              <div className="cart-subtotal-row">
-                <span>Subtotal</span>
-                <span className="cart-subtotal-value">{fmtCents(total)}</span>
-              </div>
-              <button
-                className="checkout-btn"
-                disabled={total < store.min_order_cents || submitting}
-                onClick={checkout}
-              >
-                {submitting ? 'Enviando...' : 'Fazer Pedido via WhatsApp'}
-              </button>
-            </div>
-          </>
-        )}
+            </>
+          )}
         </aside>
       </div>
 
-      <button
-        className={`cart-fab ${totalItems === 0 ? 'hidden' : ''}`}
-        onClick={() => setCartOpen(true)}
-      >
+      {/* Modal de complementos */}
+      {modalProduct && (
+        <div className="option-modal-overlay" onClick={() => setModalProduct(null)}>
+          <div className="option-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="option-modal-header">
+              <div>
+                <div className="option-modal-title">{modalProduct.name}</div>
+                {modalProduct.description && <div className="option-modal-desc">{modalProduct.description}</div>}
+              </div>
+              <button className="cart-close" onClick={() => setModalProduct(null)}><IconClose /></button>
+            </div>
+            <div className="option-modal-body">
+              {modalProduct.groups.map((g) => {
+                const sel = modalSel[g.id] ?? []
+                return (
+                  <div className="option-group" key={g.id}>
+                    <div className="option-group-head">
+                      <span className="option-group-name">{g.name}</span>
+                      <span className={`option-group-tag ${g.required ? 'req' : ''}`}>
+                        {g.required ? 'Obrigatório' : 'Opcional'}
+                        {g.max_select > 1 ? ` · até ${g.max_select}` : ''}
+                      </span>
+                    </div>
+                    {g.options.map((o) => {
+                      const checked = !!sel.find((x) => x.id === o.id)
+                      return (
+                        <label className="option-row" key={o.id}>
+                          <span className="option-row-name">{o.name}</span>
+                          <span className="option-row-right">
+                            {o.price_delta_cents > 0 && <span className="option-row-price">+ {fmtCents(o.price_delta_cents)}</span>}
+                            <input
+                              type={g.max_select === 1 ? 'radio' : 'checkbox'}
+                              name={g.id}
+                              checked={checked}
+                              onChange={() => toggleOption(g, o)}
+                            />
+                          </span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                )
+              })}
+            </div>
+            <div className="option-modal-footer">
+              <button className="checkout-btn" disabled={!modalValid} onClick={confirmModal}>
+                Adicionar · {fmtCents(modalUnit)}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <button className={`cart-fab ${totalItems === 0 ? 'hidden' : ''}`} onClick={() => setCartOpen(true)}>
         Ver pedido
         <span className="cart-count">{totalItems} {totalItems === 1 ? 'item' : 'itens'}</span>
         <span className="cart-sep">·</span>

@@ -7,7 +7,7 @@ export default async function PedidosPage() {
 
   const { data: orders } = await supabase
     .from('orders')
-    .select('id, status, customer_name, customer_phone, subtotal_cents, created_at, order_items(id, product_name_snapshot, quantity)')
+    .select('id, status, order_type, payment_method, customer_name, customer_phone, subtotal_cents, delivery_fee_cents, total_cents, table_number, address_cep, address_street, address_number, address_neighborhood, created_at, order_items(id, product_name_snapshot, quantity, order_item_options(name_snapshot))')
     .eq('store_id', store.id)
     .order('created_at', { ascending: false })
 
@@ -16,7 +16,7 @@ export default async function PedidosPage() {
   const total = allOrders.length
   const faturamento = allOrders
     .filter((o) => o.status !== 'cancelado')
-    .reduce((s, o) => s + o.subtotal_cents, 0)
+    .reduce((s, o) => s + o.total_cents, 0)
 
   return (
     <>
@@ -43,7 +43,7 @@ export default async function PedidosPage() {
         </div>
       </div>
 
-      <KanbanBoard storeId={store.id} orders={allOrders as never} />
+      <KanbanBoard storeId={store.id} storeName={store.name} orders={allOrders as never} />
 
       {allOrders.length === 0 && (
         <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 20 }}>

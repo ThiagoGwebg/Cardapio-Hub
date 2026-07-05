@@ -29,6 +29,17 @@ const FEATURES = [
     title: 'Link exclusivo da loja',
     desc: 'Um endereço só seu pra divulgar no Instagram e no WhatsApp.',
   },
+  {
+    num: '06',
+    title: 'Pedido direto pelo WhatsApp',
+    desc: 'Cliente monta o carrinho e o pedido chega pronto no seu WhatsApp — sem digitar nada.',
+  },
+  {
+    num: '07',
+    title: 'Loja aberta ou fechada num clique',
+    desc: 'Desative os pedidos fora do expediente direto pelo painel — sem precisar mexer no cardápio.',
+    size: 'wide',
+  },
 ]
 
 export default function LandingFeatures() {

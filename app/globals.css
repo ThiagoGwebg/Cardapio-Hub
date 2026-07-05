@@ -1881,3 +1881,278 @@ tr:hover td {
     display: none;
   }
 }
+/* ===== Tipo de pedido / pagamento (chips) ===== */
+.ordertype-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.ordertype-btn {
+  flex: 1;
+  padding: 9px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+.ordertype-btn.active {
+  border-color: var(--primary);
+  background: var(--primary-l);
+  color: var(--primary);
+}
+
+/* ===== Modal de complementos ===== */
+.option-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 200;
+  padding: 0;
+}
+@media (min-width: 640px) {
+  .option-modal-overlay { align-items: center; padding: 20px; }
+}
+.option-modal {
+  background: var(--surface);
+  width: 100%;
+  max-width: 460px;
+  max-height: 88vh;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+}
+@media (min-width: 640px) {
+  .option-modal { border-radius: 16px; }
+}
+.option-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 18px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.option-modal-title { font-size: 17px; font-weight: 700; color: var(--text); }
+.option-modal-desc { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.option-modal-body { overflow-y: auto; padding: 8px 18px; flex: 1; }
+.option-group { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.option-group:last-child { border-bottom: none; }
+.option-group-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.option-group-name { font-weight: 600; font-size: 14px; color: var(--text); }
+.option-group-tag {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--surface2);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.option-group-tag.req { color: var(--primary); background: var(--primary-l); }
+.option-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  cursor: pointer;
+}
+.option-row-name { font-size: 14px; color: var(--text2); }
+.option-row-right { display: inline-flex; align-items: center; gap: 10px; }
+.option-row-price { font-size: 13px; color: var(--green); font-weight: 600; }
+.option-row input { width: 18px; height: 18px; accent-color: var(--primary); }
+.option-modal-footer { padding: 14px 18px 18px; border-top: 1px solid var(--border); }
+
+/* ===== Acompanhamento do pedido ===== */
+.track-wrap {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px;
+}
+.track-card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+.track-store { font-size: 18px; font-weight: 700; color: var(--text); }
+.track-order-num { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.track-badges { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 20px; }
+.track-badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--surface2);
+  color: var(--text2);
+}
+.track-badge-eta { background: var(--primary-l); color: var(--primary); }
+.track-steps { display: flex; flex-direction: column; gap: 0; margin-bottom: 22px; }
+.track-step { display: flex; align-items: center; gap: 12px; position: relative; padding: 8px 0; }
+.track-step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 24px;
+  bottom: -8px;
+  width: 2px;
+  background: var(--border);
+}
+.track-step.done:not(:last-child)::before { background: var(--green); }
+.track-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--surface3);
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  z-index: 1;
+}
+.track-step.done .track-dot { background: var(--green); border-color: var(--green); }
+.track-step-label { font-size: 14px; color: var(--muted); }
+.track-step.done .track-step-label { color: var(--text2); }
+.track-step.current .track-step-label { color: var(--primary); font-weight: 700; }
+.track-canceled {
+  background: var(--red-l);
+  color: var(--red);
+  padding: 14px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.track-items { border-top: 1px solid var(--border); padding-top: 14px; }
+.track-item { display: flex; justify-content: space-between; font-size: 13px; color: var(--text2); padding: 5px 0; }
+.track-item-opts { color: var(--muted); }
+.track-totals { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px; }
+.track-total-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); padding: 3px 0; }
+.track-total-final { font-size: 15px; font-weight: 700; color: var(--text); margin-top: 4px; }
+.track-back { display: inline-block; margin-top: 20px; color: var(--primary); font-size: 14px; text-decoration: none; }
+
+/* ===== Kanban: tags e endereço no card ===== */
+.order-tags { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+.order-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  background: var(--surface3);
+  color: var(--text2);
+}
+.order-addr { font-size: 11px; color: var(--muted); margin: 2px 0 6px; }
+
+/* ===== CEP ===== */
+.cep-help { margin-top: 6px; font-size: 12px; }
+.cep-link {
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* ===== Botão "Avisar cliente" (Kanban) ===== */
+.notify-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 10px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--green-d);
+  background: var(--green-l);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+.notify-btn:hover { background: var(--green-d); color: #0b1f12; }
+.notify-btn-icon { font-size: 13px; }
+
+/* ===== Kanban: alerta sonoro ===== */
+.kanban-toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+.sound-toggle {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sound-toggle.flash {
+  animation: sound-flash 0.5s ease-in-out 2;
+}
+@keyframes sound-flash {
+  0%, 100% { background: var(--surface2); }
+  50% { background: var(--primary-l); border-color: var(--primary); color: var(--primary); }
+}
+
+/* ===== Meus pedidos (histórico local do cliente) ===== */
+.storefront-topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.my-orders-btn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.install-pwa-btn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--primary);
+  background: var(--primary-l);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.my-order-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+}
+.my-order-row:last-child { border-bottom: none; }
+.my-order-date { font-size: 12px; color: var(--muted); }
+
+/* ===== Acompanhamento: salvar link ===== */
+.track-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.track-copy-btn {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--primary);
+  background: var(--primary-l);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.track-copy-hint { font-size: 11px; color: var(--muted); margin: 6px 0 0; }

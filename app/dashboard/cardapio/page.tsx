@@ -1,6 +1,7 @@
 import { getCurrentStore } from '@/lib/store'
 import { fmtCents } from '@/lib/format'
 import { IconUtensils } from '@/components/icons'
+import Link from 'next/link'
 import ProductToggle from './ProductToggle'
 import { createProduct } from './actions'
 
@@ -73,6 +74,9 @@ export default async function CardapioPage() {
               </div>
             </div>
             <div className="ci-price">{fmtCents(p.price_cents)}</div>
+            <Link href={`/dashboard/cardapio/${p.id}`} className="ordertype-btn" style={{ flex: 'none', padding: '6px 12px', textDecoration: 'none' }}>
+              Complementos
+            </Link>
             <ProductToggle productId={p.id} isActive={p.is_active} />
           </div>
         ))}
