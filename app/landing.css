@@ -232,8 +232,8 @@
   margin-left: auto;
   margin-right: -60px;
   display: block;
-  -webkit-mask-image: radial-gradient(ellipse 62% 62% at 50% 50%, black 30%, transparent 96%);
-  mask-image: radial-gradient(ellipse 62% 62% at 50% 50%, black 30%, transparent 96%);
+  -webkit-mask-image: radial-gradient(ellipse 68% 68% at 50% 50%, black 80%, transparent 100%);
+  mask-image: radial-gradient(ellipse 68% 68% at 50% 50%, black 80%, transparent 100%);
 }
 
 @media (min-width: 1180px) {
