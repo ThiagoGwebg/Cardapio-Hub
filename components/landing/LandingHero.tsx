@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { IconUtensils, IconCheck } from '@/components/icons'
+import Image from 'next/image'
 
 export default function LandingHero() {
   return (
@@ -22,55 +22,14 @@ export default function LandingHero() {
         </div>
 
         <div className="l-mockup-wrap">
-          <div className="l-mockup" aria-hidden="true">
-            <div className="l-mockup-bar">
-              <div className="l-mockup-logo">
-                <IconUtensils size={16} />
-              </div>
-              <div>
-                <div className="l-mockup-name">Bom Sabor Mini Salgados</div>
-                <div className="l-mockup-status">● Aberto agora</div>
-              </div>
-            </div>
-            <div className="l-mockup-body">
-              <div className="l-mockup-card">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="l-mockup-thumb-img"
-                  src="/img/fotos_produtos/Cento_de_Mini_Salgados_-_100_Unidades.png"
-                  alt="Cento de Mini Salgados"
-                />
-                <div className="l-mockup-info">
-                  <div className="l-mockup-title">Cento de Mini Salgados</div>
-                  <div className="l-mockup-desc">100 unidades à sua escolha</div>
-                  <div className="l-mockup-footer">
-                    <span className="l-mockup-price">R$ 44,99</span>
-                    <span className="l-mockup-add">+</span>
-                  </div>
-                </div>
-              </div>
-              <div className="l-mockup-card">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  className="l-mockup-thumb-img"
-                  src="/img/fotos_produtos/Pastel_Salgado.png"
-                  alt="Pastel Salgado"
-                />
-                <div className="l-mockup-info">
-                  <div className="l-mockup-title">Pastel Salgado</div>
-                  <div className="l-mockup-desc">Frito na hora, crocante</div>
-                  <div className="l-mockup-footer">
-                    <span className="l-mockup-price">R$ 10,00</span>
-                    <span className="l-mockup-add">+</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="l-mockup-toast">
-              <IconCheck size={12} /> Pedido recebido no seu painel agora
-            </div>
-          </div>
-          <span className="l-mockup-caption">— o painel de pedidos, ao vivo —</span>
+          <Image
+            src="/marketing/hero-devices.png"
+            alt="CardápioÁgil aberto no laptop, celular e tablet"
+            width={1376}
+            height={768}
+            className="l-mockup-photo"
+            priority
+          />
         </div>
       </div>
     </section>
