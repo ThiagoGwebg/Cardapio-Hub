@@ -11,6 +11,7 @@ export default function LandingFooter() {
           <a href="#features">Funcionalidades</a>
           <a href="#pricing">Planos</a>
           <a href="#faq">Dúvidas</a>
+          <Link href="/privacidade">Privacidade</Link>
           <Link href="/login">Entrar</Link>
           <Link href="/signup">Criar conta</Link>
         </nav>

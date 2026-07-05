@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
+import Link from 'next/link'
 import { submitLead, type LeadFormState } from '@/app/actions/leads'
 
 const REVENUE_OPTIONS = [
@@ -84,7 +85,8 @@ export default function LandingLeadForm() {
         <label className="l-lead-consent">
           <input type="checkbox" name="consent" required />
           <span>
-            Declaro que li e aceito a <a href="#">Política de privacidade</a>.
+            Declaro que li e aceito a{' '}
+            <Link href="/privacidade" target="_blank">Política de privacidade</Link>.
           </span>
         </label>
 
