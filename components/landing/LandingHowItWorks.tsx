@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 const STEPS = [
   {
     title: 'Crie sua loja em minutos',
@@ -20,16 +22,27 @@ export default function LandingHowItWorks() {
         <div className="l-eyebrow">Como funciona</div>
         <h2 className="l-h2">Do zero ao primeiro pedido, sem enrolação</h2>
       </div>
-      <div className="l-steps">
-        {STEPS.map((s, i) => (
-          <div className="l-step" key={s.title}>
-            <div className="l-step-num">{String(i + 1).padStart(2, '0')}</div>
-            <div>
-              <div className="l-step-title">{s.title}</div>
-              <div className="l-step-desc">{s.desc}</div>
+      <div className="l-steps-layout">
+        <div className="l-steps">
+          {STEPS.map((s, i) => (
+            <div className="l-step" key={s.title}>
+              <div className="l-step-num">{String(i + 1).padStart(2, '0')}</div>
+              <div>
+                <div className="l-step-title">{s.title}</div>
+                <div className="l-step-desc">{s.desc}</div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+        <div className="l-steps-photo-wrap">
+          <Image
+            src="/marketing/phone.png"
+            alt="Cardápio da loja aberto no celular"
+            width={896}
+            height={1200}
+            className="l-steps-photo"
+          />
+        </div>
       </div>
     </section>
   )

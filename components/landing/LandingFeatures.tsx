@@ -1,9 +1,12 @@
+import Image from 'next/image'
+
 const FEATURES = [
   {
     num: '01',
     title: 'Cardápio com a sua cara',
     desc: 'Cor, logo e banner personalizados, categorias organizadas e busca de produtos — sem parecer o mesmo template de todo mundo.',
     size: 'big',
+    photo: true,
   },
   {
     num: '02',
@@ -44,6 +47,15 @@ export default function LandingFeatures() {
             <div className="l-feature-num">{f.num}</div>
             <div className="l-feature-title">{f.title}</div>
             <div className="l-feature-desc">{f.desc}</div>
+            {f.photo && (
+              <Image
+                src="/marketing/tablet.png"
+                alt="Cardápio personalizado aberto num tablet"
+                width={896}
+                height={1200}
+                className="l-feature-photo"
+              />
+            )}
           </div>
         ))}
       </div>
