@@ -23,10 +23,10 @@ export default function LandingHero() {
 
         <div className="l-mockup-wrap">
           <Image
-            src="/marketing/laptop-transparent.png"
-            alt="CardápioÁgil aberto no laptop"
-            width={1200}
-            height={896}
+            src="/marketing/phone.png"
+            alt="CardápioÁgil aberto no celular"
+            width={896}
+            height={1200}
             className="l-mockup-photo"
             priority
           />
