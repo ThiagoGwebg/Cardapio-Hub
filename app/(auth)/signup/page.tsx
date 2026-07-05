@@ -31,21 +31,50 @@ export default function SignupPage() {
           Criar minha loja
         </h1>
 
-        <div className="form-group">
-          <label className="form-label" htmlFor="storeName">Nome da loja</label>
-          <input className="form-input" id="storeName" name="storeName" required />
-        </div>
-        <div className="form-group">
-          <label className="form-label" htmlFor="whatsapp">WhatsApp (opcional)</label>
-          <input className="form-input" id="whatsapp" name="whatsapp" placeholder="(19) 99999-9999" />
-        </div>
-        <div className="form-group">
-          <label className="form-label" htmlFor="email">E-mail</label>
-          <input className="form-input" id="email" name="email" type="email" required />
-        </div>
-        <div className="form-group">
-          <label className="form-label" htmlFor="password">Senha</label>
-          <input className="form-input" id="password" name="password" type="password" minLength={6} required />
+        <div className="l-lead-frame">
+          <form className="l-lead-card" action={formAction}>
+            <label className="l-lead-label" htmlFor="lead-name">Nome</label>
+            <input className="l-lead-input" id="lead-name" name="name" placeholder="Nome" required />
+
+            <label className="l-lead-label" htmlFor="lead-company">Empresa</label>
+            <input className="l-lead-input" id="lead-company" name="company" placeholder="Empresa" />
+
+            <label className="l-lead-label" htmlFor="lead-email">E-mail</label>
+            <input className="l-lead-input" id="lead-email" name="email" type="email" placeholder="E-mail" required />
+
+            <label className="l-lead-label" htmlFor="lead-whatsapp">WhatsApp</label>
+            <input className="l-lead-input" id="lead-whatsapp" name="whatsapp" placeholder="WhatsApp" />
+
+            <label className="l-lead-label" htmlFor="lead-revenue">Faturamento mensal</label>
+            <select className="l-lead-input l-lead-select" id="lead-revenue" name="monthlyRevenue" defaultValue="">
+              <option value="" disabled>Selecionar</option>
+              {REVENUE_OPTIONS.map((o) => (
+                <option key={o} value={o}>{o}</option>
+              ))}
+            </select>
+
+            <label className="l-lead-label" htmlFor="lead-segment">Qual o seu segmento</label>
+            <select className="l-lead-input l-lead-select" id="lead-segment" name="segment" defaultValue="">
+              <option value="" disabled>Selecionar</option>
+              {SEGMENT_OPTIONS.map((o) => (
+                <option key={o} value={o}>{o}</option>
+              ))}
+            </select>
+
+            {state.error && <p className="l-lead-error">{state.error}</p>}
+
+            <label className="l-lead-consent">
+              <input type="checkbox" name="consent" required />
+              <span>
+                Declaro que li e aceito a{' '}
+                <Link href="/privacidade" target="_blank">Política de privacidade</Link>.
+              </span>
+            </label>
+
+            <button className="l-lead-submit" type="submit" disabled={pending}>
+              {pending ? 'Enviando...' : <>TESTE AGORA <span aria-hidden="true">→</span></>}
+            </button>
+          </form>
         </div>
 
         {state.error && <p style={{ color: 'var(--red)', fontSize: 12 }}>{state.error}</p>}

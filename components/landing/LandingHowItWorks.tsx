@@ -36,7 +36,7 @@ export default function LandingHowItWorks() {
         </div>
         <div className="l-steps-photo-wrap">
           <Image
-            src="/marketing/phone.png"
+            src="/marketing/phone-cutout.png"
             alt="Cardápio da loja aberto no celular"
             width={896}
             height={1200}

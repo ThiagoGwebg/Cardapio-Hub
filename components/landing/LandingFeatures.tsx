@@ -49,7 +49,7 @@ export default function LandingFeatures() {
             <div className="l-feature-desc">{f.desc}</div>
             {f.photo && (
               <Image
-                src="/marketing/tablet.png"
+                src="/marketing/tablet-cutout.png"
                 alt="Cardápio personalizado aberto num tablet"
                 width={896}
                 height={1200}
