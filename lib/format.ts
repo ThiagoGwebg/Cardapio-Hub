@@ -14,6 +14,13 @@ export const PAYMENT_LABEL: Record<string, string> = {
   pix: 'Pix',
 }
 
+export const PIX_KEY_TYPE_LABEL: Record<string, string> = {
+  cpf_cnpj: 'CPF/CNPJ',
+  email: 'E-mail',
+  phone: 'Telefone',
+  random: 'Chave aleatória',
+}
+
 export const STATUS_LABEL: Record<string, string> = {
   novo: 'Recebido',
   preparando: 'Em preparo',

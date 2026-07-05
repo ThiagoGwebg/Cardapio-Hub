@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bom Sabor Mini Salgados</title>
   <link
-    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Inter:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Inter:wght@400;500;600&family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=dark2">
 </head>
@@ -80,25 +80,39 @@
   <div class="view active" id="view-menu">
 
     <header class="menu-hero">
-
-      <h1 class="store-name">Bom Sabor<br>Mini Salgados</h1>
+      <span class="hero-open-badge"><span class="badge-dot"></span> Aberto agora</span>
+      <h1 class="store-name">Bom Sabor Mini Salgados</h1>
       <p class="store-sub">R. João de Oliveira Machado, 454 · Jardim Ypê I · Mogi Guaçu</p>
+      <div class="menu-search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <input id="menuSearch" type="text" placeholder="Buscar no cardápio..." autocomplete="off" aria-label="Buscar no cardápio">
+      </div>
       <nav class="menu-nav" id="menuNav" aria-label="Categorias"></nav>
     </header>
 
     <div class="menu-body" id="menuBody"></div>
 
     <button class="cart-fab hidden" id="cartFab" aria-label="Ver carrinho">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
-        <circle cx="8" cy="21" r="1" />
-        <circle cx="19" cy="21" r="1" />
-        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-      </svg>
-      Ver pedido
-      <span class="cart-count" id="cartCount">0 itens</span>
-      <span class="cart-sep">·</span>
-      <span class="cart-fab-total" id="cartFabTotal">R$ 0,00</span>
+      <span class="fab-left">
+        <span class="fab-count" id="cartCount">0</span>
+        <span class="fab-total-block">
+          <span class="fab-total-label">Total</span>
+          <span class="cart-fab-total" id="cartFabTotal">R$ 0,00</span>
+        </span>
+      </span>
+      <span class="fab-right">
+        Ver pedido
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+          <path d="M3 6h18" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg>
+      </span>
     </button>
 
   </div>

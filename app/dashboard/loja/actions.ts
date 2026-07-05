@@ -1,7 +1,29 @@
 'use server'
 
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { getCurrentStore } from '@/lib/store'
+import { isStorePro, DEFAULT_STORE_FONT } from '@/lib/plan'
 import { revalidatePath } from 'next/cache'
+
+type Theme = { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font?: string }
+
+/**
+ * Remove do Storage o arquivo antigo quando a imagem é trocada/removida,
+ * evitando arquivos órfãos. Só mexe em objetos do bucket 'store-assets'.
+ */
+async function removeOldAsset(supabase: SupabaseClient, oldUrl?: string, newUrl?: string) {
+  if (!oldUrl || oldUrl === newUrl) return
+  const marker = '/store-assets/'
+  const i = oldUrl.indexOf(marker)
+  if (i === -1) return
+  const path = decodeURIComponent(oldUrl.slice(i + marker.length).split('?')[0])
+  if (!path) return
+  try {
+    await supabase.storage.from('store-assets').remove([path])
+  } catch {
+    // silencioso: a falha de limpeza não deve quebrar o salvamento
+  }
+}
 
 export async function updateStore(formData: FormData) {
   const { supabase, store } = await getCurrentStore()
@@ -12,11 +34,24 @@ export async function updateStore(formData: FormData) {
   const is_open = formData.get('isOpen') === 'on'
   const min_order = Number(formData.get('minOrder') || 0)
 
-  const theme = {
-    primaryColor: String(formData.get('primaryColor') || '#FF5722'),
+  // Logo e banner: liberados em todos os planos.
+  // Cor e fonte: só no Pro — no Free preservamos os valores atuais (gate no servidor).
+  const current = (store.theme ?? {}) as Theme
+  const pro = await isStorePro(supabase, store.id)
+
+  const theme: Theme = {
     logoUrl: String(formData.get('logoUrl') || ''),
     bannerUrl: String(formData.get('bannerUrl') || ''),
+    primaryColor: pro
+      ? String(formData.get('primaryColor') || current.primaryColor || '#FF5722')
+      : current.primaryColor || '#FF5722',
+    // Fonte: só no Pro. No Free preserva o valor atual (undefined = fonte padrão).
+    font: pro ? String(formData.get('font') || current.font || DEFAULT_STORE_FONT) : current.font,
   }
+
+  // Limpa logo/banner antigos do Storage quando forem trocados ou removidos.
+  await removeOldAsset(supabase, current.logoUrl, theme.logoUrl)
+  await removeOldAsset(supabase, current.bannerUrl, theme.bannerUrl)
 
   await supabase
     .from('stores')
@@ -37,7 +72,7 @@ export async function updateStore(formData: FormData) {
       accepts_card: formData.get('acceptsCard') === 'on',
       accepts_pix: formData.get('acceptsPix') === 'on',
       pix_key: String(formData.get('pixKey') || '') || null,
-      checkout_mode: formData.get('checkoutMode') === 'system' ? 'system' : 'whatsapp',
+      pix_key_type: String(formData.get('pixKeyType') || '') || null,
     })
     .eq('id', store.id)
 

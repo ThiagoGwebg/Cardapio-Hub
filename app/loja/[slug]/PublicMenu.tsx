@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { fmtCents } from '@/lib/format'
+import { fmtCents, PIX_KEY_TYPE_LABEL } from '@/lib/format'
+import { googleFontHref, DEFAULT_STORE_FONT } from '@/lib/plan'
 import { IconPin, IconUtensils, IconClose } from '@/components/icons'
 import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } from '@/lib/orderHistory'
 import InstallPwaButton from '@/components/InstallPwaButton'
@@ -36,7 +37,7 @@ type Store = {
   address: string | null
   min_order_cents: number
   is_open: boolean
-  theme: { primaryColor?: string; logoUrl?: string; bannerUrl?: string } | null
+  theme: { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font?: string } | null
   delivery_enabled: boolean
   pickup_enabled: boolean
   dine_in_enabled: boolean
@@ -46,7 +47,8 @@ type Store = {
   accepts_cash: boolean
   accepts_card: boolean
   accepts_pix: boolean
-  checkout_mode: 'whatsapp' | 'system'
+  pix_key: string | null
+  pix_key_type: string | null
 }
 
 type SelectedOption = { option_id: string; name: string; price_delta_cents: number }
@@ -159,8 +161,12 @@ export default function PublicMenu({
   }, [store])
   const [payment, setPayment] = useState<Payment | ''>('')
   const [changeFor, setChangeFor] = useState('')
+  const [pixCopied, setPixCopied] = useState(false)
 
   const theme = store.theme ?? {}
+  const storeFont = theme.font && theme.font !== DEFAULT_STORE_FONT ? theme.font : ''
+  const styleVars = { '--primary': theme.primaryColor || undefined } as React.CSSProperties
+  if (storeFont) (styleVars as Record<string, string>)['--store-font'] = `"${storeFont}"`
 
   const filteredMenu = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -318,35 +324,6 @@ export default function PublicMenu({
     setSubmitting(false)
     if (rpcError) return setError(rpcError.message)
 
-    if (store.whatsapp_number && store.checkout_mode !== 'system') {
-      const lines = cart
-        .map((i) => {
-          const opts = i.options.length ? ` (${i.options.map((o) => o.name).join(', ')})` : ''
-          return `• ${i.qty}x ${i.name}${opts} = ${fmtCents(unitOf(i) * i.qty)}`
-        })
-        .join('\n')
-      const parts = [
-        `Olá! Pedido #${String(orderId).slice(0, 8)}:`,
-        '',
-        lines,
-        '',
-        `Subtotal: ${fmtCents(subtotal)}`,
-        deliveryFee ? `Entrega: ${fmtCents(deliveryFee)}` : '',
-        `*Total: ${fmtCents(total)}*`,
-        '',
-        orderType === 'delivery'
-          ? `Entrega: ${addr.street}, ${addr.number} - ${addr.neighborhood}`
-          : orderType === 'pickup'
-            ? 'Retirada no local'
-            : `Mesa ${tableNumber}`,
-        payment ? `Pagamento: ${payment === 'cash' ? 'Dinheiro' : payment === 'card' ? 'Cartão' : 'Pix'}` : '',
-      ].filter(Boolean)
-      window.open(
-        `https://wa.me/${store.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(parts.join('\n'))}`,
-        '_blank'
-      )
-    }
-
     saveOrderToHistory({
       id: String(orderId),
       storeSlug: store.slug,
@@ -360,10 +337,11 @@ export default function PublicMenu({
   const minToReach = store.min_order_cents - subtotal
 
   return (
-    <div className="storefront" style={{ '--primary': theme.primaryColor || undefined } as React.CSSProperties}>
+    <div className="storefront" style={styleVars}>
       <link rel="manifest" href={`/loja/${store.slug}/manifest.webmanifest`} />
       <meta name="theme-color" content={theme.primaryColor || '#FF5722'} />
       <link rel="apple-touch-icon" href={theme.logoUrl || `/loja/${store.slug}/app-icon.svg`} />
+      {storeFont && <link rel="stylesheet" href={googleFontHref(storeFont)} />}
 
       <div className="storefront-topbar">
         {theme.logoUrl && (
@@ -407,6 +385,13 @@ export default function PublicMenu({
         style={{ opacity: cartOpen ? 1 : 0, pointerEvents: cartOpen ? 'all' : 'none' }}
         onClick={() => setCartOpen(false)}
       />
+
+      {theme.bannerUrl && (
+        <div className="storefront-banner">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={theme.bannerUrl} alt={`Banner ${store.name}`} />
+        </div>
+      )}
 
       <header className="storefront-header">
         {theme.logoUrl ? (
@@ -635,6 +620,28 @@ export default function PublicMenu({
                     <input className="form-input" type="number" step="0.01" placeholder="Troco para quanto? (opcional)" value={changeFor} onChange={(e) => setChangeFor(e.target.value)} />
                   </div>
                 )}
+                {payment === 'pix' && store.pix_key && (
+                  <div className="pix-key-box">
+                    <span className="pix-key-label">
+                      Chave Pix da loja{store.pix_key_type ? ` (${PIX_KEY_TYPE_LABEL[store.pix_key_type]})` : ''}
+                    </span>
+                    <div className="pix-key-row">
+                      <span className="pix-key-value">{store.pix_key}</span>
+                      <button
+                        type="button"
+                        className="pix-copy-btn"
+                        onClick={() => {
+                          navigator.clipboard.writeText(store.pix_key!)
+                          setPixCopied(true)
+                          setTimeout(() => setPixCopied(false), 2000)
+                        }}
+                      >
+                        {pixCopied ? '✓' : 'Copiar'}
+                      </button>
+                    </div>
+                    <p className="pix-key-hint">Pague com essa chave e confirme o pedido. O comprovante pode ser confirmado direto com a loja.</p>
+                  </div>
+                )}
 
                 <div className="form-group">
                   <input className="form-input" placeholder="Cupom (opcional)" value={coupon} onChange={(e) => setCoupon(e.target.value.toUpperCase())} />
@@ -662,11 +669,7 @@ export default function PublicMenu({
                 </div>
 
                 <button className="checkout-btn" disabled={subtotal < store.min_order_cents || submitting} onClick={checkout}>
-                  {submitting
-                    ? 'Enviando...'
-                    : store.whatsapp_number && store.checkout_mode !== 'system'
-                      ? 'Fazer Pedido via WhatsApp'
-                      : 'Confirmar Pedido'}
+                  {submitting ? 'Enviando...' : 'Confirmar Pedido'}
                 </button>
               </div>
             </>
@@ -728,10 +731,17 @@ export default function PublicMenu({
       )}
 
       <button className={`cart-fab ${totalItems === 0 ? 'hidden' : ''}`} onClick={() => setCartOpen(true)}>
-        Ver pedido
-        <span className="cart-count">{totalItems} {totalItems === 1 ? 'item' : 'itens'}</span>
-        <span className="cart-sep">·</span>
-        <span className="cart-fab-total">{fmtCents(total)}</span>
+        <span className="fab-left">
+          <span className="fab-count">{totalItems}</span>
+          <span className="fab-total-block">
+            <span className="fab-total-label">Total</span>
+            <span className="cart-fab-total">{fmtCents(total)}</span>
+          </span>
+        </span>
+        <span className="fab-right">
+          Ver pedido
+          <span className="cart-count">{totalItems} {totalItems === 1 ? 'item' : 'itens'}</span>
+        </span>
       </button>
     </div>
   )

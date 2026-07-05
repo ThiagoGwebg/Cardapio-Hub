@@ -2416,3 +2416,450 @@ tr:hover td {
   white-space: nowrap;
 }
 .track-copy-hint { font-size: 11px; color: var(--muted); margin: 6px 0 0; }
+
+/* ===== Chave Pix no checkout ===== */
+.pix-key-box {
+  background: var(--surface2);
+  border: 1px dashed var(--primary);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 4px;
+}
+.pix-key-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.pix-key-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.pix-key-value { flex: 1; font-size: 14px; font-weight: 700; color: var(--text); word-break: break-all; }
+.pix-copy-btn {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--primary);
+  background: var(--primary-l);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pix-key-hint { font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+/* ══════════════════════════════════════════════════════════
+   CARDÁPIO PÚBLICO — TEMA CLARO "BRASEIRO QUENTE"
+   Layout padrão apetitoso/mobile-first para TODAS as lojas.
+   Baseado no design gerado no Google Stitch. Escopado a
+   .storefront: redefine as variáveis de tema só aqui, então
+   todo o cardápio vira claro sem afetar o painel do dono (dark).
+   --primary continua vindo do tema da loja (themeável).
+══════════════════════════════════════════════════════════ */
+.storefront {
+  /* Paleta clara/quente — sobrescreve as vars dark só no cardápio */
+  --bg: #FFF8F3;
+  --surface: #FFFFFF;
+  --surface2: #FFF3EC;
+  --surface3: #F1EAE4;
+
+  --primary-l: rgba(255, 87, 34, 0.10);
+
+  --green: #2E9E4F;
+  --green-d: #248A43;
+  --green-l: rgba(46, 158, 79, 0.12);
+
+  --red: #E4572E;
+  --red-l: rgba(228, 87, 46, 0.10);
+
+  --yellow: #E8A33D;
+  --yellow-l: rgba(232, 163, 61, 0.14);
+
+  --text: #1F1B1A;
+  --text2: #3A3432;
+  --muted: #7A7168;
+  --muted2: #A79E97;
+
+  --border: #ECE3DB;
+  --border2: #F3ECE6;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 14px 34px rgba(0, 0, 0, 0.12);
+
+  --radius: 16px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+
+  min-height: 100dvh;
+  color: var(--text);
+  font-family: var(--store-font, 'Plus Jakarta Sans'), 'Plus Jakarta Sans', 'Inter', sans-serif;
+  background:
+    radial-gradient(130% 320px at 50% 0, rgba(255, 87, 34, 0.13), transparent 72%),
+    var(--bg);
+}
+
+html:has(.storefront) { color-scheme: light; }
+body:has(.storefront) { background: #FFF8F3; }
+
+/* ── Topbar / cabeçalho ── */
+.storefront .storefront-topbar {
+  background: rgba(255, 248, 243, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+.storefront .storefront-name {
+  letter-spacing: -0.5px;
+}
+
+.storefront .storefront-logo {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Busca ── */
+.storefront .storefront-search-row .form-input {
+  max-width: 520px;
+  padding: 13px 16px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* ── Chips de categoria (pills roláveis) ── */
+.storefront .menu-nav {
+  gap: 8px;
+  padding-bottom: 4px;
+}
+
+.storefront .menu-nav-item {
+  padding: 9px 16px;
+  border: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-radius: 999px;
+  margin-bottom: 0;
+  background: var(--surface);
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.storefront .menu-nav-item:hover {
+  background: var(--primary-l);
+  color: var(--primary);
+}
+
+.storefront .menu-nav-item.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 4px 10px rgba(255, 87, 34, 0.28);
+}
+
+/* ── Rótulos de seção ── */
+.storefront .section-label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  text-transform: none;
+  letter-spacing: -0.2px;
+}
+
+.storefront .section-label::after { background: var(--border); }
+
+/* ── Grade de produtos ── */
+.storefront .products-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 760px) {
+  .storefront .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Card de produto ── */
+.storefront .product-card {
+  border-radius: 16px;
+  border-color: var(--border2);
+}
+
+.storefront .product-card:not(.out-of-stock):hover {
+  border-color: rgba(255, 87, 34, 0.35);
+  box-shadow: 0 12px 26px rgba(255, 87, 34, 0.12);
+  transform: translateY(-3px);
+}
+
+.storefront .product-img {
+  background: #F4EFEA;
+  border-bottom: none;
+}
+
+.storefront .product-info { padding: 12px 12px 14px; }
+
+.storefront .product-name {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.storefront .product-desc {
+  font-size: 11.5px;
+  line-height: 1.45;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.storefront .product-price { font-size: 16px; }
+
+.storefront .add-btn {
+  width: 34px;
+  height: 34px;
+  background: var(--primary);
+  border-radius: 999px;
+  font-size: 20px;
+  box-shadow: 0 4px 10px rgba(255, 87, 34, 0.3);
+}
+
+.storefront .add-btn:hover:not(:disabled) {
+  background: var(--primary-d);
+  box-shadow: 0 6px 14px rgba(255, 87, 34, 0.4);
+}
+
+.storefront .add-btn:disabled {
+  background: #EDE6E0;
+  color: #B9B1AA;
+  opacity: 1;
+}
+
+/* ── Barra flutuante do carrinho (mobile) ── */
+.storefront .cart-fab {
+  border-radius: 18px;
+  padding: 12px 18px;
+  gap: 10px;
+  box-shadow: 0 12px 30px rgba(255, 87, 34, 0.4);
+}
+
+.storefront .fab-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.storefront .fab-count {
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.storefront .fab-total-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.05;
+}
+
+.storefront .fab-total-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.85;
+}
+
+.storefront .cart-fab-total { font-size: 17px; }
+
+.storefront .fab-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.storefront .fab-right .cart-count {
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 11px;
+}
+
+/* ── Drawer / carrinho ── */
+.storefront .cart-drawer-header { background: var(--surface2); }
+.storefront .cart-footer { background: var(--surface2); }
+.storefront .cart-item { background: var(--surface2); }
+.storefront .cart-item-total { color: var(--primary); }
+
+/* ── Botão de finalizar ── */
+.storefront .checkout-btn {
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(46, 158, 79, 0.3);
+}
+
+/* ── Mobile: barra do carrinho full-width e dedo-friendly ── */
+@media (max-width: 700px) {
+  .storefront .cart-fab {
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    justify-content: space-between;
+    border-radius: 18px;
+  }
+}
+
+/* ── Anti-overflow horizontal (nada pode vazar da tela) ── */
+html:has(.storefront),
+body:has(.storefront) {
+  overflow-x: hidden;
+}
+
+/* Itens de grid com imagem precisam de min-width:0 senão a faixa
+   1fr estoura para a largura intrínseca da foto → 2ª coluna some. */
+.storefront .products-grid { min-width: 0; }
+.storefront .product-card { min-width: 0; }
+.storefront .product-img img { min-width: 0; }
+.storefront .product-name,
+.storefront .product-desc { overflow-wrap: anywhere; }
+
+/* Topbar: nome encolhe com reticências em vez de empurrar a largura */
+.storefront .storefront-topbar-name { flex: 1 1 auto; min-width: 0; }
+
+/* Cabeçalho compacto no celular */
+@media (max-width: 540px) {
+  .storefront .storefront-header {
+    gap: 14px;
+    padding: 20px 16px 14px;
+  }
+  .storefront .storefront-logo {
+    width: 58px;
+    height: 58px;
+    border-radius: 14px;
+  }
+  .storefront .storefront-name {
+    font-size: 22px;
+    overflow-wrap: anywhere;
+  }
+  .storefront .storefront-search-row { padding: 0 16px 8px; }
+  .storefront .storefront-layout { padding: 0 16px 140px; }
+}
+
+/* ── Banner do topo (personalizável) ── */
+.storefront-banner {
+  width: 100%;
+  max-height: 220px;
+  overflow: hidden;
+  background: #F4EFEA;
+  line-height: 0;
+}
+.storefront-banner img {
+  width: 100%;
+  height: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+}
+@media (max-width: 540px) {
+  .storefront-banner,
+  .storefront-banner img { max-height: 150px; }
+}
+
+/* ── Fonte personalizada da loja (Pro) aplicada aos títulos ── */
+.storefront .storefront-name,
+.storefront .section-label,
+.storefront .product-name,
+.storefront .product-price,
+.storefront .cart-drawer-title,
+.storefront .cart-fab-total,
+.storefront .fab-count,
+.storefront .cart-subtotal-value {
+  font-family: var(--store-font, 'Nunito'), 'Nunito', sans-serif;
+}
+
+/* ══════════════════════════════════════════════════════════
+   PAINEL — Upload de imagem + bloco de recurso Pro
+   (tema dark do painel; usa as variáveis globais)
+══════════════════════════════════════════════════════════ */
+.upload-field {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+.upload-field-banner {
+  flex-direction: column;
+  align-items: stretch;
+}
+.upload-preview {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.upload-preview-logo { width: 72px; height: 72px; }
+.upload-preview-banner {
+  width: 100%;
+  aspect-ratio: 3 / 1;
+  max-height: 170px;
+}
+.upload-preview img { width: 100%; height: 100%; object-fit: cover; }
+.upload-preview-empty { font-size: 11px; color: var(--muted2); }
+.upload-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.upload-field-banner .upload-actions { margin-top: 10px; }
+.upload-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+.upload-error { font-size: 12px; color: var(--red); margin-top: 6px; }
+
+.pro-block {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border2);
+}
+.pro-block-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted2);
+  font-family: 'Inter', monospace;
+}
+.pro-badge {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(135deg, #FFB020, #FF7A00);
+  color: #1a0e08;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: none;
+}
+.pro-lock {
+  background: var(--surface2);
+  border: 1px dashed var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 18px 16px;
+  text-align: center;
+}
+.pro-lock-text {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.pro-lock-btn {
+  display: inline-block;
+  text-decoration: none;
+  margin: 0;
+}

@@ -144,7 +144,7 @@ function updateFab() {
     fab.classList.add('hidden');
   } else {
     fab.classList.remove('hidden');
-    countEl.textContent = total + (total === 1 ? ' item' : ' itens');
+    countEl.textContent = total;
     totalEl.textContent = fmt(cartTotal());
   }
 }
@@ -286,7 +286,7 @@ function renderProductCard(p) {
   `;
 
   return `
-    <div class="product-card${p.available ? '' : ' out-of-stock'}">
+    <div class="product-card${p.available ? '' : ' out-of-stock'}" data-name="${(p.name + ' ' + p.desc).toLowerCase().replace(/"/g, '')}">
       ${p.available ? '' : '<div class="tag-em-falta">Em falta</div>'}
       <div class="product-img">${imgContent}</div>
       <div class="product-info">
@@ -312,6 +312,24 @@ function setupSectionObserver() {
   }, { rootMargin: '-30% 0px -60% 0px' });
 
   document.querySelectorAll('.menu-section').forEach(s => observer.observe(s));
+}
+
+/* Busca do cardápio — filtra cards por nome/descrição */
+function setupSearch() {
+  const input = document.getElementById('menuSearch');
+  if (!input) return;
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    document.querySelectorAll('#menuBody .menu-section').forEach(sec => {
+      let visible = 0;
+      sec.querySelectorAll('.product-card').forEach(card => {
+        const match = !q || (card.dataset.name || '').includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) visible++;
+      });
+      sec.style.display = visible ? '' : 'none';
+    });
+  });
 }
 
 function scrollToSection(id) {
@@ -451,6 +469,7 @@ function showView(viewId) {
 document.addEventListener('DOMContentLoaded', () => {
   renderMenu();
   renderKanban();
+  setupSearch();
 
   // Toggle de view
   document.querySelectorAll('.mode-toggle button').forEach(btn => {

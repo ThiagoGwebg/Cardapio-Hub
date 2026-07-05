@@ -3,6 +3,7 @@ import { fmtCents } from '@/lib/format'
 import { IconUtensils } from '@/components/icons'
 import Link from 'next/link'
 import ProductToggle from './ProductToggle'
+import ImageUploadField from '@/components/ImageUploadField'
 import { createProduct } from './actions'
 
 export default async function CardapioPage() {
@@ -42,14 +43,17 @@ export default async function CardapioPage() {
               <input className="form-input" name="price" type="number" step="0.01" min="0" required />
             </div>
             <div className="form-group">
-              <label className="form-label">URL da imagem (opcional)</label>
-              <input className="form-input" name="imageUrl" placeholder="/img/fotos_produtos/..." />
+              <label className="form-label">Descrição</label>
+              <input className="form-input" name="description" />
             </div>
           </div>
-          <div className="form-group">
-            <label className="form-label">Descrição</label>
-            <input className="form-input" name="description" />
-          </div>
+          <ImageUploadField
+            storeId={store.id}
+            kind="product"
+            name="imageUrl"
+            label="Foto do produto (opcional)"
+            hint="Quadrada fica melhor (ideal 600×600). PNG, JPG, WEBP ou SVG até 5 MB."
+          />
           <button className="save-btn" type="submit" style={{ alignSelf: 'flex-start' }}>
             Adicionar produto
           </button>

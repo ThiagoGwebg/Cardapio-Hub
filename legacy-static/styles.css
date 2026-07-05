@@ -1750,3 +1750,422 @@ tr:hover td {
     transform: translateY(14px);
   }
 }
+
+/* ══════════════════════════════════════════════════════════
+   CARDÁPIO DO CLIENTE — REDESIGN "BRASEIRO QUENTE"
+   Tema claro / apetitoso, mobile-first. Baseado no design
+   gerado no Google Stitch. Escopado a #view-menu para não
+   afetar o Painel de Gestão (que permanece dark).
+══════════════════════════════════════════════════════════ */
+#view-menu {
+  --m-primary: #FF5722;
+  --m-primary-d: #E64A19;
+  --m-primary-l: #FFEDE7;
+  --m-surface: #FFF8F3;
+  --m-card: #FFFFFF;
+  --m-text: #1F1B1A;
+  --m-muted: #707070;
+  --m-outline: #E7E1DC;
+  --m-outline-v: #F1ECE7;
+  --m-success: #2E9E4F;
+  background: var(--m-surface);
+  min-height: 100vh;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
+
+body:has(#view-menu.active) {
+  background: #FFF8F3;
+}
+
+/* ── Hero ── */
+#view-menu .menu-hero {
+  background: linear-gradient(180deg, #FFE7DC 0%, #FFF8F3 78%);
+  border-bottom: 1px solid var(--m-outline-v);
+  padding: 66px 20px 0;
+  text-align: left;
+}
+
+#view-menu .store-name {
+  font-family: 'Sora', 'Nunito', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.4px;
+  color: var(--m-text);
+  margin: 10px 0 0;
+}
+
+#view-menu .hero-open-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(46, 158, 79, 0.12);
+  color: var(--m-success);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+#view-menu .hero-open-badge .badge-dot {
+  background: var(--m-success);
+}
+
+#view-menu .store-sub {
+  justify-content: flex-start;
+  color: var(--m-muted);
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 8px 0 0;
+}
+
+/* ── Busca ── */
+#view-menu .menu-search {
+  position: relative;
+  margin-top: 16px;
+}
+
+#view-menu .menu-search svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--m-muted);
+  pointer-events: none;
+}
+
+#view-menu .menu-search input {
+  width: 100%;
+  padding: 13px 16px 13px 42px;
+  border: 1px solid var(--m-outline-v);
+  border-radius: 14px;
+  background: var(--m-card);
+  color: var(--m-text);
+  font-family: inherit;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+#view-menu .menu-search input::placeholder {
+  color: #A79E97;
+}
+
+#view-menu .menu-search input:focus {
+  border-color: var(--m-primary);
+  box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.12);
+}
+
+/* ── Chips de categoria (pills roláveis) ── */
+#view-menu .menu-nav {
+  border-top: none;
+  justify-content: flex-start;
+  gap: 8px;
+  overflow-x: auto;
+  margin: 16px -20px 0;
+  padding: 2px 20px 14px;
+}
+
+#view-menu .menu-nav-item {
+  padding: 9px 16px;
+  border: 1px solid var(--m-outline);
+  border-bottom: 1px solid var(--m-outline);
+  border-radius: 999px;
+  margin-bottom: 0;
+  background: var(--m-card);
+  color: var(--m-text);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+#view-menu .menu-nav-item:hover {
+  background: var(--m-primary-l);
+  color: var(--m-primary-d);
+}
+
+#view-menu .menu-nav-item.active {
+  background: var(--m-primary);
+  color: #fff;
+  border-color: var(--m-primary);
+  box-shadow: 0 4px 10px rgba(255, 87, 34, 0.3);
+}
+
+/* ── Corpo / seções ── */
+#view-menu .menu-body {
+  padding: 26px 20px 160px;
+}
+
+#view-menu .section-label {
+  font-family: 'Sora', 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--m-text);
+  text-transform: none;
+  letter-spacing: -0.2px;
+}
+
+#view-menu .section-label::after {
+  background: var(--m-outline);
+}
+
+#view-menu .products-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+/* ── Card de produto ── */
+#view-menu .product-card {
+  background: var(--m-card);
+  border: 1px solid var(--m-outline-v);
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+#view-menu .product-card:not(.out-of-stock):hover {
+  border-color: rgba(255, 87, 34, 0.35);
+  box-shadow: 0 10px 24px rgba(255, 87, 34, 0.12);
+  transform: translateY(-3px);
+}
+
+#view-menu .product-img {
+  background: #F4EFEA;
+  border-bottom: none;
+}
+
+#view-menu .product-info {
+  background: var(--m-card);
+  padding: 12px 12px 14px;
+}
+
+#view-menu .product-name {
+  font-family: 'Sora', 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--m-text);
+  margin-bottom: 4px;
+}
+
+#view-menu .product-desc {
+  font-size: 11px;
+  color: var(--m-muted);
+  line-height: 1.45;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#view-menu .product-price {
+  font-family: 'Sora', 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--m-primary);
+}
+
+#view-menu .add-btn {
+  width: 34px;
+  height: 34px;
+  background: var(--m-primary);
+  border-radius: 999px;
+  font-size: 20px;
+  box-shadow: 0 4px 10px rgba(255, 87, 34, 0.3);
+}
+
+#view-menu .add-btn:hover:not(:disabled) {
+  background: var(--m-primary-d);
+}
+
+#view-menu .add-btn:disabled {
+  background: #EFE9E4;
+  color: #B9B1AA;
+}
+
+#view-menu .qty-ctrl-btn {
+  background: var(--m-primary-l);
+  border: 1px solid var(--m-primary-l);
+  border-radius: 999px;
+  color: var(--m-primary-d);
+}
+
+#view-menu .qty-ctrl-btn:hover {
+  background: var(--m-primary);
+  border-color: var(--m-primary);
+  color: #fff;
+}
+
+#view-menu .qty-display {
+  color: var(--m-text);
+}
+
+/* ── Barra flutuante do carrinho ── */
+#view-menu .cart-fab {
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  width: auto;
+  transform: none;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--m-primary);
+  border-radius: 18px;
+  padding: 12px 18px;
+  box-shadow: 0 12px 30px rgba(255, 87, 34, 0.4);
+}
+
+#view-menu .cart-fab:hover {
+  transform: translateY(-2px);
+  background: var(--m-primary-d);
+}
+
+#view-menu .cart-fab.hidden {
+  transform: translateY(16px);
+}
+
+#view-menu .fab-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#view-menu .fab-count {
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+#view-menu .fab-total-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.05;
+}
+
+#view-menu .fab-total-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.85;
+}
+
+#view-menu .cart-fab-total {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+}
+
+#view-menu .fab-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* ── Drawer do carrinho (tema claro) ── */
+body:has(#view-menu.active) .cart-drawer {
+  background: #fff;
+  border-left: 1px solid #E7E1DC;
+}
+
+body:has(#view-menu.active) .cart-drawer-header,
+body:has(#view-menu.active) .cart-footer {
+  background: #FFF8F3;
+  border-color: #E7E1DC;
+}
+
+body:has(#view-menu.active) .cart-drawer-title,
+body:has(#view-menu.active) .cart-subtotal-value {
+  color: #1F1B1A;
+}
+
+body:has(#view-menu.active) .cart-close {
+  background: #F1ECE7;
+  border-color: #E7E1DC;
+  color: #707070;
+}
+
+body:has(#view-menu.active) .cart-close:hover {
+  background: #E7E1DC;
+  color: #1F1B1A;
+}
+
+body:has(#view-menu.active) .cart-item {
+  background: #FFF8F3;
+  border-color: #F1ECE7;
+}
+
+body:has(#view-menu.active) .cart-item-name {
+  color: #1F1B1A;
+}
+
+body:has(#view-menu.active) .cart-item-unit,
+body:has(#view-menu.active) .cart-subtotal-row,
+body:has(#view-menu.active) .cart-empty p {
+  color: #707070;
+}
+
+body:has(#view-menu.active) .cart-qty-btn {
+  background: #fff;
+  border-color: #E7E1DC;
+  color: #1F1B1A;
+}
+
+body:has(#view-menu.active) .cart-qty-btn:hover {
+  background: #FF5722;
+  border-color: #FF5722;
+  color: #fff;
+}
+
+body:has(#view-menu.active) .cart-item-total {
+  color: #E64A19;
+}
+
+/* ── Responsivo ── */
+@media (min-width: 560px) {
+  #view-menu .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 860px) {
+  #view-menu .products-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  #view-menu .store-name {
+    font-size: 32px;
+  }
+
+  #view-menu .cart-fab {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(560px, calc(100% - 40px));
+  }
+
+  #view-menu .cart-fab:hover {
+    transform: translateX(-50%) translateY(-2px);
+  }
+
+  #view-menu .cart-fab.hidden {
+    transform: translateX(-50%) translateY(16px);
+  }
+}

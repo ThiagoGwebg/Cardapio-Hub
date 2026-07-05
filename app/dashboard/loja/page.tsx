@@ -1,12 +1,16 @@
 import { getCurrentStore } from '@/lib/store'
 import { fmtCents } from '@/lib/format'
+import { isStorePro, STORE_FONTS, DEFAULT_STORE_FONT } from '@/lib/plan'
 import { updateStore, addZone, deleteZone } from './actions'
+import PixKeyField from '@/components/PixKeyField'
+import ImageUploadField from '@/components/ImageUploadField'
 
-type Theme = { primaryColor?: string; logoUrl?: string; bannerUrl?: string }
+type Theme = { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font?: string }
 
 export default async function LojaPage() {
   const { supabase, store } = await getCurrentStore()
   const theme = (store.theme ?? {}) as Theme
+  const isPro = await isStorePro(supabase, store.id)
 
   const { data: zones } = await supabase
     .from('delivery_zones')
@@ -41,28 +45,6 @@ export default async function LojaPage() {
               <input className="form-input" name="minOrder" type="number" step="0.01" min="0" defaultValue={(store.min_order_cents / 100).toFixed(2)} />
             </div>
           </div>
-        </div>
-
-        <div className="settings-card">
-          <div className="settings-section-title">Como finalizar o pedido</div>
-          <div className="ordertype-row">
-            <label style={{ flex: 1 }}>
-              <input type="radio" name="checkoutMode" value="whatsapp" defaultChecked={store.checkout_mode !== 'system'} style={{ display: 'none' }} />
-              <span className={`ordertype-btn ${store.checkout_mode !== 'system' ? 'active' : ''}`} style={{ display: 'block', textAlign: 'center' }}>
-                Abrir WhatsApp
-              </span>
-            </label>
-            <label style={{ flex: 1 }}>
-              <input type="radio" name="checkoutMode" value="system" defaultChecked={store.checkout_mode === 'system'} style={{ display: 'none' }} />
-              <span className={`ordertype-btn ${store.checkout_mode === 'system' ? 'active' : ''}`} style={{ display: 'block', textAlign: 'center' }}>
-                Só confirmar no sistema
-              </span>
-            </label>
-          </div>
-          <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8 }}>
-            <b>Abrir WhatsApp:</b> o cliente finaliza e é levado ao WhatsApp da loja com o pedido pronto pra enviar — bom pra manter contato direto.<br />
-            <b>Só confirmar no sistema:</b> o pedido cai direto no seu Kanban e o cliente acompanha pela página de status, sem sair do cardápio. Use "Avisar cliente" no Kanban pra notificar pelo WhatsApp quando quiser.
-          </p>
         </div>
 
         <div className="settings-card">
@@ -109,27 +91,60 @@ export default async function LojaPage() {
             <div><div className="toggle-label">Pix</div></div>
             <label className="toggle-switch"><input type="checkbox" name="acceptsPix" defaultChecked={store.accepts_pix} /><span className="toggle-slider"></span></label>
           </div>
-          <div className="form-group" style={{ marginTop: 8 }}>
-            <label className="form-label">Chave Pix (aparece no checkout)</label>
-            <input className="form-input" name="pixKey" defaultValue={store.pix_key ?? ''} placeholder="email, telefone ou chave aleatória" />
-          </div>
+          <PixKeyField defaultType={store.pix_key_type} defaultValue={store.pix_key} />
         </div>
 
         <div className="settings-card">
           <div className="settings-section-title">Identidade visual do cardápio público</div>
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Cor principal</label>
-              <input className="form-input" name="primaryColor" type="color" defaultValue={theme.primaryColor || '#FF5722'} style={{ height: 40, padding: 4 }} />
+
+          <ImageUploadField
+            storeId={store.id}
+            kind="logo"
+            name="logoUrl"
+            label="Logo da loja"
+            hint="Imagem quadrada (ideal 512×512). PNG, JPG, WEBP ou SVG até 5 MB."
+            defaultUrl={theme.logoUrl || ''}
+          />
+
+          <ImageUploadField
+            storeId={store.id}
+            kind="banner"
+            name="bannerUrl"
+            label="Banner do topo"
+            hint="Imagem larga (ideal 1200×400). Aparece no topo do seu cardápio."
+            defaultUrl={theme.bannerUrl || ''}
+          />
+
+          <div className="pro-block">
+            <div className="pro-block-head">
+              <span>Cores e fonte</span>
+              {!isPro && <span className="pro-badge">Pro</span>}
             </div>
-          </div>
-          <div className="form-group">
-            <label className="form-label">URL do logo</label>
-            <input className="form-input" name="logoUrl" defaultValue={theme.logoUrl || ''} placeholder="https://..." />
-          </div>
-          <div className="form-group">
-            <label className="form-label">URL do banner</label>
-            <input className="form-input" name="bannerUrl" defaultValue={theme.bannerUrl || ''} placeholder="https://..." />
+
+            {isPro ? (
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Cor principal</label>
+                  <input className="form-input" name="primaryColor" type="color" defaultValue={theme.primaryColor || '#FF5722'} style={{ height: 40, padding: 4 }} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Fonte do cardápio</label>
+                  <select className="form-input" name="font" defaultValue={theme.font || DEFAULT_STORE_FONT}>
+                    {STORE_FONTS.map((f) => (
+                      <option key={f.value} value={f.value}>{f.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            ) : (
+              <div className="pro-lock">
+                <p className="pro-lock-text">
+                  Deixe o cardápio com a sua cara: escolha a <strong>cor principal</strong> e a{' '}
+                  <strong>fonte</strong> no plano Pro.
+                </p>
+                <a href="/dashboard/billing" className="save-btn pro-lock-btn">Assinar Pro</a>
+              </div>
+            )}
           </div>
         </div>
 

@@ -46,8 +46,8 @@ export default async function BillingPage({
         </p>
         <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 16 }}>
           {isPro
-            ? 'Produtos e pedidos ilimitados, banner e fontes personalizadas no cardápio.'
-            : 'Até 20 produtos e 30 pedidos por mês. Cor e logo personalizáveis.'}
+            ? 'Produtos e pedidos ilimitados, cor e fonte personalizadas no cardápio.'
+            : 'Até 20 produtos e 30 pedidos por mês. Logo e banner liberados; cor e fonte no Pro.'}
         </p>
 
         {isPro ? (

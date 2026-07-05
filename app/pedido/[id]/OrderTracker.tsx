@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { fmtCents, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL } from '@/lib/format'
+import { fmtCents, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL, PIX_KEY_TYPE_LABEL } from '@/lib/format'
 import { saveOrderToHistory } from '@/lib/orderHistory'
 
 type OrderItem = { name: string; quantity: number; unit_price_cents: number; options: string[] }
@@ -21,6 +21,8 @@ type Order = {
   store_slug: string
   estimated_prep_min: number
   estimated_delivery_min: number
+  pix_key: string | null
+  pix_key_type: string | null
   items: OrderItem[]
 }
 
@@ -31,6 +33,7 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [pixCopied, setPixCopied] = useState(false)
 
   const load = useCallback(async () => {
     const supabase = createClient()
@@ -83,6 +86,28 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
           {order.payment_method && <span className="track-badge">{PAYMENT_LABEL[order.payment_method]}</span>}
           {!canceled && <span className="track-badge track-badge-eta">⏱ ~{eta} min</span>}
         </div>
+
+        {!canceled && order.payment_method === 'pix' && order.pix_key && (
+          <div className="pix-key-box" style={{ marginBottom: 16 }}>
+            <span className="pix-key-label">
+              Chave Pix da loja{order.pix_key_type ? ` (${PIX_KEY_TYPE_LABEL[order.pix_key_type]})` : ''}
+            </span>
+            <div className="pix-key-row">
+              <span className="pix-key-value">{order.pix_key}</span>
+              <button
+                className="pix-copy-btn"
+                onClick={() => {
+                  navigator.clipboard.writeText(order.pix_key!)
+                  setPixCopied(true)
+                  setTimeout(() => setPixCopied(false), 2000)
+                }}
+              >
+                {pixCopied ? '✓' : 'Copiar'}
+              </button>
+            </div>
+            <p className="pix-key-hint">Se ainda não pagou, envie o Pix pra essa chave e mostre o comprovante na retirada/entrega.</p>
+          </div>
+        )}
 
         {canceled ? (
           <div className="track-canceled">Este pedido foi cancelado.</div>
