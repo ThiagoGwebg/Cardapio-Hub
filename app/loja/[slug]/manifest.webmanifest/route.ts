@@ -19,14 +19,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
   const primaryColor = theme.primaryColor || '#FF5722'
   const logoUrl = theme.logoUrl
 
+  const generatedIcon = `/loja/${slug}/app-icon.svg`
   const icons = logoUrl
     ? [
         { src: logoUrl, sizes: '192x192', type: 'image/png', purpose: 'any' },
         { src: logoUrl, sizes: '512x512', type: 'image/png', purpose: 'any' },
       ]
     : [
-        { src: '/icons/icon-fallback.svg', sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
-        { src: '/icons/icon-fallback.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any' },
+        { src: generatedIcon, sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
+        { src: generatedIcon, sizes: '512x512', type: 'image/svg+xml', purpose: 'any' },
       ]
 
   const manifest = {

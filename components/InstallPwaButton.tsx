@@ -20,10 +20,11 @@ function isStandalone() {
   )
 }
 
-export default function InstallPwaButton({ storeName }: { storeName: string }) {
+export default function InstallPwaButton({ storeName, appIconSrc }: { storeName: string; appIconSrc: string }) {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [installed, setInstalled] = useState(false)
-  const [showIosHint, setShowIosHint] = useState(false)
+  const [cardOpen, setCardOpen] = useState(false)
+  const [installing, setInstalling] = useState(false)
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
@@ -51,45 +52,92 @@ export default function InstallPwaButton({ storeName }: { storeName: string }) {
   }, [])
 
   if (installed) return null
-
-  async function handleClick() {
-    if (deferredPrompt) {
-      await deferredPrompt.prompt()
-      const { outcome } = await deferredPrompt.userChoice
-      if (outcome === 'accepted') setInstalled(true)
-      setDeferredPrompt(null)
-      return
-    }
-    if (isIos()) {
-      setShowIosHint(true)
-      return
-    }
-  }
-
   if (!deferredPrompt && !isIos()) return null
+
+  async function confirmInstall() {
+    if (!deferredPrompt) return
+    setInstalling(true)
+    await deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+    setInstalling(false)
+    if (outcome === 'accepted') setInstalled(true)
+    setDeferredPrompt(null)
+    setCardOpen(false)
+  }
 
   return (
     <>
-      <button className="install-pwa-btn" onClick={handleClick}>
-        📲 Instalar app
+      <button className="install-pwa-btn" onClick={() => setCardOpen(true)}>
+        <span className="install-pwa-btn-icon">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={appIconSrc} alt="" width={18} height={18} />
+        </span>
+        Instalar app
       </button>
-      {showIosHint && (
-        <div className="option-modal-overlay" onClick={() => setShowIosHint(false)}>
-          <div className="option-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 360 }}>
-            <div className="option-modal-header">
-              <div className="option-modal-title">Instalar {storeName}</div>
+
+      {cardOpen && (
+        <div className="pwa-overlay" onClick={() => !installing && setCardOpen(false)}>
+          <div className="pwa-card" onClick={(e) => e.stopPropagation()}>
+            <div className="pwa-card-top">
+              <div className="pwa-app-icon">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={appIconSrc} alt={storeName} />
+              </div>
+              <div>
+                <div className="pwa-card-title">{storeName}</div>
+                <div className="pwa-card-subtitle">Peça em segundos, direto da tela inicial</div>
+              </div>
             </div>
-            <div className="option-modal-body" style={{ fontSize: 14, color: 'var(--text2)', lineHeight: 1.6 }}>
-              <p>No iPhone/iPad:</p>
-              <ol style={{ paddingLeft: 20, marginTop: 8 }}>
-                <li>Toque no ícone de <b>Compartilhar</b> (o quadrado com a seta ↑) na barra do Safari</li>
-                <li>Escolha <b>&quot;Adicionar à Tela de Início&quot;</b></li>
-                <li>Toque em <b>Adicionar</b></li>
-              </ol>
+
+            <div className="pwa-benefits">
+              <div className="pwa-benefit">
+                <span className="pwa-benefit-icon">⚡</span>
+                <span>Abre na hora, sem precisar buscar o site</span>
+              </div>
+              <div className="pwa-benefit">
+                <span className="pwa-benefit-icon">📋</span>
+                <span>Seus pedidos ficam salvos e fáceis de acompanhar</span>
+              </div>
+              <div className="pwa-benefit">
+                <span className="pwa-benefit-icon">💾</span>
+                <span>Leve — não ocupa espaço como um app de loja</span>
+              </div>
             </div>
-            <div className="option-modal-footer">
-              <button className="checkout-btn" onClick={() => setShowIosHint(false)}>Entendi</button>
-            </div>
+
+            {isIos() && !deferredPrompt ? (
+              <>
+                <div className="pwa-ios-steps">
+                  <div className="pwa-ios-step">
+                    <span className="pwa-ios-step-num">1</span>
+                    <span>
+                      Toque no ícone <span className="pwa-ios-glyph">⬆️</span> <b>Compartilhar</b> na barra do Safari
+                    </span>
+                  </div>
+                  <div className="pwa-ios-step">
+                    <span className="pwa-ios-step-num">2</span>
+                    <span>
+                      Escolha <b>&quot;Adicionar à Tela de Início&quot;</b>
+                    </span>
+                  </div>
+                  <div className="pwa-ios-step">
+                    <span className="pwa-ios-step-num">3</span>
+                    <span>Toque em <b>Adicionar</b> — pronto!</span>
+                  </div>
+                </div>
+                <button className="pwa-install-btn" onClick={() => setCardOpen(false)}>
+                  Entendi
+                </button>
+              </>
+            ) : (
+              <>
+                <button className="pwa-install-btn" onClick={confirmInstall} disabled={installing}>
+                  {installing ? 'Instalando...' : 'Instalar agora'}
+                </button>
+                <button className="pwa-dismiss-btn" onClick={() => setCardOpen(false)}>
+                  Agora não
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

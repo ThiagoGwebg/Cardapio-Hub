@@ -363,7 +363,7 @@ export default function PublicMenu({
     <div className="storefront" style={{ '--primary': theme.primaryColor || undefined } as React.CSSProperties}>
       <link rel="manifest" href={`/loja/${store.slug}/manifest.webmanifest`} />
       <meta name="theme-color" content={theme.primaryColor || '#FF5722'} />
-      <link rel="apple-touch-icon" href={theme.logoUrl || '/icons/icon-fallback.svg'} />
+      <link rel="apple-touch-icon" href={theme.logoUrl || `/loja/${store.slug}/app-icon.svg`} />
 
       <div className="storefront-topbar">
         {theme.logoUrl && (
@@ -372,7 +372,7 @@ export default function PublicMenu({
         )}
         <span className="storefront-topbar-name">{store.name}</span>
         <div className="storefront-topbar-actions">
-          <InstallPwaButton storeName={store.name} />
+          <InstallPwaButton storeName={store.name} appIconSrc={theme.logoUrl || `/loja/${store.slug}/app-icon.svg`} />
           {myOrders.length > 0 && (
             <button className="my-orders-btn" onClick={() => setMyOrdersOpen(true)}>
               Meus pedidos {myOrders.length > 1 ? `(${myOrders.length})` : ''}

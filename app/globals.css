@@ -855,6 +855,12 @@ body {
   font-weight: 700;
   padding: 3px 10px;
   border-radius: var(--radius-xs);
+  white-space: nowrap;
+}
+.open-badge.is-closed-badge {
+  background: var(--red-l);
+  border-color: rgba(242, 139, 130, 0.25);
+  color: var(--red);
 }
 
 .nav-section-title {
@@ -1690,22 +1696,121 @@ tr:hover td {
   }
 }
 
-@media (max-width: 700px) {
+/* ===== Dashboard mobile: menu hambúrguer ===== */
+.mobile-topbar { display: none; }
+.sidebar-overlay { display: none; }
+.sidebar-close { display: none; }
+
+@media (max-width: 900px) {
+  .mobile-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 150;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+  }
+  .mobile-menu-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface2);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .mobile-menu-btn span {
+    display: block;
+    width: 14px;
+    height: 2px;
+    margin: 0 auto;
+    background: var(--text2);
+    border-radius: 2px;
+  }
+  .mobile-topbar-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 15px;
+    color: var(--text);
+  }
+  .mobile-topbar-title span { color: var(--primary); }
+  .mobile-topbar .open-badge { margin-left: auto; }
+
+  .dashboard { flex-direction: column; }
+
   .sidebar {
-    display: none;
+    position: fixed;
+    left: -260px;
+    width: 240px;
+    transition: left 0.22s ease-out;
+    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.5);
+  }
+  .sidebar.open { left: 0; }
+  .sidebar-close {
+    display: block;
+    align-self: flex-end;
+    margin: 0 14px 8px auto;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 6px;
+  }
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 99;
   }
 
   .dash-content {
     margin-left: 0;
-    padding: 14px;
+    padding: 16px;
   }
 
+  .dash-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 700px) {
   .stats-row {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  /* Kanban vira scroll horizontal com snap, tipo Trello */
   .kanban {
-    grid-template-columns: 1fr;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 12px;
+    padding-bottom: 6px;
+    margin: 0 -16px 20px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .kanban-col {
+    min-width: 84vw;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+
+  .form-row {
+    flex-wrap: wrap;
+  }
+  .form-row .form-group {
+    flex: 1 1 100%;
+    min-width: 140px;
   }
 
   .cart-drawer {
@@ -1746,6 +1851,42 @@ tr:hover td {
 
   .cart-fab.hidden {
     transform: translateY(14px);
+  }
+
+  .cardapio-item {
+    flex-wrap: wrap;
+  }
+  .cardapio-item .ci-info {
+    flex: 1 1 55%;
+    min-width: 0;
+  }
+
+  .settings-card {
+    padding: 16px;
+  }
+
+  .storefront-topbar-actions {
+    gap: 6px;
+  }
+  .install-pwa-btn span:not(.install-pwa-btn-icon),
+  .my-orders-btn {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 420px) {
+  .stats-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .stat-card {
+    padding: 12px;
+  }
+  .stat-value {
+    font-size: 20px;
+  }
+  .kanban-col {
+    min-width: 90vw;
   }
 }
 
@@ -2118,7 +2259,10 @@ tr:hover td {
   white-space: nowrap;
 }
 .install-pwa-btn {
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px 6px 6px;
   border-radius: 20px;
   border: 1px solid var(--primary);
   background: var(--primary-l);
@@ -2127,6 +2271,122 @@ tr:hover td {
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
+  transition: transform .15s, background .15s;
+}
+.install-pwa-btn:hover { background: var(--primary); color: #1a0e08; }
+.install-pwa-btn:active { transform: scale(0.97); }
+.install-pwa-btn-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.install-pwa-btn-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ===== Cartão de instalação (PWA) ===== */
+.pwa-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 300;
+  animation: pwa-fade-in .18s ease-out;
+}
+@media (min-width: 640px) {
+  .pwa-overlay { align-items: center; padding: 20px; }
+}
+@keyframes pwa-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.pwa-card {
+  width: 100%;
+  max-width: 400px;
+  background: linear-gradient(180deg, var(--surface2) 0%, var(--surface) 22%);
+  border: 1px solid var(--border2);
+  border-radius: 20px 20px 0 0;
+  padding: 26px 24px 22px;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.4);
+  animation: pwa-slide-up .22s cubic-bezier(.25, .8, .3, 1.1);
+}
+@media (min-width: 640px) {
+  .pwa-card { border-radius: 20px; }
+}
+@keyframes pwa-slide-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.pwa-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.pwa-app-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 15px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+.pwa-app-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pwa-card-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 17px; color: var(--text); }
+.pwa-card-subtitle { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+
+.pwa-benefits { display: flex; flex-direction: column; gap: 12px; margin-bottom: 22px; }
+.pwa-benefit { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--text2); }
+.pwa-benefit-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--surface3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.pwa-ios-steps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+.pwa-ios-step { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--text2); line-height: 1.4; }
+.pwa-ios-step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary-l);
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.pwa-ios-glyph { display: inline-block; }
+
+.pwa-install-btn {
+  width: 100%;
+  padding: 13px;
+  border-radius: 12px;
+  border: none;
+  background: var(--primary);
+  color: #1a0e08;
+  font-weight: 800;
+  font-size: 14.5px;
+  cursor: pointer;
+  transition: filter .15s;
+}
+.pwa-install-btn:hover { filter: brightness(1.08); }
+.pwa-install-btn:disabled { opacity: 0.6; cursor: default; }
+.pwa-dismiss-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
 }
 .my-order-row {
   display: flex;
