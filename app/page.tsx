@@ -6,6 +6,7 @@ import LandingFeatures from '@/components/landing/LandingFeatures'
 import LandingHowItWorks from '@/components/landing/LandingHowItWorks'
 import LandingPricing from '@/components/landing/LandingPricing'
 import LandingFaq from '@/components/landing/LandingFaq'
+import LandingLeadSection from '@/components/landing/LandingLeadSection'
 import LandingFinalCta from '@/components/landing/LandingFinalCta'
 import LandingFooter from '@/components/landing/LandingFooter'
 
@@ -21,6 +22,7 @@ export default function Home() {
       <LandingHowItWorks />
       <LandingPricing />
       <LandingFaq />
+      <LandingLeadSection />
       <LandingFinalCta />
       <LandingFooter />
     </div>
