@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { isStorePro, DEFAULT_STORE_FONT } from '@/lib/plan'
 import { revalidatePath } from 'next/cache'
 
-type Theme = { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font?: string }
+type Theme = { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font?: string; announcement?: string }
 
 /**
  * Remove do Storage o arquivo antigo quando a imagem é trocada/removida,
@@ -47,6 +47,10 @@ export async function updateStore(formData: FormData) {
       : current.primaryColor || '#FF5722',
     // Fonte: só no Pro. No Free preserva o valor atual (undefined = fonte padrão).
     font: pro ? String(formData.get('font') || current.font || DEFAULT_STORE_FONT) : current.font,
+    // Aviso promocional: só no Pro (string vazia oculta o aviso).
+    announcement: pro
+      ? String(formData.get('announcement') || '').trim().slice(0, 120) || undefined
+      : current.announcement,
   }
 
   // Limpa logo/banner antigos do Storage quando forem trocados ou removidos.

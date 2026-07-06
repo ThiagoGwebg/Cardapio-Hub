@@ -2,7 +2,9 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentStore } from '@/lib/store'
+import { getStoreUsage } from '@/lib/plan'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 export async function toggleProduct(productId: string, isActive: boolean) {
   const supabase = await createClient()
@@ -12,6 +14,12 @@ export async function toggleProduct(productId: string, isActive: boolean) {
 
 export async function createProduct(formData: FormData) {
   const { supabase, store } = await getCurrentStore()
+
+  // Gate no servidor: o Free tem limite de produtos (não confiar só na UI).
+  const usage = await getStoreUsage(supabase, store.id)
+  if (usage.productCount >= usage.maxProducts) {
+    redirect('/dashboard/cardapio?limit=1')
+  }
 
   const name = String(formData.get('name') || '')
   const priceReais = Number(formData.get('price') || 0)

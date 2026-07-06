@@ -1,19 +1,32 @@
 import { getCurrentStore } from '@/lib/store'
 import { fmtCents } from '@/lib/format'
+import { getStoreUsage } from '@/lib/plan'
 import { IconUtensils } from '@/components/icons'
 import Link from 'next/link'
 import ProductToggle from './ProductToggle'
 import ImageUploadField from '@/components/ImageUploadField'
+import { UsageMeter, ProUpsellBanner } from '@/components/dashboard/ProUpsell'
 import { createProduct } from './actions'
 
-export default async function CardapioPage() {
+export default async function CardapioPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ limit?: string }>
+}) {
+  const { limit } = await searchParams
   const { supabase, store } = await getCurrentStore()
 
-  const { data: products } = await supabase
-    .from('products')
-    .select('id, name, price_cents, image_url, is_active, categories(name)')
-    .eq('store_id', store.id)
-    .order('created_at', { ascending: false })
+  const [{ data: products }, usage] = await Promise.all([
+    supabase
+      .from('products')
+      .select('id, name, price_cents, image_url, is_active, categories(name)')
+      .eq('store_id', store.id)
+      .order('created_at', { ascending: false }),
+    getStoreUsage(supabase, store.id),
+  ])
+
+  const atLimit = !usage.isPro && usage.productCount >= usage.maxProducts
+  const nearLimit = !usage.isPro && !atLimit && usage.productCount >= usage.maxProducts * 0.8
 
   return (
     <>
@@ -24,6 +37,25 @@ export default async function CardapioPage() {
         </span>
       </div>
 
+      {!usage.isPro && (
+        <div className="settings-card">
+          <UsageMeter label="Produtos do plano Free" used={usage.productCount} limit={usage.maxProducts} />
+          {(atLimit || limit) && (
+            <ProUpsellBanner
+              title="Limite de produtos atingido"
+              text="Seu cardápio chegou ao máximo do plano Free. Assine o Pro e cadastre produtos ilimitados."
+            />
+          )}
+          {nearLimit && !limit && (
+            <ProUpsellBanner
+              title="Seu cardápio está quase cheio"
+              text={`Faltam ${usage.maxProducts - usage.productCount} produto(s) para o limite do Free. No Pro não existe limite.`}
+            />
+          )}
+        </div>
+      )}
+
+      {!atLimit && (
       <div className="settings-card">
         <div className="settings-section-title">Novo produto</div>
         <form action={createProduct} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -58,6 +90,7 @@ export default async function CardapioPage() {
           </button>
         </form>
       </div>
+      )}
 
       <div className="settings-card">
         {(products ?? []).map((p) => (

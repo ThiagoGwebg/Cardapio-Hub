@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { isStorePro } from '@/lib/plan'
 import { notFound } from 'next/navigation'
 import PublicMenu from './PublicMenu'
 
@@ -13,6 +15,10 @@ export default async function LojaPage({ params }: { params: Promise<{ slug: str
     .maybeSingle()
 
   if (!store) notFound()
+
+  // Selo "Feito com CardápioÁgil" aparece só em lojas Free (white-label é Pro).
+  // subscriptions não é legível pelo anon (RLS), então usamos o client admin no servidor.
+  const isPro = await isStorePro(createAdminClient(), store.id)
 
   const { data: categories } = await supabase
     .from('categories')
@@ -86,5 +92,5 @@ export default async function LojaPage({ params }: { params: Promise<{ slug: str
     }))
     .filter((c) => c.products.length > 0)
 
-  return <PublicMenu store={store} menu={menu} zones={zones ?? []} />
+  return <PublicMenu store={store} menu={menu} zones={zones ?? []} showBranding={!isPro} />
 }

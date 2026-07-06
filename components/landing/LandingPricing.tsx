@@ -34,8 +34,10 @@ export default function LandingPricing() {
           </p>
           <ul className="l-plan-list">
             <li>Produtos e pedidos ilimitados</li>
-            <li>Banner e fontes personalizadas no cardápio</li>
-            <li>Tudo do plano Free incluso</li>
+            <li>Cores, fontes e aviso promocional no cardápio</li>
+            <li>Sua marca, sem selo CardápioÁgil</li>
+            <li>Clientes fiéis (CRM) + relatórios de 30/90 dias</li>
+            <li>QR Code para imprimir e exportação em CSV</li>
             <li>Cancele quando quiser, direto pelo painel</li>
           </ul>
           <Link href="/signup" className="l-plan-cta primary">Assinar Pro</Link>

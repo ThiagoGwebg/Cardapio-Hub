@@ -37,7 +37,7 @@ type Store = {
   address: string | null
   min_order_cents: number
   is_open: boolean
-  theme: { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font?: string } | null
+  theme: { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font?: string; announcement?: string } | null
   delivery_enabled: boolean
   pickup_enabled: boolean
   dine_in_enabled: boolean
@@ -72,10 +72,12 @@ export default function PublicMenu({
   store,
   menu,
   zones,
+  showBranding = true,
 }: {
   store: Store
   menu: Category[]
   zones: Zone[]
+  showBranding?: boolean
 }) {
   const router = useRouter()
   const [cart, setCart] = useState<CartItem[]>([])
@@ -322,7 +324,12 @@ export default function PublicMenu({
       p_payload: payload,
     })
     setSubmitting(false)
-    if (rpcError) return setError(rpcError.message)
+    if (rpcError) {
+      if (rpcError.message.includes('limite_pedidos_mes')) {
+        return setError('A loja atingiu o limite de pedidos do mês. Tente novamente mais tarde.')
+      }
+      return setError(rpcError.message)
+    }
 
     saveOrderToHistory({
       id: String(orderId),
@@ -418,6 +425,10 @@ export default function PublicMenu({
           </div>
         </div>
       </header>
+
+      {theme.announcement && (
+        <div className="storefront-announce">📣 {theme.announcement}</div>
+      )}
 
       <div className="storefront-search-row">
         <input className="form-input" placeholder="Busque por um produto" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -728,6 +739,14 @@ export default function PublicMenu({
             </div>
           </div>
         </div>
+      )}
+
+      {showBranding && (
+        <footer className="storefront-branding">
+          <a href="/" target="_blank" rel="noopener">
+            Feito com <strong>cardápio<span>ágil</span></strong>
+          </a>
+        </footer>
       )}
 
       <button className={`cart-fab ${totalItems === 0 ? 'hidden' : ''}`} onClick={() => setCartOpen(true)}>

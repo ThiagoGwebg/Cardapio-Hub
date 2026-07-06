@@ -1217,6 +1217,10 @@ body {
   padding: 14px 18px;
   border-bottom: 1px solid var(--border);
   background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .history-title {
@@ -2862,4 +2866,323 @@ body:has(.storefront) {
   display: inline-block;
   text-decoration: none;
   margin: 0;
+}
+
+/* ══════════════════════════════════════════
+   UPSELL PRO: medidores, banners, prévias
+══════════════════════════════════════════ */
+.usage-meter { margin-bottom: 12px; }
+.usage-meter:last-child { margin-bottom: 0; }
+
+.usage-meter-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.usage-meter-count { font-family: 'Nunito', sans-serif; font-weight: 800; }
+.usage-ok { color: var(--green); }
+.usage-warn { color: var(--yellow); }
+.usage-full { color: var(--red); }
+
+.usage-meter-track {
+  height: 8px;
+  background: var(--surface3);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.usage-meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s;
+}
+.usage-fill-ok { background: linear-gradient(90deg, var(--green-d), var(--green)); }
+.usage-fill-warn { background: linear-gradient(90deg, #d99a00, var(--yellow)); }
+.usage-fill-full { background: linear-gradient(90deg, #c05045, var(--red)); }
+
+.upsell-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 176, 32, 0.35);
+  background: linear-gradient(135deg, rgba(255, 176, 32, 0.10), rgba(255, 122, 0, 0.06));
+  flex-wrap: wrap;
+}
+
+.upsell-banner-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.upsell-banner-text { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+.upsell-banner-btn {
+  text-decoration: none;
+  white-space: nowrap;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* Seção Pro bloqueada com prévia desfocada */
+.pro-locked-card { position: relative; overflow: hidden; }
+
+.pro-locked-preview {
+  filter: blur(4px);
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+
+.pro-locked-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 20px;
+  text-align: center;
+  background: linear-gradient(180deg, transparent, rgba(18, 18, 18, 0.55) 40%);
+}
+
+/* Abas de período (Desempenho) */
+.period-tabs { display: flex; gap: 6px; }
+
+.period-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.period-tab:hover { border-color: var(--primary); color: var(--text); }
+
+.period-tab.active {
+  background: var(--primary-l);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.period-tab.locked { opacity: 0.8; }
+
+/* Barras horizontais (top produtos / canais) */
+.hbar-list { display: flex; flex-direction: column; gap: 10px; }
+
+.hbar-row { display: flex; align-items: center; gap: 10px; }
+
+.hbar-label {
+  flex: 0 0 130px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hbar-track {
+  flex: 1;
+  height: 10px;
+  background: var(--surface3);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.hbar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary-d), var(--primary));
+}
+
+.hbar-value {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Gráfico de horários de pico */
+.hour-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 110px;
+}
+
+.hour-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.hour-wrap {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  background: var(--surface2);
+  border-radius: 4px 4px 0 0;
+  overflow: hidden;
+}
+
+.hour-fill {
+  width: 100%;
+  background: linear-gradient(180deg, var(--teal), var(--teal-d));
+  border-radius: 4px 4px 0 0;
+  min-height: 2px;
+}
+
+.hour-label { font-size: 9px; color: var(--muted2); }
+
+.channel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.channel-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted2);
+  margin-bottom: 10px;
+}
+
+@media (max-width: 720px) {
+  .channel-grid { grid-template-columns: 1fr; }
+  .hbar-label { flex-basis: 96px; }
+}
+
+/* Tabela comparativa Free × Pro (Assinatura) */
+.plan-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+.plan-table th {
+  text-align: left;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted2);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.plan-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border2);
+  color: var(--text2);
+}
+
+.plan-table tr:last-child td { border-bottom: none; }
+
+.plan-table-pro {
+  color: var(--primary) !important;
+  font-weight: 700;
+  background: rgba(255, 87, 34, 0.05);
+}
+
+.plan-cell-off { color: var(--muted2); }
+
+.export-locked { display: inline-flex; align-items: center; gap: 6px; }
+
+/* Aviso promocional no cardápio público (Pro) */
+.storefront-announce {
+  margin: 12px 16px 0;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--primary-l), rgba(255, 87, 34, 0.06));
+  border: 1px solid rgba(255, 87, 34, 0.35);
+  color: var(--text);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Selo "Feito com CardápioÁgil" (some no Pro) */
+.storefront-branding {
+  padding: 28px 16px 96px;
+  text-align: center;
+}
+
+.storefront-branding a {
+  color: var(--muted2);
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.storefront-branding strong {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  color: var(--muted);
+}
+
+.storefront-branding strong span { color: var(--primary); }
+
+.storefront-branding a:hover strong { color: var(--text); }
+
+/* QR Code (Meus Links) */
+.qr-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.qr-img {
+  width: 160px;
+  height: 160px;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.qr-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  color: #121212;
+}
+
+/* Selo de cliente VIP (página Clientes) */
+.vip-badge {
+  margin-left: 8px;
+  font-family: 'Nunito', sans-serif;
+  background: var(--teal-l);
+  border: 1px solid var(--teal);
+  color: var(--teal);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 999px;
 }

@@ -5,7 +5,7 @@ import { updateStore, addZone, deleteZone } from './actions'
 import PixKeyField from '@/components/PixKeyField'
 import ImageUploadField from '@/components/ImageUploadField'
 
-type Theme = { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font?: string }
+type Theme = { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font?: string; announcement?: string }
 
 export default async function LojaPage() {
   const { supabase, store } = await getCurrentStore()
@@ -120,25 +120,41 @@ export default async function LojaPage() {
             </div>
 
             {isPro ? (
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Cor principal</label>
-                  <input className="form-input" name="primaryColor" type="color" defaultValue={theme.primaryColor || '#FF5722'} style={{ height: 40, padding: 4 }} />
+              <>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Cor principal</label>
+                    <input className="form-input" name="primaryColor" type="color" defaultValue={theme.primaryColor || '#FF5722'} style={{ height: 40, padding: 4 }} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Fonte do cardápio</label>
+                    <select className="form-input" name="font" defaultValue={theme.font || DEFAULT_STORE_FONT}>
+                      {STORE_FONTS.map((f) => (
+                        <option key={f.value} value={f.value}>{f.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Fonte do cardápio</label>
-                  <select className="form-input" name="font" defaultValue={theme.font || DEFAULT_STORE_FONT}>
-                    {STORE_FONTS.map((f) => (
-                      <option key={f.value} value={f.value}>{f.label}</option>
-                    ))}
-                  </select>
+                <div className="form-group" style={{ marginTop: 8 }}>
+                  <label className="form-label">Aviso promocional no cardápio</label>
+                  <input
+                    className="form-input"
+                    name="announcement"
+                    maxLength={120}
+                    placeholder='Ex.: "Frete grátis acima de R$ 50 hoje!"'
+                    defaultValue={theme.announcement || ''}
+                  />
+                  <p style={{ fontSize: 11, color: 'var(--muted2)', marginTop: 4 }}>
+                    Aparece em destaque no topo do cardápio público. Deixe vazio para ocultar.
+                  </p>
                 </div>
-              </div>
+              </>
             ) : (
               <div className="pro-lock">
                 <p className="pro-lock-text">
-                  Deixe o cardápio com a sua cara: escolha a <strong>cor principal</strong> e a{' '}
-                  <strong>fonte</strong> no plano Pro.
+                  Deixe o cardápio com a sua cara: escolha a <strong>cor principal</strong>, a{' '}
+                  <strong>fonte</strong> e publique um <strong>aviso promocional</strong> no topo do
+                  cardápio. No Pro, o selo &quot;Feito com CardápioÁgil&quot; também some da sua página.
                 </p>
                 <a href="/dashboard/billing" className="save-btn pro-lock-btn">Assinar Pro</a>
               </div>

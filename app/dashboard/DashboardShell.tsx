@@ -9,6 +9,7 @@ const NAV_PRINCIPAL = [
   { href: '/dashboard/pedidos', label: 'Pedidos' },
   { href: '/dashboard/cardapio', label: 'Cardápio' },
   { href: '/dashboard/desempenho', label: 'Desempenho' },
+  { href: '/dashboard/clientes', label: 'Clientes' },
   { href: '/dashboard/caixa', label: 'Caixa' },
 ]
 

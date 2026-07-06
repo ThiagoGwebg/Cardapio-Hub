@@ -1,15 +1,22 @@
 import { getCurrentStore } from '@/lib/store'
 import { fmtCents } from '@/lib/format'
+import { getStoreUsage } from '@/lib/plan'
+import { UsageMeter, ProUpsellBanner } from '@/components/dashboard/ProUpsell'
 import KanbanBoard from '@/components/kanban/KanbanBoard'
 
 export default async function PedidosPage() {
   const { supabase, store } = await getCurrentStore()
 
-  const { data: orders } = await supabase
-    .from('orders')
-    .select('id, status, order_type, payment_method, customer_name, customer_phone, subtotal_cents, delivery_fee_cents, total_cents, table_number, address_cep, address_street, address_number, address_neighborhood, created_at, order_items(id, product_name_snapshot, quantity, order_item_options(name_snapshot))')
-    .eq('store_id', store.id)
-    .order('created_at', { ascending: false })
+  const [{ data: orders }, usage] = await Promise.all([
+    supabase
+      .from('orders')
+      .select('id, status, order_type, payment_method, customer_name, customer_phone, subtotal_cents, delivery_fee_cents, total_cents, table_number, address_cep, address_street, address_number, address_neighborhood, created_at, order_items(id, product_name_snapshot, quantity, order_item_options(name_snapshot))')
+      .eq('store_id', store.id)
+      .order('created_at', { ascending: false }),
+    getStoreUsage(supabase, store.id),
+  ])
+
+  const nearOrderLimit = !usage.isPro && usage.ordersThisMonth >= usage.maxOrdersPerMonth * 0.8
 
   const allOrders = orders ?? []
   const prepCount = allOrders.filter((o) => o.status === 'preparando').length
@@ -23,6 +30,18 @@ export default async function PedidosPage() {
       <div className="dash-header">
         <div className="dash-title">Pedidos</div>
       </div>
+
+      {!usage.isPro && (
+        <div className="settings-card">
+          <UsageMeter label="Pedidos do mês (plano Free)" used={usage.ordersThisMonth} limit={usage.maxOrdersPerMonth} />
+          {nearOrderLimit && (
+            <ProUpsellBanner
+              title="Você está perto do limite de pedidos"
+              text="No plano Free são 30 pedidos por mês. Assine o Pro e nunca mais deixe uma venda passar."
+            />
+          )}
+        </div>
+      )}
 
       <div className="stats-row">
         <div className="stat-card">
