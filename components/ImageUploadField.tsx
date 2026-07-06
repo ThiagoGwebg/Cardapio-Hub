@@ -1,10 +1,8 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 
 type Props = {
-  storeId: string
   kind: 'logo' | 'banner' | 'product'
   name: string
   label: string
@@ -12,16 +10,9 @@ type Props = {
   defaultUrl?: string
 }
 
-const EXT: Record<string, string> = {
-  'image/png': 'png',
-  'image/jpeg': 'jpg',
-  'image/jpg': 'jpg',
-  'image/webp': 'webp',
-  'image/gif': 'gif',
-  'image/svg+xml': 'svg',
-}
+const ALLOWED = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif', 'image/svg+xml']
 
-export default function ImageUploadField({ storeId, kind, name, label, hint, defaultUrl }: Props) {
+export default function ImageUploadField({ kind, name, label, hint, defaultUrl }: Props) {
   const [url, setUrl] = useState(defaultUrl || '')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +23,7 @@ export default function ImageUploadField({ storeId, kind, name, label, hint, def
     if (!file) return
     setError(null)
 
-    if (!EXT[file.type]) {
+    if (!ALLOWED.includes(file.type)) {
       setError('Use uma imagem PNG, JPG, WEBP, GIF ou SVG.')
       return
     }
@@ -43,16 +34,13 @@ export default function ImageUploadField({ storeId, kind, name, label, hint, def
 
     setBusy(true)
     try {
-      const supabase = createClient()
-      const ext = EXT[file.type]
-      const path = `${storeId}/${kind}-${Date.now()}.${ext}`
-      const { error: upErr } = await supabase.storage
-        .from('store-assets')
-        .upload(path, file, { cacheControl: '3600', upsert: true, contentType: file.type })
-      if (upErr) throw upErr
-
-      const { data } = supabase.storage.from('store-assets').getPublicUrl(path)
-      setUrl(data.publicUrl)
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('kind', kind)
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json.error || 'Falha no upload. Tente novamente.')
+      setUrl(json.url)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Falha no upload. Tente novamente.')
     } finally {

@@ -1,7 +1,7 @@
 'use server'
 
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { getCurrentStore } from '@/lib/store'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { isStorePro, DEFAULT_STORE_FONT } from '@/lib/plan'
 import { revalidatePath } from 'next/cache'
 
@@ -11,7 +11,7 @@ type Theme = { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font
  * Remove do Storage o arquivo antigo quando a imagem é trocada/removida,
  * evitando arquivos órfãos. Só mexe em objetos do bucket 'store-assets'.
  */
-async function removeOldAsset(supabase: SupabaseClient, oldUrl?: string, newUrl?: string) {
+async function removeOldAsset(oldUrl?: string, newUrl?: string) {
   if (!oldUrl || oldUrl === newUrl) return
   const marker = '/store-assets/'
   const i = oldUrl.indexOf(marker)
@@ -19,7 +19,7 @@ async function removeOldAsset(supabase: SupabaseClient, oldUrl?: string, newUrl?
   const path = decodeURIComponent(oldUrl.slice(i + marker.length).split('?')[0])
   if (!path) return
   try {
-    await supabase.storage.from('store-assets').remove([path])
+    await createAdminClient().storage.from('store-assets').remove([path])
   } catch {
     // silencioso: a falha de limpeza não deve quebrar o salvamento
   }
@@ -50,8 +50,8 @@ export async function updateStore(formData: FormData) {
   }
 
   // Limpa logo/banner antigos do Storage quando forem trocados ou removidos.
-  await removeOldAsset(supabase, current.logoUrl, theme.logoUrl)
-  await removeOldAsset(supabase, current.bannerUrl, theme.bannerUrl)
+  await removeOldAsset(current.logoUrl, theme.logoUrl)
+  await removeOldAsset(current.bannerUrl, theme.bannerUrl)
 
   await supabase
     .from('stores')

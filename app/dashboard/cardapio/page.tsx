@@ -48,7 +48,6 @@ export default async function CardapioPage() {
             </div>
           </div>
           <ImageUploadField
-            storeId={store.id}
             kind="product"
             name="imageUrl"
             label="Foto do produto (opcional)"

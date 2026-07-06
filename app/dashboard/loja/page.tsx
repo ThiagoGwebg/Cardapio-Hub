@@ -98,7 +98,6 @@ export default async function LojaPage() {
           <div className="settings-section-title">Identidade visual do cardápio público</div>
 
           <ImageUploadField
-            storeId={store.id}
             kind="logo"
             name="logoUrl"
             label="Logo da loja"
@@ -107,7 +106,6 @@ export default async function LojaPage() {
           />
 
           <ImageUploadField
-            storeId={store.id}
             kind="banner"
             name="bannerUrl"
             label="Banner do topo"
