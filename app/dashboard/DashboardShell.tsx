@@ -4,8 +4,10 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import LogoutButton from './LogoutButton'
+import './dashboard.css'
 
 const NAV_PRINCIPAL = [
+  { href: '/dashboard', label: 'Início' },
   { href: '/dashboard/pedidos', label: 'Pedidos' },
   { href: '/dashboard/cardapio', label: 'Cardápio' },
   { href: '/dashboard/desempenho', label: 'Desempenho' },
@@ -18,6 +20,7 @@ const NAV_CONFIG = [
   { href: '/dashboard/notificacoes', label: 'Notificações' },
   { href: '/dashboard/links', label: 'Meus Links' },
   { href: '/dashboard/billing', label: 'Assinatura' },
+  { href: '/dashboard/ajuda', label: 'Ajuda' },
 ]
 
 type Store = { name: string; address: string | null; is_open: boolean }
@@ -25,6 +28,12 @@ type Store = { name: string; address: string | null; is_open: boolean }
 export default function DashboardShell({ store, children }: { store: Store; children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
+
+  // Destaca "Início" quando está exatamente em /dashboard
+  function isActive(href: string) {
+    if (href === '/dashboard') return pathname === '/dashboard'
+    return pathname.startsWith(href)
+  }
 
   function NavLinks() {
     return (
@@ -34,7 +43,7 @@ export default function DashboardShell({ store, children }: { store: Store; chil
           <Link
             key={item.href}
             href={item.href}
-            className={`nav-item ${pathname === item.href ? 'active' : ''}`}
+            className={`nav-item ${isActive(item.href) ? 'active' : ''}`}
             onClick={() => setOpen(false)}
           >
             {item.label}
@@ -46,7 +55,7 @@ export default function DashboardShell({ store, children }: { store: Store; chil
           <Link
             key={item.href}
             href={item.href}
-            className={`nav-item ${pathname === item.href ? 'active' : ''}`}
+            className={`nav-item ${pathname.startsWith(item.href) ? 'active' : ''}`}
             onClick={() => setOpen(false)}
           >
             {item.label}
