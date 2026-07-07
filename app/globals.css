@@ -3360,3 +3360,43 @@ body:has(.storefront) {
     display: none !important;
   }
 }
+
+/* Galeria de fotos no modal do produto (cardápio público) */
+.pm-gallery {
+  margin-bottom: 16px;
+}
+.pm-gallery-main {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 12px;
+  background: var(--surface);
+  display: block;
+}
+.pm-gallery-thumbs {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.pm-gallery-thumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  background: var(--surface);
+}
+.pm-gallery-thumb.active {
+  border-color: var(--primary);
+}
+.pm-gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}

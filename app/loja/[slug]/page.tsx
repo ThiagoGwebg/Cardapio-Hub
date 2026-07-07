@@ -23,7 +23,7 @@ export default async function LojaPage({ params }: { params: Promise<{ slug: str
   const { data: categories } = await supabase
     .from('categories')
     .select(
-      'id, name, emoji, sort_order, products(id, name, description, price_cents, image_url, is_active, sort_order, product_option_groups(id, name, min_select, max_select, required, sort_order, product_options(id, name, price_delta_cents, is_active, sort_order)))'
+      'id, name, emoji, sort_order, products(id, name, description, price_cents, image_url, images, is_active, sort_order, product_option_groups(id, name, min_select, max_select, required, sort_order, product_options(id, name, price_delta_cents, is_active, sort_order)))'
     )
     .eq('store_id', store.id)
     .order('sort_order', { ascending: true })
@@ -56,6 +56,7 @@ export default async function LojaPage({ params }: { params: Promise<{ slug: str
     description: string | null
     price_cents: number
     image_url: string | null
+    images: string[] | null
     is_active: boolean
     sort_order: number
     product_option_groups: RawGroup[]
@@ -75,6 +76,11 @@ export default async function LojaPage({ params }: { params: Promise<{ slug: str
           description: p.description,
           price_cents: p.price_cents,
           image_url: p.image_url,
+          images: (Array.isArray(p.images) ? p.images.filter(Boolean) : []).length
+            ? (p.images as string[]).filter(Boolean)
+            : p.image_url
+              ? [p.image_url]
+              : [],
           is_active: p.is_active,
           groups: (p.product_option_groups ?? [])
             .sort((a, b) => a.sort_order - b.sort_order)

@@ -24,6 +24,7 @@ type Product = {
   description: string | null
   price_cents: number
   image_url: string | null
+  images: string[]
   is_active: boolean
   groups: Group[]
 }
@@ -84,6 +85,7 @@ export default function PublicMenu({
   const [cartOpen, setCartOpen] = useState(false)
   const [modalProduct, setModalProduct] = useState<Product | null>(null)
   const [modalSel, setModalSel] = useState<Record<string, Option[]>>({})
+  const [galleryIdx, setGalleryIdx] = useState(0)
 
   const [customerName, setCustomerName] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
@@ -96,7 +98,8 @@ export default function PublicMenu({
   const [myOrdersOpen, setMyOrdersOpen] = useState(false)
 
   useEffect(() => {
-    setMyOrders(getOrderHistoryForStore(store.slug))
+    const raf = requestAnimationFrame(() => setMyOrders(getOrderHistoryForStore(store.slug)))
+    return () => cancelAnimationFrame(raf)
   }, [store.slug])
 
   const enabledTypes = useMemo(() => {
@@ -215,10 +218,13 @@ export default function PublicMenu({
 
   // ---- Product modal ----
   function openProduct(p: Product) {
-    if (p.groups.length === 0) {
+    // Sem complementos e no máximo 1 foto: adiciona direto (1 clique).
+    // Com complementos OU com galeria (2+ fotos): abre o modal.
+    if (p.groups.length === 0 && p.images.length <= 1) {
       addToCart(p, [])
       return
     }
+    setGalleryIdx(0)
     setModalProduct(p)
     setModalSel({})
   }
@@ -700,6 +706,31 @@ export default function PublicMenu({
               <button className="cart-close" onClick={() => setModalProduct(null)}><IconClose /></button>
             </div>
             <div className="option-modal-body">
+              {modalProduct.images.length > 0 && (
+                <div className="pm-gallery">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    className="pm-gallery-main"
+                    src={modalProduct.images[galleryIdx] ?? modalProduct.images[0]}
+                    alt={modalProduct.name}
+                  />
+                  {modalProduct.images.length > 1 && (
+                    <div className="pm-gallery-thumbs">
+                      {modalProduct.images.map((u, i) => (
+                        <button
+                          key={u + i}
+                          type="button"
+                          className={`pm-gallery-thumb ${i === galleryIdx ? 'active' : ''}`}
+                          onClick={() => setGalleryIdx(i)}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={u} alt={`${modalProduct.name} ${i + 1}`} />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
               {modalProduct.groups.map((g) => {
                 const sel = modalSel[g.id] ?? []
                 return (

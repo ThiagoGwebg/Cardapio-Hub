@@ -4,7 +4,7 @@ import { getStoreUsage } from '@/lib/plan'
 import { IconUtensils } from '@/components/icons'
 import Link from 'next/link'
 import ProductToggle from './ProductToggle'
-import ImageUploadField from '@/components/ImageUploadField'
+import ProductImagesField from '@/components/ProductImagesField'
 import { UsageMeter, ProUpsellBanner } from '@/components/dashboard/ProUpsell'
 import { createProduct } from './actions'
 
@@ -79,11 +79,11 @@ export default async function CardapioPage({
               <input className="form-input" name="description" />
             </div>
           </div>
-          <ImageUploadField
-            kind="product"
-            name="imageUrl"
-            label="Foto do produto (opcional)"
-            hint="Quadrada fica melhor (ideal 600×600). PNG, JPG, WEBP ou SVG até 5 MB."
+          <ProductImagesField
+            name="images"
+            label="Fotos do produto (opcional)"
+            hint="A 1ª foto é a capa. Dá pra adicionar várias — quadradas (600×600) ficam melhor. Até 5 MB cada."
+            max={6}
           />
           <button className="save-btn" type="submit" style={{ alignSelf: 'flex-start' }}>
             Adicionar produto
@@ -114,7 +114,7 @@ export default async function CardapioPage({
             </div>
             <div className="ci-price">{fmtCents(p.price_cents)}</div>
             <Link href={`/dashboard/cardapio/${p.id}`} className="ordertype-btn" style={{ flex: 'none', padding: '6px 12px', textDecoration: 'none' }}>
-              Complementos
+              Editar
             </Link>
             <ProductToggle productId={p.id} isActive={p.is_active} />
           </div>

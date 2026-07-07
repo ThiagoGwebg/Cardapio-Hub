@@ -10,7 +10,7 @@ export default function LandingStory() {
           <div>Tempo de uso: 3 meses</div>
         </div>
         <div className="l-story-copy">
-          <div className="l-story-eyebrow">// aconteceu de verdade</div>
+          <div className="l-story-eyebrow">{'// aconteceu de verdade'}</div>
           <p className="l-story-headline">
             A Dona Marli só queria parar de perder pedido no bloquinho. Três meses depois de
             colocar o cardápio no ar, ela foi de 40 pra 210 pedidos por mês — sem contratar
