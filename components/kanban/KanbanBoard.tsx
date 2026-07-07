@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { fmtCents, ORDER_TYPE_LABEL, PAYMENT_LABEL } from '@/lib/format'
+import Link from 'next/link'
+import { fmtCents, fmtOrderNumber, ORDER_TYPE_LABEL, PAYMENT_LABEL } from '@/lib/format'
 import { advanceOrder, cancelOrder } from '@/app/dashboard/pedidos/actions'
 
 const SOUND_KEY = 'cardapioagil_kanban_sound'
@@ -36,6 +37,7 @@ type OptSnap = { name_snapshot: string }
 type OrderItem = { id: string; product_name_snapshot: string; quantity: number; order_item_options: OptSnap[] }
 type Order = {
   id: string
+  order_number: number | null
   status: string
   order_type: string
   payment_method: string | null
@@ -74,7 +76,7 @@ function waPhone(raw: string) {
 }
 
 function statusMessage(order: Order, storeName: string) {
-  const num = `#${order.id.slice(0, 8)}`
+  const num = fmtOrderNumber(order.order_number, order.id)
   const hi = `Oi ${order.customer_name.split(' ')[0]}! `
   switch (order.status) {
     case 'novo':
@@ -174,7 +176,9 @@ export default function KanbanBoard({ storeId, storeName, orders }: { storeId: s
               {colOrders.map((order) => (
                 <div className="order-card" key={order.id}>
                   <div className="order-card-top">
-                    <div className="order-num">#{order.id.slice(0, 8)}</div>
+                    <Link href={`/dashboard/pedidos/${order.id}`} className="order-num" title="Abrir ficha do pedido">
+                      {fmtOrderNumber(order.order_number, order.id)}
+                    </Link>
                     <div className="order-time">
                       {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                     </div>
@@ -212,6 +216,9 @@ export default function KanbanBoard({ storeId, storeName, orders }: { storeId: s
 
                   <div className="order-footer">
                     <div className="order-price">{fmtCents(order.total_cents)}</div>
+                    <Link href={`/dashboard/pedidos/${order.id}`} className="order-detail-link" title="Ver ficha / imprimir">
+                      Ficha →
+                    </Link>
                   </div>
 
                   {order.customer_phone && (

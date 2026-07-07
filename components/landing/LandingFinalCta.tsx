@@ -7,10 +7,10 @@ export default function LandingFinalCta() {
         <div>
           <h2 className="l-h2">Pronto pra vender mais com menos trabalho?</h2>
           <p className="l-final-cta-sub">
-            Crie sua loja agora e coloque seu cardápio digital no ar em minutos.
+            Deixe seus dados que a gente coloca seu cardápio digital no ar com você.
           </p>
         </div>
-        <Link href="/signup" className="l-btn-primary large">Criar minha loja grátis</Link>
+        <Link href="/contato" className="l-btn-primary large">Falar com o time</Link>
       </div>
     </section>
   )

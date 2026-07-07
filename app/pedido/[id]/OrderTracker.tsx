@@ -2,12 +2,13 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { fmtCents, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL, PIX_KEY_TYPE_LABEL } from '@/lib/format'
+import { fmtCents, fmtOrderNumber, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL, PIX_KEY_TYPE_LABEL } from '@/lib/format'
 import { saveOrderToHistory } from '@/lib/orderHistory'
 
 type OrderItem = { name: string; quantity: number; unit_price_cents: number; options: string[] }
 type Order = {
   id: string
+  order_number: number | null
   status: string
   order_type: string
   created_at: string
@@ -74,7 +75,7 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
         <div className="track-header-row">
           <div>
             <div className="track-store">{order.store_name}</div>
-            <div className="track-order-num">Pedido #{order.id.slice(0, 8)}</div>
+            <div className="track-order-num">Pedido {fmtOrderNumber(order.order_number, order.id)}</div>
           </div>
           <button className="track-copy-btn" onClick={copyLink}>
             {copied ? '✓ Copiado' : '🔗 Salvar link'}

@@ -1095,6 +1095,69 @@
   line-height: 1.6;
 }
 
+/* Página dedicada /contato */
+.l-contato {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  padding: 56px 24px 80px;
+}
+
+.l-contato-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 0.9fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.l-contato-head .l-eyebrow {
+  margin-bottom: 12px;
+}
+
+.l-contato-head .l-h2 {
+  margin-bottom: 14px;
+}
+
+/* Sucesso com identidade do WhatsApp */
+.l-lead-frame-wa {
+  background: #25d366;
+}
+
+.l-lead-success-wa {
+  align-items: center;
+  gap: 6px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.l-wa-badge {
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  background: #25d366;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 6px;
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.35);
+}
+
+.l-lead-success-wa .l-lead-success-title {
+  color: #075e54;
+}
+
+.l-lead-success-wa .l-lead-success-desc {
+  color: #128c7e;
+}
+
+.l-lead-success-wa .l-lead-success-desc strong {
+  color: #075e54;
+}
+
 @media (max-width: 860px) {
   .l-lead-section-inner {
     grid-template-columns: 1fr;
@@ -1106,5 +1169,15 @@
 
   .l-lead-card {
     padding: 22px;
+  }
+
+  .l-contato-inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .l-contato {
+    padding: 32px 20px 64px;
+    align-items: flex-start;
   }
 }

@@ -10,7 +10,7 @@ export default async function PedidosPage() {
   const [{ data: orders }, usage] = await Promise.all([
     supabase
       .from('orders')
-      .select('id, status, order_type, payment_method, customer_name, customer_phone, subtotal_cents, delivery_fee_cents, total_cents, table_number, address_cep, address_street, address_number, address_neighborhood, created_at, order_items(id, product_name_snapshot, quantity, order_item_options(name_snapshot))')
+      .select('id, order_number, status, order_type, payment_method, customer_name, customer_phone, subtotal_cents, delivery_fee_cents, total_cents, table_number, address_cep, address_street, address_number, address_neighborhood, created_at, order_items(id, product_name_snapshot, quantity, order_item_options(name_snapshot))')
       .eq('store_id', store.id)
       .order('created_at', { ascending: false }),
     getStoreUsage(supabase, store.id),

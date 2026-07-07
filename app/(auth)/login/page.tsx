@@ -47,7 +47,7 @@ export default function LoginPage() {
         </button>
 
         <p style={{ fontSize: 12, color: 'var(--muted)', textAlign: 'center' }}>
-          Ainda não tem loja? <Link href="/signup" style={{ color: 'var(--primary)' }}>Criar loja</Link>
+          Ainda não tem loja? <Link href="/contato" style={{ color: 'var(--primary)' }}>Fale com a gente</Link>
         </p>
       </form>
     </div>

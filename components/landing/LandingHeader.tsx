@@ -16,7 +16,7 @@ export default function LandingHeader() {
         <a href="#faq">Dúvidas</a>
         <div className="l-nav-cta">
           <Link href="/login" className="l-btn-ghost">Entrar</Link>
-          <Link href="/signup" className="l-btn-primary">Criar minha loja</Link>
+          <Link href="/contato" className="l-btn-primary">Fale com a gente</Link>
         </div>
       </nav>
 

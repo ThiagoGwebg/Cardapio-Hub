@@ -15,10 +15,10 @@ export default function LandingHero() {
             precisar anotar nada no bloquinho.
           </p>
           <div className="l-hero-ctas">
-            <Link href="/signup" className="l-btn-primary large">Criar minha loja grátis</Link>
+            <Link href="/contato" className="l-btn-primary large">Quero minha loja no ar</Link>
             <a href="#story" className="l-hero-link">ou veja quem já usa ↓</a>
           </div>
-          <p className="l-hero-trust">sem cartão de crédito · loja no ar em minutos</p>
+          <p className="l-hero-trust">sem cartão de crédito · a gente configura junto com você</p>
         </div>
 
         <div className="l-mockup-wrap">

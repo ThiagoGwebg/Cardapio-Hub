@@ -104,7 +104,10 @@ export default async function CardapioPage({
               </span>
             )}
             <div className="ci-info">
-              <div className="ci-name">{p.name}</div>
+              <div className="ci-name">
+                {p.name}
+                {!p.is_active && <span className="sold-out-badge">Esgotado</span>}
+              </div>
               <div className="ci-cat">
                 {(p.categories as unknown as { name: string } | null)?.name ?? 'Sem categoria'}
               </div>

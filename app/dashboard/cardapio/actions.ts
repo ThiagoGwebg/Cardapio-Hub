@@ -93,6 +93,12 @@ export async function createOption(productId: string, groupId: string, formData:
   revalidatePath(`/dashboard/cardapio/${productId}`)
 }
 
+export async function toggleOption(productId: string, optionId: string, isActive: boolean) {
+  const { supabase, store } = await getCurrentStore()
+  await supabase.from('product_options').update({ is_active: isActive }).eq('id', optionId).eq('store_id', store.id)
+  revalidatePath(`/dashboard/cardapio/${productId}`)
+}
+
 export async function deleteOption(productId: string, optionId: string) {
   const { supabase, store } = await getCurrentStore()
   await supabase.from('product_options').delete().eq('id', optionId).eq('store_id', store.id)

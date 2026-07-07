@@ -13,7 +13,7 @@ export default function LandingFooter() {
           <a href="#faq">Dúvidas</a>
           <Link href="/privacidade">Privacidade</Link>
           <Link href="/login">Entrar</Link>
-          <Link href="/signup">Criar conta</Link>
+          <Link href="/contato">Fale com a gente</Link>
         </nav>
         <span className="l-footer-copy">© 2026 CardápioÁgil. Todos os direitos reservados.</span>
       </div>

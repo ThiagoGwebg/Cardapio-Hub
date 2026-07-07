@@ -22,7 +22,7 @@ export default function LandingPricing() {
             <li>Cor e logo personalizáveis</li>
             <li>Painel de pedidos, caixa e desempenho</li>
           </ul>
-          <Link href="/signup" className="l-plan-cta outline">Começar grátis</Link>
+          <Link href="/contato" className="l-plan-cta outline">Quero o Free</Link>
         </div>
 
         <div className="l-plan-card featured">
@@ -40,10 +40,10 @@ export default function LandingPricing() {
             <li>QR Code para imprimir e exportação em CSV</li>
             <li>Cancele quando quiser, direto pelo painel</li>
           </ul>
-          <Link href="/signup" className="l-plan-cta primary">Assinar Pro</Link>
+          <Link href="/contato" className="l-plan-cta primary">Quero o Pro</Link>
         </div>
       </div>
-      <p className="l-pricing-note">Crie sua conta grátis e veja o valor exato do Pro dentro do painel.</p>
+      <p className="l-pricing-note">Fale com a gente e mostramos o valor exato do Pro pro seu segmento.</p>
     </section>
   )
 }

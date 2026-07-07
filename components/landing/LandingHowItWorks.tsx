@@ -2,16 +2,16 @@ import Image from 'next/image'
 
 const STEPS = [
   {
-    title: 'Crie sua loja em minutos',
-    desc: 'Nome, endereço e WhatsApp — sem precisar de cartão de crédito para começar.',
+    title: 'Deixe seus dados',
+    desc: 'Preencha o formulário rapidinho — nome, WhatsApp e o tipo da sua loja. Sem cartão de crédito.',
   },
   {
-    title: 'Monte seu cardápio',
-    desc: 'Categorias, fotos e preços dos seus produtos, do jeito que fizer sentido pra loja.',
+    title: 'A gente te chama',
+    desc: 'Alguém do nosso time liga pra entender seu negócio e monta o cardápio junto com você.',
   },
   {
-    title: 'Compartilhe e venda',
-    desc: 'Seu link, seus clientes, seus pedidos caindo direto no painel.',
+    title: 'Sua loja no ar',
+    desc: 'Você recebe o link pronto, compartilha com seus clientes e os pedidos caem direto no painel.',
   },
 ]
 

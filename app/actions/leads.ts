@@ -1,6 +1,7 @@
 'use server'
 
 import { createServerClient } from '@supabase/ssr'
+import { notifyNewLead } from '@/lib/notify'
 
 export type LeadFormState = { ok: boolean; error?: string }
 
@@ -39,6 +40,16 @@ export async function submitLead(_prev: LeadFormState, formData: FormData): Prom
   if (error) {
     return { ok: false, error: 'Não deu pra enviar agora, tenta de novo em instantes.' }
   }
+
+  // Notifica o time (best-effort — não bloqueia nem derruba o cadastro do lead)
+  await notifyNewLead({
+    name,
+    company,
+    email,
+    whatsapp,
+    monthlyRevenue,
+    segment,
+  })
 
   return { ok: true }
 }

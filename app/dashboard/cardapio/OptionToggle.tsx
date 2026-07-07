@@ -1,9 +1,17 @@
 'use client'
 
 import { useTransition } from 'react'
-import { toggleProduct } from './actions'
+import { toggleOption } from './actions'
 
-export default function ProductToggle({ productId, isActive }: { productId: string; isActive: boolean }) {
+export default function OptionToggle({
+  productId,
+  optionId,
+  isActive,
+}: {
+  productId: string
+  optionId: string
+  isActive: boolean
+}) {
   const [pending, startTransition] = useTransition()
 
   return (
@@ -16,7 +24,7 @@ export default function ProductToggle({ productId, isActive }: { productId: stri
           type="checkbox"
           checked={isActive}
           disabled={pending}
-          onChange={(e) => startTransition(() => toggleProduct(productId, e.target.checked))}
+          onChange={(e) => startTransition(() => toggleOption(productId, optionId, e.target.checked))}
         />
         <span className="toggle-slider"></span>
       </label>
