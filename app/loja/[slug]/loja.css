@@ -1,0 +1,366 @@
+/* ══════════════════════════════════════════
+   TEMA CLARO (STOREFRONT LIGHT)
+══════════════════════════════════════════ */
+.storefront-light {
+  --bg: #F8F9FA;
+  --surface: #FFFFFF;
+  --surface2: #F1F3F5;
+  --surface3: #E9ECEF;
+  --text: #212529;
+  --text2: #495057;
+  --muted: #6C757D;
+  --muted2: #ADB5BD;
+  --border: #DEE2E6;
+  --border2: #E9ECEF;
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.15);
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.storefront-light .storefront-header,
+.storefront-light .menu-hero {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.storefront-light .storefront-name {
+  color: var(--text);
+}
+
+.storefront-light .storefront-sub,
+.storefront-light .storefront-meta-row {
+  color: var(--muted);
+}
+
+/* SEARCH ROW */
+.storefront-light .storefront-search-row {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 24px;
+}
+.storefront-light .storefront-search-row input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* LAYOUT 2 COLUMNS ON DESKTOP */
+.storefront-light .storefront-layout {
+  display: flex;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: flex-start;
+  padding: 0 24px 140px;
+}
+
+.storefront-light .storefront-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.storefront-light .menu-nav {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.storefront-light .menu-nav-item {
+  color: var(--muted);
+}
+.storefront-light .menu-nav-item:hover {
+  color: var(--text);
+  background: rgba(0,0,0,0.03);
+}
+
+/* PRODUCT CARDS (HORIZONTAL) */
+.storefront-light .products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.storefront-light .product-card {
+  display: flex;
+  flex-direction: row;
+  height: 140px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.storefront-light .product-info {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.storefront-light .product-name {
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.storefront-light .product-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 8px;
+  color: var(--text2);
+  font-size: 13px;
+}
+
+.storefront-light .product-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.storefront-light .product-img {
+  width: 140px;
+  height: 140px;
+  border-bottom: none;
+  border-left: 1px solid var(--border2);
+  order: 2; /* Move image to the right */
+  object-fit: cover;
+}
+
+/* MOBILE PRODUCT CARD ADJUSTMENTS */
+@media (max-width: 600px) {
+  .storefront-light .products-grid {
+    grid-template-columns: 1fr;
+  }
+  .storefront-light .product-card {
+    height: auto;
+    min-height: 120px;
+  }
+  .storefront-light .product-img {
+    width: 110px;
+    height: 110px;
+    margin: 8px;
+    border-radius: var(--radius-sm);
+    border: none;
+  }
+}
+
+/* CART SIDEBAR */
+.storefront-light .cart-drawer {
+  background: var(--surface2); /* Light gray like screenshot */
+}
+
+.storefront-light .cart-drawer-header {
+  border-bottom: 1px solid var(--border);
+  padding: 16px;
+}
+
+.storefront-light .cart-drawer-title {
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Inputs within the cart sidebar should be white to contrast with gray bg */
+.storefront-light .cart-drawer .form-input,
+.storefront-light .cart-drawer select.form-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+}
+
+/* Order type toggle buttons (Entrega / Retirada) */
+.storefront-light .ordertype-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.storefront-light .ordertype-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-weight: 600;
+  text-align: center;
+  transition: 0.2s;
+}
+.storefront-light .ordertype-btn.active {
+  background: rgba(var(--primary-rgb, 255, 87, 34), 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Cart item text colors */
+.storefront-light .cart-item-name { color: var(--text); font-weight: 600; }
+.storefront-light .cart-item-unit { color: var(--muted); }
+.storefront-light .cart-item-total { color: var(--text); font-weight: 700; }
+
+/* Desktop overrides for Cart Sidebar */
+@media (min-width: 900px) {
+  .storefront-light .cart-drawer {
+    position: sticky;
+    top: 24px;
+    right: 0;
+    width: 360px;
+    height: auto;
+    max-height: calc(100vh - 48px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: flex !important;
+    opacity: 1 !important;
+    pointer-events: all !important;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .storefront-light .cart-overlay {
+    display: none !important;
+  }
+
+  .storefront-light .cart-close {
+    display: none;
+  }
+
+  .storefront-light .cart-fab {
+    display: none !important;
+  }
+}
+
+/* MODAL 2 COLUMNS */
+.storefront-light .option-modal-overlay {
+  z-index: 9999 !important; /* Ensure modal is always on top of the cart */
+}
+
+.storefront-light .option-modal {
+  background: var(--surface);
+  color: var(--text);
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
+.storefront-light .option-modal-left {
+  width: 100%;
+  height: 250px;
+  flex-shrink: 0;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.storefront-light .option-modal-left img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.storefront-light .option-modal-right {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  height: auto;
+}
+
+.storefront-light .option-modal-body {
+  overflow-y: auto;
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  .storefront-light .option-modal {
+    flex-direction: row;
+    height: 600px;
+  }
+  
+  .storefront-light .option-modal-left {
+    width: 50%;
+    height: 100%;
+    border-right: 1px solid var(--border);
+  }
+  
+  .storefront-light .option-modal-right {
+    width: 50%;
+    height: 100%;
+  }
+}
+
+/* Modal text styling */
+.storefront-light .option-modal-title {
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 700;
+}
+.storefront-light .option-modal-desc {
+  color: var(--text2);
+  font-size: 14px;
+}
+.storefront-light .option-group-head {
+  background: var(--surface2);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.storefront-light .option-group-name {
+  color: var(--text);
+  font-weight: 600;
+}
+.storefront-light .option-row {
+  border-bottom: 1px solid var(--border2);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+}
+.storefront-light .option-row:hover {
+  background: var(--surface2);
+}
+.storefront-light .option-row-name {
+  color: var(--text);
+  font-size: 15px;
+}
+
+/* Fix Checkout/Adicionar Button to use primary color instead of green */
+.storefront-light .checkout-btn {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  width: 100%;
+  font-size: 16px;
+  transition: opacity 0.2s;
+}
+.storefront-light .checkout-btn:hover {
+  opacity: 0.9;
+}
+.storefront-light .checkout-btn:disabled {
+  background: var(--muted2) !important;
+  opacity: 0.7;
+}
+
+/* Textarea in Modal */
+.storefront-light .option-modal textarea.form-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+}
