@@ -1,5 +1,5 @@
 import { getCurrentStore } from '@/lib/store'
-import { fmtCents, fmtSince } from '@/lib/format'
+import { fmtCents, fmtSince, spDayStart } from '@/lib/format'
 import { getStoreUsage } from '@/lib/plan'
 import Link from 'next/link'
 import OnboardingChecklist from '@/components/dashboard/OnboardingChecklist'
@@ -7,9 +7,8 @@ import OnboardingChecklist from '@/components/dashboard/OnboardingChecklist'
 export default async function DashboardHomePage() {
   const { supabase, store } = await getCurrentStore()
 
-  // Busca dados para o resumo
-  const todayStart = new Date()
-  todayStart.setHours(0, 0, 0, 0)
+  // "Hoje" = dia de calendário em São Paulo (o servidor roda em UTC).
+  const todayStart = spDayStart(new Date(), 0)
 
   const [{ data: todayOrders }, { data: allOrders }, { count: productCount }, usage] = await Promise.all([
     supabase
