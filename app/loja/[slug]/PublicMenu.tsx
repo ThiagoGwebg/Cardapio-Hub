@@ -8,6 +8,7 @@ import { googleFontHref, DEFAULT_STORE_FONT } from '@/lib/plan'
 import { IconPin, IconUtensils, IconClose } from '@/components/icons'
 import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } from '@/lib/orderHistory'
 import InstallPwaButton from '@/components/InstallPwaButton'
+import './loja.css'
 
 type Option = { id: string; name: string; price_delta_cents: number }
 type Group = {
@@ -60,6 +61,7 @@ type CartItem = {
   base_cents: number
   options: SelectedOption[]
   qty: number
+  note?: string
 }
 
 type OrderType = 'delivery' | 'pickup' | 'dine_in'
@@ -85,6 +87,7 @@ export default function PublicMenu({
   const [cartOpen, setCartOpen] = useState(false)
   const [modalProduct, setModalProduct] = useState<Product | null>(null)
   const [modalSel, setModalSel] = useState<Record<string, Option[]>>({})
+  const [modalNote, setModalNote] = useState('')
   const [galleryIdx, setGalleryIdx] = useState(0)
 
   const [customerName, setCustomerName] = useState('')
@@ -221,12 +224,13 @@ export default function PublicMenu({
     // Sem complementos e no máximo 1 foto: adiciona direto (1 clique).
     // Com complementos OU com galeria (2+ fotos): abre o modal.
     if (p.groups.length === 0 && p.images.length <= 1) {
-      addToCart(p, [])
+      addToCart(p, [], '')
       return
     }
     setGalleryIdx(0)
     setModalProduct(p)
     setModalSel({})
+    setModalNote('')
   }
 
   function toggleOption(group: Group, option: Option) {
@@ -269,16 +273,16 @@ export default function PublicMenu({
       name: o.name,
       price_delta_cents: o.price_delta_cents,
     }))
-    addToCart(modalProduct, selected)
+    addToCart(modalProduct, selected, modalNote)
     setModalProduct(null)
   }
 
-  function addToCart(p: Product, options: SelectedOption[]) {
-    const key = p.id + '|' + options.map((o) => o.option_id).sort().join(',')
+  function addToCart(p: Product, options: SelectedOption[], note: string) {
+    const key = p.id + '|' + options.map((o) => o.option_id).sort().join(',') + '|' + note
     setCart((prev) => {
       const existing = prev.find((i) => i.lineId === key)
       if (existing) return prev.map((i) => (i.lineId === key ? { ...i, qty: i.qty + 1 } : i))
-      return [...prev, { lineId: key, productId: p.id, name: p.name, base_cents: p.price_cents, options, qty: 1 }]
+      return [...prev, { lineId: key, productId: p.id, name: p.name, base_cents: p.price_cents, options, qty: 1, note }]
     })
   }
 
@@ -322,6 +326,7 @@ export default function PublicMenu({
         product_id: i.productId,
         quantity: i.qty,
         options: i.options.map((o) => ({ option_id: o.option_id })),
+        note: i.note || null,
       })),
     }
 
@@ -350,7 +355,7 @@ export default function PublicMenu({
   const minToReach = store.min_order_cents - subtotal
 
   return (
-    <div className="storefront" style={styleVars}>
+    <div className="storefront storefront-light" style={styleVars}>
       <link rel="manifest" href={`/loja/${store.slug}/manifest.webmanifest`} />
       <meta name="theme-color" content={theme.primaryColor || '#FF5722'} />
       <link rel="apple-touch-icon" href={theme.logoUrl || `/loja/${store.slug}/app-icon.svg`} />
@@ -518,6 +523,11 @@ export default function PublicMenu({
                       {item.options.length > 0 && (
                         <div className="cart-item-unit" style={{ fontSize: 11 }}>
                           {item.options.map((o) => o.name).join(', ')}
+                        </div>
+                      )}
+                      {item.note && (
+                        <div className="cart-item-unit" style={{ fontSize: 11, fontStyle: 'italic', color: 'var(--primary)' }}>
+                          Obs: {item.note}
                         </div>
                       )}
                       <div className="cart-item-unit">{fmtCents(unitOf(item))} / un.</div>
@@ -698,75 +708,83 @@ export default function PublicMenu({
       {modalProduct && (
         <div className="option-modal-overlay" onClick={() => setModalProduct(null)}>
           <div className="option-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="option-modal-header">
-              <div>
-                <div className="option-modal-title">{modalProduct.name}</div>
-                {modalProduct.description && <div className="option-modal-desc">{modalProduct.description}</div>}
-              </div>
-              <button className="cart-close" onClick={() => setModalProduct(null)}><IconClose /></button>
-            </div>
-            <div className="option-modal-body">
-              {modalProduct.images.length > 0 && (
-                <div className="pm-gallery">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    className="pm-gallery-main"
-                    src={modalProduct.images[galleryIdx] ?? modalProduct.images[0]}
-                    alt={modalProduct.name}
-                  />
-                  {modalProduct.images.length > 1 && (
-                    <div className="pm-gallery-thumbs">
-                      {modalProduct.images.map((u, i) => (
-                        <button
-                          key={u + i}
-                          type="button"
-                          className={`pm-gallery-thumb ${i === galleryIdx ? 'active' : ''}`}
-                          onClick={() => setGalleryIdx(i)}
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={u} alt={`${modalProduct.name} ${i + 1}`} />
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+            <div className="option-modal-left">
+              {modalProduct.images.length > 0 ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={modalProduct.images[galleryIdx] ?? modalProduct.images[0]} alt={modalProduct.name} />
+              ) : modalProduct.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={modalProduct.image_url} alt={modalProduct.name} />
+              ) : (
+                <div style={{ padding: 40, color: 'var(--muted)' }}><IconUtensils size={60} /></div>
               )}
-              {modalProduct.groups.map((g) => {
-                const sel = modalSel[g.id] ?? []
-                return (
-                  <div className="option-group" key={g.id}>
-                    <div className="option-group-head">
-                      <span className="option-group-name">{g.name}</span>
-                      <span className={`option-group-tag ${g.required ? 'req' : ''}`}>
-                        {g.required ? 'Obrigatório' : 'Opcional'}
-                        {g.max_select > 1 ? ` · até ${g.max_select}` : ''}
-                      </span>
-                    </div>
-                    {g.options.map((o) => {
-                      const checked = !!sel.find((x) => x.id === o.id)
-                      return (
-                        <label className="option-row" key={o.id}>
-                          <span className="option-row-name">{o.name}</span>
-                          <span className="option-row-right">
-                            {o.price_delta_cents > 0 && <span className="option-row-price">+ {fmtCents(o.price_delta_cents)}</span>}
-                            <input
-                              type={g.max_select === 1 ? 'radio' : 'checkbox'}
-                              name={g.id}
-                              checked={checked}
-                              onChange={() => toggleOption(g, o)}
-                            />
-                          </span>
-                        </label>
-                      )
-                    })}
-                  </div>
-                )
-              })}
             </div>
-            <div className="option-modal-footer">
-              <button className="checkout-btn" disabled={!modalValid} onClick={confirmModal}>
-                Adicionar · {fmtCents(modalUnit)}
-              </button>
+            <div className="option-modal-right">
+              <div className="option-modal-header">
+                <div>
+                  <div className="option-modal-title">{modalProduct.name}</div>
+                  <div style={{ color: 'var(--primary)', fontWeight: 800, marginTop: 4 }}>
+                    {fmtCents(modalProduct.price_cents)}
+                  </div>
+                  {modalProduct.description && <div className="option-modal-desc" style={{ marginTop: 8 }}>{modalProduct.description}</div>}
+                </div>
+                <button className="cart-close" onClick={() => setModalProduct(null)}><IconClose /></button>
+              </div>
+              <div className="option-modal-body">
+                {modalProduct.groups.map((g) => {
+                  const sel = modalSel[g.id] ?? []
+                  return (
+                    <div className="option-group" key={g.id}>
+                      <div className="option-group-head">
+                        <span className="option-group-name">{g.name}</span>
+                        <span className={`option-group-tag ${g.required ? 'req' : ''}`}>
+                          {g.required ? 'Obrigatório' : 'Opcional'}
+                          {g.max_select > 1 ? ` · até ${g.max_select}` : ''}
+                        </span>
+                      </div>
+                      {g.options.map((o) => {
+                        const checked = !!sel.find((x) => x.id === o.id)
+                        return (
+                          <label className="option-row" key={o.id}>
+                            <span className="option-row-name">{o.name}</span>
+                            <span className="option-row-right">
+                              {o.price_delta_cents > 0 && <span className="option-row-price">+ {fmtCents(o.price_delta_cents)}</span>}
+                              <input
+                                type={g.max_select === 1 ? 'radio' : 'checkbox'}
+                                name={g.id}
+                                checked={checked}
+                                onChange={() => toggleOption(g, o)}
+                              />
+                            </span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                  )
+                })}
+                <div className="option-group">
+                   <div className="option-group-head">
+                      <span className="option-group-name">Alguma observação?</span>
+                      <span className="option-group-tag" style={{ color: 'var(--muted)' }}>{modalNote.length} / 140</span>
+                   </div>
+                   <div style={{ padding: '0 16px 16px', background: 'var(--surface)' }}>
+                     <textarea 
+                       className="form-input" 
+                       rows={2} 
+                       maxLength={140}
+                       placeholder="Ex: Tirar cebola, maionese à parte..."
+                       value={modalNote}
+                       onChange={(e) => setModalNote(e.target.value)}
+                       style={{ resize: 'none' }}
+                     />
+                   </div>
+                </div>
+              </div>
+              <div className="option-modal-footer">
+                <button className="checkout-btn" disabled={!modalValid} onClick={confirmModal}>
+                  Adicionar · {fmtCents(modalUnit)}
+                </button>
+              </div>
             </div>
           </div>
         </div>
