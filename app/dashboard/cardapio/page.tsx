@@ -39,17 +39,17 @@ export default async function CardapioPage({
 
       {!usage.isPro && (
         <div className="settings-card">
-          <UsageMeter label="Produtos do plano Free" used={usage.productCount} limit={usage.maxProducts} />
+          <UsageMeter label="Produtos do plano Lite" used={usage.productCount} limit={usage.maxProducts} />
           {(atLimit || limit) && (
             <ProUpsellBanner
               title="Limite de produtos atingido"
-              text="Seu cardápio chegou ao máximo do plano Free. Assine o Pro e cadastre produtos ilimitados."
+              text="Seu cardápio chegou ao máximo do plano Lite. Assine o Pro e cadastre produtos ilimitados."
             />
           )}
           {nearLimit && !limit && (
             <ProUpsellBanner
               title="Seu cardápio está quase cheio"
-              text={`Faltam ${usage.maxProducts - usage.productCount} produto(s) para o limite do Free. No Pro não existe limite.`}
+              text={`Faltam ${usage.maxProducts - usage.productCount} produto(s) para o limite do Lite. No Pro não existe limite.`}
             />
           )}
         </div>

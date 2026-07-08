@@ -78,7 +78,7 @@ export default async function DashboardHomePage() {
           <div className="stat-card">
             <div className="stat-label">Pedidos no mês</div>
             <div className="stat-value">{usage.ordersThisMonth}/{usage.maxOrdersPerMonth}</div>
-            <div className="stat-sub amber">Plano Free</div>
+            <div className="stat-sub amber">Plano Lite</div>
           </div>
         )}
         {usage.isPro && (

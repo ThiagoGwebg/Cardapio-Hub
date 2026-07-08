@@ -1,17 +1,22 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
-import { fetchLeads, setLeadStatus, setLeadNotes, type LeadRow } from './actions'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  fetchLeads,
+  setLeadStatus,
+  setLeadNotes,
+  approveLead,
+  resetLeadPassword,
+  type LeadRow,
+} from './actions'
 
-type Filter = 'novo' | 'contatado' | 'todos'
+type Filter = 'novo' | 'contatado' | 'fechado' | 'todos'
 
 const STATUS_META: Record<string, { label: string; color: string; bg: string }> = {
-  novo: { label: 'Novo', color: '#1d4ed8', bg: '#dbeafe' },
-  contatado: { label: 'Em contato', color: '#b45309', bg: '#fef3c7' },
-  fechado: { label: 'Fechado', color: '#15803d', bg: '#dcfce7' },
-  perdido: { label: 'Perdido', color: '#b91c1c', bg: '#fee2e2' },
+  novo: { label: 'Novo', color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.12)' },
+  contatado: { label: 'Em contato', color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.11)' },
+  fechado: { label: 'Cliente', color: '#34d399', bg: 'rgba(52, 211, 153, 0.12)' },
+  perdido: { label: 'Perdido', color: '#f87171', bg: 'rgba(248, 113, 113, 0.11)' },
 }
 const STATUS_ORDER = ['novo', 'contatado', 'fechado', 'perdido'] as const
 
@@ -20,10 +25,11 @@ const POLL_MS = 10_000
 function onlyDigits(raw: string | null): string {
   return (raw || '').replace(/\D/g, '')
 }
-function waLink(raw: string | null): string | null {
+function waLink(raw: string | null, text?: string): string | null {
   const d = onlyDigits(raw)
   if (d.length < 10) return null
-  return `https://wa.me/${d.startsWith('55') ? d : '55' + d}`
+  const num = d.startsWith('55') ? d : '55' + d
+  return `https://wa.me/${num}${text ? '?text=' + encodeURIComponent(text) : ''}`
 }
 function telLink(raw: string | null): string | null {
   const d = onlyDigits(raw)
@@ -64,14 +70,19 @@ function makeDing(ctx: AudioContext) {
   })
 }
 
+// Credenciais retornadas na aprovação/reset — mostradas uma única vez
+type Credentials = { email: string; password: string; slug: string; leadName: string | null; leadWhatsapp: string | null }
+
 export default function LeadsBoard({ initialLeads }: { initialLeads: LeadRow[] }) {
-  const router = useRouter()
   const [leads, setLeads] = useState<LeadRow[]>(initialLeads)
   const [filter, setFilter] = useState<Filter>('novo')
+  const [query, setQuery] = useState('')
   const [now, setNow] = useState<number>(() => new Date(initialLeads[0]?.created_at ?? 0).getTime() || 0)
   const [alertsOn, setAlertsOn] = useState(false)
   const [toast, setToast] = useState<LeadRow | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [approving, setApproving] = useState<LeadRow | null>(null)
+  const [credentials, setCredentials] = useState<Credentials | null>(null)
 
   const seenIds = useRef<Set<string>>(new Set(initialLeads.map((l) => l.id)))
   const audioRef = useRef<AudioContext | null>(null)
@@ -189,12 +200,6 @@ export default function LeadsBoard({ initialLeads }: { initialLeads: LeadRow[] }
     } catch {}
   }
 
-  async function logout() {
-    await createClient().auth.signOut()
-    router.push('/login')
-    router.refresh()
-  }
-
   // Atualiza um lead localmente (otimista) e persiste no servidor
   function patchLead(id: string, patch: Partial<LeadRow>) {
     setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, ...patch } : l)))
@@ -203,79 +208,138 @@ export default function LeadsBoard({ initialLeads }: { initialLeads: LeadRow[] }
   const counts = {
     novo: leads.filter((l) => l.status === 'novo').length,
     contatado: leads.filter((l) => l.status === 'contatado').length,
+    fechado: leads.filter((l) => l.status === 'fechado').length,
     todos: leads.length,
   }
+  const conversion = counts.todos > 0 ? Math.round((counts.fechado / counts.todos) * 100) : 0
 
-  const visible = leads.filter((l) => (filter === 'todos' ? true : l.status === filter))
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const qDigits = onlyDigits(q)
+    return leads.filter((l) => {
+      if (filter !== 'todos' && l.status !== filter) return false
+      if (!q) return true
+      return (
+        (l.name || '').toLowerCase().includes(q) ||
+        (l.company || '').toLowerCase().includes(q) ||
+        (l.email || '').toLowerCase().includes(q) ||
+        (qDigits.length >= 4 && onlyDigits(l.whatsapp).includes(qDigits))
+      )
+    })
+  }, [leads, filter, query])
 
   return (
     <div className="leads-app">
       <header className="leads-header">
-        <div className="leads-header-row">
-          <div className="leads-title">
-            Leads
-            {pendingCount > 0 && <span className="leads-pending-badge">{pendingCount}</span>}
-          </div>
-          <div className="leads-header-actions">
-            <button
-              className="leads-icon-btn"
-              onClick={refresh}
-              aria-label="Atualizar"
-              title="Atualizar"
-            >
-              <svg className={refreshing ? 'spin' : ''} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12a9 9 0 1 1-2.64-6.36" />
-                <path d="M21 3v6h-6" />
-              </svg>
-            </button>
-            <button
-              className={`leads-icon-btn ${alertsOn ? 'on' : ''}`}
-              onClick={alertsOn ? disableAlerts : enableAlerts}
-              aria-label="Alertas"
-              title={alertsOn ? 'Alertas ligados' : 'Ativar alertas'}
-            >
-              {alertsOn ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+        <div className="leads-header-inner">
+          <div className="leads-header-row">
+            <div className="leads-title">
+              Leads
+              {pendingCount > 0 && <span className="leads-pending-badge">{pendingCount}</span>}
+            </div>
+            <div className="leads-header-actions">
+              <button
+                className="leads-icon-btn"
+                onClick={refresh}
+                aria-label="Atualizar"
+                title="Atualizar"
+              >
+                <svg className={refreshing ? 'spin' : ''} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+                  <path d="M21 3v6h-6" />
                 </svg>
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                  <path d="M18.63 13A17.9 17.9 0 0 1 18 8" />
-                  <path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14" />
-                  <path d="M18 8a6 6 0 0 0-9.33-5" />
-                  <line x1="1" y1="1" x2="23" y2="23" />
-                </svg>
-              )}
-            </button>
-            <button className="leads-logout" onClick={logout}>Sair</button>
+              </button>
+              <button
+                className={`leads-icon-btn ${alertsOn ? 'on' : ''}`}
+                onClick={alertsOn ? disableAlerts : enableAlerts}
+                aria-label="Alertas"
+                title={alertsOn ? 'Alertas ligados' : 'Ativar alertas'}
+              >
+                {alertsOn ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    <path d="M18.63 13A17.9 17.9 0 0 1 18 8" />
+                    <path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14" />
+                    <path d="M18 8a6 6 0 0 0-9.33-5" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
-        </div>
 
-        {!alertsOn && (
-          <button className="leads-alert-cta" onClick={enableAlerts}>
-            🔔 Tocar um som e me avisar a cada lead novo
-          </button>
-        )}
+          {!alertsOn && (
+            <button className="leads-alert-cta" onClick={enableAlerts}>
+              🔔 Tocar um som e me avisar a cada lead novo
+            </button>
+          )}
 
-        <div className="leads-tabs">
-          <button className={`leads-tab ${filter === 'novo' ? 'active' : ''}`} onClick={() => setFilter('novo')}>
-            Pendentes {counts.novo > 0 && <span className="leads-tab-count">{counts.novo}</span>}
-          </button>
-          <button className={`leads-tab ${filter === 'contatado' ? 'active' : ''}`} onClick={() => setFilter('contatado')}>
-            Em contato {counts.contatado > 0 && <span className="leads-tab-count">{counts.contatado}</span>}
-          </button>
-          <button className={`leads-tab ${filter === 'todos' ? 'active' : ''}`} onClick={() => setFilter('todos')}>
-            Todos <span className="leads-tab-count muted">{counts.todos}</span>
-          </button>
+          <div className="leads-stats">
+            <div className="leads-stat">
+              <span className="leads-stat-num">{counts.novo}</span>
+              <span className="leads-stat-label">Pendentes</span>
+            </div>
+            <div className="leads-stat">
+              <span className="leads-stat-num">{counts.contatado}</span>
+              <span className="leads-stat-label">Em contato</span>
+            </div>
+            <div className="leads-stat">
+              <span className="leads-stat-num green">{counts.fechado}</span>
+              <span className="leads-stat-label">Clientes</span>
+            </div>
+            <div className="leads-stat">
+              <span className="leads-stat-num">{conversion}%</span>
+              <span className="leads-stat-label">Conversão</span>
+            </div>
+          </div>
+
+          <div className="leads-search">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Buscar por nome, empresa, e-mail ou WhatsApp…"
+            />
+            {query && (
+              <button className="leads-search-clear" onClick={() => setQuery('')} aria-label="Limpar busca">✕</button>
+            )}
+          </div>
+
+          <div className="leads-tabs">
+            <button className={`leads-tab ${filter === 'novo' ? 'active' : ''}`} onClick={() => setFilter('novo')}>
+              Pendentes {counts.novo > 0 && <span className="leads-tab-count">{counts.novo}</span>}
+            </button>
+            <button className={`leads-tab ${filter === 'contatado' ? 'active' : ''}`} onClick={() => setFilter('contatado')}>
+              Em contato {counts.contatado > 0 && <span className="leads-tab-count">{counts.contatado}</span>}
+            </button>
+            <button className={`leads-tab ${filter === 'fechado' ? 'active' : ''}`} onClick={() => setFilter('fechado')}>
+              Clientes {counts.fechado > 0 && <span className="leads-tab-count green">{counts.fechado}</span>}
+            </button>
+            <button className={`leads-tab ${filter === 'todos' ? 'active' : ''}`} onClick={() => setFilter('todos')}>
+              Todos <span className="leads-tab-count muted">{counts.todos}</span>
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="leads-list">
         {visible.length === 0 ? (
           <div className="leads-empty">
-            {filter === 'novo' ? (
+            {query ? (
+              <>
+                <div className="leads-empty-emoji">🔍</div>
+                <div className="leads-empty-title">Nada encontrado</div>
+                <div className="leads-empty-sub">Nenhum lead bate com “{query}” nesse filtro.</div>
+              </>
+            ) : filter === 'novo' ? (
               <>
                 <div className="leads-empty-emoji">✅</div>
                 <div className="leads-empty-title">Nenhum lead pendente</div>
@@ -289,14 +353,44 @@ export default function LeadsBoard({ initialLeads }: { initialLeads: LeadRow[] }
             )}
           </div>
         ) : (
-          visible.map((lead) => (
-            <LeadCard key={lead.id} lead={lead} now={now} onPatch={patchLead} />
-          ))
+          <div className="leads-grid">
+            {visible.map((lead) => (
+              <LeadCard
+                key={lead.id}
+                lead={lead}
+                now={now}
+                onPatch={patchLead}
+                onApprove={() => setApproving(lead)}
+                onCredentials={(c) => setCredentials(c)}
+              />
+            ))}
+          </div>
         )}
         <div className="leads-foot">
           {refreshing ? 'Atualizando…' : `Atualiza sozinho a cada ${POLL_MS / 1000}s`}
         </div>
       </main>
+
+      {approving && (
+        <ApproveModal
+          lead={approving}
+          onClose={() => setApproving(null)}
+          onDone={(creds, storeId) => {
+            patchLead(approving.id, {
+              status: 'fechado',
+              converted_at: new Date().toISOString(),
+              converted_store_id: storeId,
+              store_slug: creds.slug,
+            })
+            setApproving(null)
+            setCredentials(creds)
+          }}
+        />
+      )}
+
+      {credentials && (
+        <CredentialsModal credentials={credentials} onClose={() => setCredentials(null)} />
+      )}
 
       {toast && (
         <button className="leads-toast" onClick={() => { setFilter('novo'); setToast(null) }}>
@@ -316,24 +410,35 @@ function LeadCard({
   lead,
   now,
   onPatch,
+  onApprove,
+  onCredentials,
 }: {
   lead: LeadRow
   now: number
   onPatch: (id: string, patch: Partial<LeadRow>) => void
+  onApprove: () => void
+  onCredentials: (c: Credentials) => void
 }) {
   const [openNotes, setOpenNotes] = useState(false)
   const [notes, setNotes] = useState(lead.notes || '')
   const [savingNote, setSavingNote] = useState(false)
   const [savedNote, setSavedNote] = useState(false)
   const [busyStatus, setBusyStatus] = useState(false)
+  const [resetting, setResetting] = useState(false)
 
   const meta = STATUS_META[lead.status] || STATUS_META.novo
   const wa = waLink(lead.whatsapp)
   const tel = telLink(lead.whatsapp)
   const isNew = lead.status === 'novo'
+  const converted = Boolean(lead.converted_store_id)
 
   async function changeStatus(s: string) {
     if (s === lead.status || busyStatus) return
+    // 'fechado' de verdade passa pela aprovação (cria a conta); aqui só bloqueia o atalho
+    if (s === 'fechado' && !converted) {
+      onApprove()
+      return
+    }
     setBusyStatus(true)
     const prev = lead.status
     onPatch(lead.id, { status: s })
@@ -354,10 +459,23 @@ function LeadCard({
     }
   }
 
+  async function newPassword() {
+    if (resetting) return
+    if (!window.confirm('Gerar uma nova senha temporária pra esse cliente? A senha antiga deixa de funcionar.')) return
+    setResetting(true)
+    const res = await resetLeadPassword(lead.id)
+    setResetting(false)
+    if (res.ok) {
+      onCredentials({ ...res, leadName: lead.name, leadWhatsapp: lead.whatsapp })
+    } else {
+      window.alert(res.error)
+    }
+  }
+
   return (
-    <article className={`lead-card ${isNew ? 'is-new' : ''}`}>
+    <article className={`lead-card ${isNew ? 'is-new' : ''} ${converted ? 'is-client' : ''}`}>
       <div className="lead-top">
-        <div className="lead-avatar" style={isNew ? undefined : { background: '#eceff3', color: '#5f6b7a' }}>
+        <div className="lead-avatar" style={isNew ? undefined : converted ? { background: 'linear-gradient(135deg, #10b981, #059669)' } : { background: '#212633', color: '#99a1b3' }}>
           {initial(lead.name)}
         </div>
         <div className="lead-ident">
@@ -371,7 +489,7 @@ function LeadCard({
           </div>
         </div>
         <span className="lead-status-pill" style={{ background: meta.bg, color: meta.color }}>
-          {meta.label}
+          {converted ? '✓ Cliente' : meta.label}
         </span>
       </div>
 
@@ -402,6 +520,29 @@ function LeadCard({
         )}
       </div>
 
+      {converted ? (
+        <div className="lead-client-box">
+          <div className="lead-client-info">
+            <span className="lead-client-check">✓</span>
+            <div>
+              <div className="lead-client-title">Conta ativa</div>
+              {lead.store_slug && (
+                <a className="lead-client-link" href={`/loja/${lead.store_slug}`} target="_blank" rel="noopener noreferrer">
+                  /loja/{lead.store_slug} ↗
+                </a>
+              )}
+            </div>
+          </div>
+          <button className="lead-btn ghost sm" onClick={newPassword} disabled={resetting}>
+            {resetting ? 'Gerando…' : '🔑 Nova senha'}
+          </button>
+        </div>
+      ) : (
+        <button className="lead-approve-btn" onClick={onApprove}>
+          ✓ Aprovar e criar conta
+        </button>
+      )}
+
       <div className="lead-statusbar">
         {STATUS_ORDER.map((s) => {
           const sm = STATUS_META[s]
@@ -411,7 +552,7 @@ function LeadCard({
               key={s}
               className={`lead-status-opt ${active ? 'active' : ''}`}
               onClick={() => changeStatus(s)}
-              disabled={busyStatus}
+              disabled={busyStatus || (converted && s !== 'fechado')}
               style={active ? { background: sm.bg, color: sm.color, borderColor: sm.color } : undefined}
             >
               {sm.label}
@@ -442,5 +583,155 @@ function LeadCard({
         </div>
       )}
     </article>
+  )
+}
+
+// ── Modal: aprovar lead e criar a conta ─────────────────────────────────
+function ApproveModal({
+  lead,
+  onClose,
+  onDone,
+}: {
+  lead: LeadRow
+  onClose: () => void
+  onDone: (creds: Credentials, storeId: string | null) => void
+}) {
+  const [storeName, setStoreName] = useState(lead.company || lead.name || '')
+  const [email, setEmail] = useState(lead.email || '')
+  const [whatsapp, setWhatsapp] = useState(lead.whatsapp || '')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    if (busy) return
+    setBusy(true)
+    setError(null)
+    const res = await approveLead(lead.id, { storeName, email, whatsapp })
+    setBusy(false)
+    if (res.ok) {
+      onDone({ ...res, leadName: lead.name, leadWhatsapp: whatsapp || lead.whatsapp }, res.storeId || null)
+    } else {
+      setError(res.error)
+    }
+  }
+
+  return (
+    <div className="leads-modal-overlay" onClick={onClose}>
+      <form className="leads-modal" onClick={(e) => e.stopPropagation()} onSubmit={submit}>
+        <div className="leads-modal-head">
+          <div className="leads-modal-title">Aprovar {lead.name || 'lead'}</div>
+          <button type="button" className="leads-modal-close" onClick={onClose} aria-label="Fechar">✕</button>
+        </div>
+        <p className="leads-modal-sub">
+          Cria a conta e a loja na hora. Você recebe a senha temporária pra mandar no WhatsApp — o cliente já entra direto.
+        </p>
+
+        <label className="leads-field">
+          <span>Nome da loja</span>
+          <input value={storeName} onChange={(e) => setStoreName(e.target.value)} required autoFocus />
+        </label>
+        <label className="leads-field">
+          <span>E-mail de acesso</span>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        </label>
+        <label className="leads-field">
+          <span>WhatsApp da loja (opcional)</span>
+          <input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="(11) 99999-9999" />
+        </label>
+
+        {error && <p className="leads-modal-error">{error}</p>}
+
+        <button className="leads-modal-submit" type="submit" disabled={busy}>
+          {busy ? 'Criando conta…' : '✓ Criar conta e liberar acesso'}
+        </button>
+      </form>
+    </div>
+  )
+}
+
+// ── Modal: credenciais geradas (mostradas uma única vez) ────────────────
+function CredentialsModal({ credentials, onClose }: { credentials: Credentials; onClose: () => void }) {
+  const [copied, setCopied] = useState(false)
+  const [copiedField, setCopiedField] = useState<string | null>(null)
+
+  async function copyField(field: string, value: string) {
+    try {
+      await navigator.clipboard.writeText(value)
+      setCopiedField(field)
+      window.setTimeout(() => setCopiedField(null), 1600)
+    } catch {}
+  }
+
+  const origin = typeof window !== 'undefined' ? window.location.origin : ''
+  const message = [
+    `Olá${credentials.leadName ? ' ' + credentials.leadName.split(' ')[0] : ''}! 🎉 Sua conta no CardápioÁgil está pronta!`,
+    '',
+    `🔗 Acesse: ${origin}/login`,
+    `📧 E-mail: ${credentials.email}`,
+    `🔑 Senha temporária: ${credentials.password}`,
+    '',
+    credentials.slug ? `Seu cardápio já está no ar: ${origin}/loja/${credentials.slug}` : '',
+    '',
+    'Qualquer dúvida é só chamar! 😉',
+  ].filter((l, i, arr) => l !== '' || arr[i - 1] !== '').join('\n')
+
+  const waSend = waLink(credentials.leadWhatsapp, message)
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(message)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 2000)
+    } catch {}
+  }
+
+  return (
+    <div className="leads-modal-overlay" onClick={onClose}>
+      <div className="leads-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="leads-modal-head">
+          <div className="leads-modal-title">🎉 Conta criada!</div>
+          <button type="button" className="leads-modal-close" onClick={onClose} aria-label="Fechar">✕</button>
+        </div>
+
+        <div className="leads-cred-box">
+          <div className="leads-cred-row">
+            <span className="leads-cred-label">E-mail</span>
+            <code>{credentials.email}</code>
+            <button className="leads-cred-copy" onClick={() => copyField('email', credentials.email)}>
+              {copiedField === 'email' ? '✓' : 'copiar'}
+            </button>
+          </div>
+          <div className="leads-cred-row">
+            <span className="leads-cred-label">Senha</span>
+            <code className="leads-cred-pass">{credentials.password}</code>
+            <button className="leads-cred-copy" onClick={() => copyField('pass', credentials.password)}>
+              {copiedField === 'pass' ? '✓' : 'copiar'}
+            </button>
+          </div>
+          {credentials.slug && (
+            <div className="leads-cred-row">
+              <span className="leads-cred-label">Cardápio</span>
+              <code>/loja/{credentials.slug}</code>
+            </div>
+          )}
+        </div>
+
+        <p className="leads-cred-warn">
+          ⚠️ A senha só aparece agora — envie ou copie antes de fechar. Se perder, é só gerar outra no card do cliente.
+        </p>
+
+        <div className="leads-cred-actions">
+          {waSend && (
+            <a className="lead-btn wa" href={waSend} target="_blank" rel="noopener noreferrer">
+              Enviar acesso no WhatsApp
+            </a>
+          )}
+          <button className="lead-btn ghost" onClick={copy}>
+            {copied ? 'Copiado ✓' : 'Copiar mensagem'}
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }

@@ -4,8 +4,8 @@ const FAQS = [
     a: 'Não. Você preenche os dados da sua loja e monta o cardápio direto pelo painel, sem escrever nenhuma linha de código.',
   },
   {
-    q: 'Como funciona o plano grátis?',
-    a: 'Sem custo, com até 20 produtos e 30 pedidos por mês — dá pra testar a plataforma inteira sem compromisso.',
+    q: 'Como funciona o plano Lite?',
+    a: 'Por R$ 29/mês você tem até 30 produtos e 60 pedidos por mês, sem comissão por venda — o essencial pra colocar sua loja no ar e começar a vender.',
   },
   {
     q: 'Eu pago comissão por pedido?',

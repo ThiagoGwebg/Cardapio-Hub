@@ -33,11 +33,11 @@ export default async function PedidosPage() {
 
       {!usage.isPro && (
         <div className="settings-card">
-          <UsageMeter label="Pedidos do mês (plano Free)" used={usage.ordersThisMonth} limit={usage.maxOrdersPerMonth} />
+          <UsageMeter label="Pedidos do mês (plano Lite)" used={usage.ordersThisMonth} limit={usage.maxOrdersPerMonth} />
           {nearOrderLimit && (
             <ProUpsellBanner
               title="Você está perto do limite de pedidos"
-              text="No plano Free são 30 pedidos por mês. Assine o Pro e nunca mais deixe uma venda passar."
+              text="No plano Lite são 60 pedidos por mês. Assine o Pro e nunca mais deixe uma venda passar."
             />
           )}
         </div>

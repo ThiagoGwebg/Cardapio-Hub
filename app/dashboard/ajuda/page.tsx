@@ -81,8 +81,8 @@ export default function AjudaPage() {
             a: 'Não! O cardápio abre direto no navegador do celular. O cliente pode até instalar como um app na tela inicial (PWA) para acessar mais rápido.',
           },
           {
-            q: 'Como funciona o plano Free vs Pro?',
-            a: 'No plano Free você tem até 30 pedidos por mês e até 15 produtos no cardápio. No plano Pro, é ilimitado e você ainda ganha relatórios avançados, notificações por WhatsApp e suporte prioritário.',
+            q: 'Como funciona o plano Lite vs Pro?',
+            a: 'No plano Lite você tem até 60 pedidos por mês e até 30 produtos no cardápio. No plano Pro, é ilimitado e você ainda ganha relatórios avançados, notificações por WhatsApp, vários usuários/lojas e suporte prioritário.',
           },
         ].map((item, i) => (
           <div className="help-faq-item" key={i}>
