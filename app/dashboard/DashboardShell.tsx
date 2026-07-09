@@ -4,7 +4,17 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import LogoutButton from './LogoutButton'
+import ThemeToggle from './ThemeToggle'
 import './dashboard.css'
+
+const THEME_INIT_SCRIPT = `
+(function () {
+  try {
+    var t = localStorage.getItem('cardapio-dash-theme') || 'light';
+    document.documentElement.setAttribute('data-dash-theme', t);
+  } catch (e) {}
+})();
+`
 
 const NAV_PRINCIPAL = [
   { href: '/dashboard', label: 'Início' },
@@ -67,6 +77,7 @@ export default function DashboardShell({ store, children }: { store: Store; chil
 
   return (
     <div className="dashboard">
+      <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       <div className="mobile-topbar">
         <button className="mobile-menu-btn" onClick={() => setOpen(true)} aria-label="Abrir menu">
           <span /><span /><span />
@@ -92,7 +103,8 @@ export default function DashboardShell({ store, children }: { store: Store; chil
 
         <NavLinks />
 
-        <div style={{ marginTop: 'auto', padding: '18px' }}>
+        <div style={{ marginTop: 'auto', padding: '18px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <ThemeToggle />
           <LogoutButton />
         </div>
       </aside>

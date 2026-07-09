@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import InstallAppButton from './InstallAppButton'
 
 const LINKS = [
   {
@@ -79,6 +80,7 @@ export default function AdminNav({ email }: { email: string }) {
       </div>
 
       <div className="adm-nav-foot">
+        <InstallAppButton />
         <div className="adm-nav-user" title={email}>
           <span className="adm-nav-avatar">{(email[0] || '?').toUpperCase()}</span>
           <span className="adm-nav-email">{email}</span>

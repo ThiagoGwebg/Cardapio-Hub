@@ -238,10 +238,10 @@ export default function KanbanBoard({ storeId, storeName, orders }: { storeId: s
 
                   {col.next && (
                     <div style={{ display: 'flex', gap: 6 }}>
-                      <button className="advance-btn" style={{ flex: 1 }} onClick={() => advanceOrder(order.id, order.status, order.order_type)}>
+                      <button className="advance-btn" style={{ flex: 1, width: 'auto' }} onClick={() => advanceOrder(order.id, order.status, order.order_type)}>
                         {nextLabel(col, order.order_type)} →
                       </button>
-                      <button className="advance-btn" style={{ flex: 'none', padding: '0 10px', background: 'var(--red-l)', color: 'var(--red)' }} onClick={() => cancelOrder(order.id)} title="Cancelar">
+                      <button className="advance-btn" style={{ flex: 'none', width: 'auto', padding: '0 10px', background: 'var(--red-l)', color: 'var(--red)' }} onClick={() => cancelOrder(order.id)} title="Cancelar">
                         ✕
                       </button>
                     </div>

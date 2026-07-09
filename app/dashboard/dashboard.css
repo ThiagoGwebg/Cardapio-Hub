@@ -1,4 +1,165 @@
 /* ================================================================
+   TEMA DO PAINEL — light (padrão) / dark / black
+   Sobrescreve as variáveis de cor só dentro de .dashboard, sem
+   afetar o cardápio público (/loja) que usa o tema global escuro.
+   ================================================================ */
+.dashboard {
+  /* padrão / fallback antes do script de tema rodar = light */
+  --bg: #F6F6F8;
+  --surface: #FFFFFF;
+  --surface2: #F7F7F9;
+  --surface3: #EDEDF1;
+
+  --primary: #FF5722;
+  --primary-d: #E64A19;
+  --primary-l: rgba(255, 87, 34, 0.10);
+
+  --teal: #0891B2;
+  --teal-d: #0E7490;
+  --teal-l: rgba(8, 145, 178, 0.10);
+
+  --green: #15803D;
+  --green-d: #166534;
+  --green-l: rgba(21, 128, 61, 0.10);
+
+  --red: #DC2626;
+  --red-l: rgba(220, 38, 38, 0.10);
+
+  --yellow: #B45309;
+  --yellow-l: rgba(180, 83, 9, 0.10);
+
+  --blue: #2563EB;
+  --blue-l: rgba(37, 99, 235, 0.10);
+
+  --text: #18181B;
+  --text2: #3F3F46;
+  --muted: #71717A;
+  --muted2: #A1A1AA;
+
+  --border: #E4E4E7;
+  --border2: #ECECEF;
+
+  --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.05);
+  --shadow: 0 4px 16px rgba(24, 24, 27, 0.07);
+  --shadow-lg: 0 16px 32px rgba(24, 24, 27, 0.09);
+}
+
+html[data-dash-theme="dark"] .dashboard {
+  --bg: #121212;
+  --surface: #202124;
+  --surface2: #28292C;
+  --surface3: #323337;
+
+  --primary: #FF5722;
+  --primary-d: #E64A19;
+  --primary-l: rgba(255, 87, 34, 0.12);
+
+  --teal: #26C6DA;
+  --teal-d: #009688;
+  --teal-l: rgba(38, 198, 218, 0.15);
+
+  --green: #81C995;
+  --green-d: #5BB974;
+  --green-l: rgba(129, 201, 149, 0.15);
+
+  --red: #F28B82;
+  --red-l: rgba(242, 139, 130, 0.15);
+
+  --yellow: #FDD663;
+  --yellow-l: rgba(253, 214, 99, 0.15);
+
+  --blue: #8AB4F8;
+  --blue-l: rgba(138, 180, 248, 0.15);
+
+  --text: #E8EAED;
+  --text2: #D2D4D7;
+  --muted: #9AA0A6;
+  --muted2: #80868B;
+
+  --border: #3C4043;
+  --border2: #444746;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.6);
+}
+
+html[data-dash-theme="black"] .dashboard {
+  --bg: #000000;
+  --surface: #0A0A0A;
+  --surface2: #141414;
+  --surface3: #1E1E1E;
+
+  --primary: #FF6E40;
+  --primary-d: #FF5722;
+  --primary-l: rgba(255, 110, 64, 0.14);
+
+  --teal: #2DD4E8;
+  --teal-d: #22B8CC;
+  --teal-l: rgba(45, 212, 232, 0.14);
+
+  --green: #8FE0A3;
+  --green-d: #6ED184;
+  --green-l: rgba(143, 224, 163, 0.14);
+
+  --red: #FF8A80;
+  --red-l: rgba(255, 138, 128, 0.14);
+
+  --yellow: #FFE082;
+  --yellow-l: rgba(255, 224, 130, 0.14);
+
+  --blue: #90CAF9;
+  --blue-l: rgba(144, 202, 249, 0.14);
+
+  --text: #F2F2F2;
+  --text2: #D6D6D6;
+  --muted: #9E9E9E;
+  --muted2: #7A7A7A;
+
+  --border: #262626;
+  --border2: #2E2E2E;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.7);
+  --shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 14px 28px rgba(0, 0, 0, 0.8);
+}
+
+/* ── Toggle de tema (sidebar) ── */
+.theme-toggle {
+  display: flex;
+  gap: 3px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+}
+
+.theme-toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.theme-toggle-btn:hover {
+  color: var(--text2);
+}
+
+.theme-toggle-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 1px 6px rgba(255, 87, 34, 0.35);
+}
+
+/* ================================================================
    DASHBOARD HOME — ONBOARDING + QUICK ACTIONS + RECENT ORDERS
    ================================================================ */
 .onboarding-card {
