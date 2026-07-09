@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import Analytics from '@/components/analytics/Analytics'
 
 export const metadata: Metadata = {
   title: 'CardápioÁgil',
@@ -19,7 +20,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <Analytics />
+        {children}
+      </body>
     </html>
   )
 }

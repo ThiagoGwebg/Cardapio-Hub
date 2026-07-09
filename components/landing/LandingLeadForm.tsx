@@ -1,8 +1,9 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import Link from 'next/link'
 import { submitLead, type LeadFormState } from '@/app/actions/leads'
+import { trackLead } from '@/lib/analytics'
 
 const REVENUE_OPTIONS = [
   'Não sei',
@@ -34,6 +35,11 @@ const initialState: LeadFormState = { ok: false }
 
 export default function LandingLeadForm() {
   const [state, formAction, pending] = useActionState(submitLead, initialState)
+
+  // Dispara a conversão de Lead nos pixels quando o envio dá certo.
+  useEffect(() => {
+    if (state.ok) trackLead()
+  }, [state.ok])
 
   if (state.ok) {
     return (
