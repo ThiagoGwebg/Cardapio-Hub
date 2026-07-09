@@ -364,3 +364,18 @@
   padding: 12px;
   font-size: 14px;
 }
+
+/* ── Modo app instalado (standalone) ──
+   Com status bar translúcido no iOS o conteúdo vai até o topo; aqui damos o respiro
+   do notch e da barra inferior pra não ficar torto ao abrir como app. */
+@media (display-mode: standalone) {
+  .storefront-topbar {
+    padding-top: calc(10px + env(safe-area-inset-top));
+  }
+  .storefront {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .cart-fab {
+    bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+}

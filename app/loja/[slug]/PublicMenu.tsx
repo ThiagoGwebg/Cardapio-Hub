@@ -356,9 +356,7 @@ export default function PublicMenu({
 
   return (
     <div className="storefront storefront-light" style={styleVars}>
-      <link rel="manifest" href={`/loja/${store.slug}/manifest.webmanifest`} />
-      <meta name="theme-color" content={theme.primaryColor || '#FF5722'} />
-      <link rel="apple-touch-icon" href={theme.logoUrl || `/loja/${store.slug}/app-icon.svg`} />
+      {/* manifest, theme-color e apple-touch-icon agora vêm do layout.tsx (head real, com as tags de iOS). */}
       {storeFont && <link rel="stylesheet" href={googleFontHref(storeFont)} />}
 
       <div className="storefront-topbar">
