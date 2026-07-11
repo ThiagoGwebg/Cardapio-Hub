@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { playNewOrderBeep } from '@/lib/sound'
+import { subscribeToPush, type PushResult } from '@/lib/push'
 
 const KEY = 'cardapio-order-alerts'
 
 export default function OrderAlertsSettings() {
   const [enabled, setEnabled] = useState(false)
   const [perm, setPerm] = useState<NotificationPermission | 'unsupported'>('default')
+  const [pushStatus, setPushStatus] = useState<PushResult | null>(null)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
@@ -31,6 +33,12 @@ export default function OrderAlertsSettings() {
     localStorage.setItem(KEY, '1')
     setEnabled(true)
     window.dispatchEvent(new Event('order-alerts-changed'))
+
+    // Inscreve o aparelho pra push (funciona com o app fechado, se permitido).
+    if (granted) {
+      const r = await subscribeToPush()
+      setPushStatus(r)
+    }
 
     // Teste imediato pro lojista ver/ouvir que ativou.
     playNewOrderBeep()
@@ -74,6 +82,18 @@ export default function OrderAlertsSettings() {
         <div className="alert-status alert-status--off">
           <span className="alert-status-dot" /> Alertas desativados
         </div>
+      )}
+
+      {enabled && pushStatus && (
+        <p style={{ fontSize: 12, marginTop: 10, color: pushStatus === 'ok' ? 'var(--green)' : 'var(--muted)' }}>
+          {pushStatus === 'ok'
+            ? '✅ Push ativo — você é avisado até com o app fechado.'
+            : pushStatus === 'no-key'
+              ? '⚠️ Push com app fechado ainda não configurado no servidor (faltam as chaves). Com a aba aberta, o alerta já funciona.'
+              : pushStatus === 'unsupported'
+                ? 'Este navegador não suporta push com app fechado. Com a aba aberta, o alerta funciona.'
+                : 'Não deu pra ativar o push com app fechado agora. Com a aba aberta, o alerta funciona.'}
+        </p>
       )}
 
       <div style={{ display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
