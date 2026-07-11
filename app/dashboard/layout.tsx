@@ -5,7 +5,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { store } = await getCurrentStore()
 
   return (
-    <DashboardShell store={{ name: store.name, address: store.address, is_open: store.is_open }}>
+    <DashboardShell store={{ id: store.id, name: store.name, address: store.address, is_open: store.is_open }}>
       {children}
     </DashboardShell>
   )

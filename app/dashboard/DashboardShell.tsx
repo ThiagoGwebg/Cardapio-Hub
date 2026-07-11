@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import LogoutButton from './LogoutButton'
 import ThemeToggle from './ThemeToggle'
 import './dashboard.css'
@@ -33,11 +34,51 @@ const NAV_CONFIG = [
   { href: '/dashboard/ajuda', label: 'Ajuda' },
 ]
 
-type Store = { name: string; address: string | null; is_open: boolean }
+type Store = { id: string; name: string; address: string | null; is_open: boolean }
 
 export default function DashboardShell({ store, children }: { store: Store; children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
+  const [novoCount, setNovoCount] = useState(0)
+  const [pulse, setPulse] = useState(false)
+  const prevCountRef = useRef(0)
   const pathname = usePathname()
+
+  // Contador de pedidos NOVOS em tempo real — visível de qualquer tela do painel.
+  useEffect(() => {
+    const supabase = createClient()
+    let active = true
+
+    async function refreshCount() {
+      const { count } = await supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('store_id', store.id)
+        .eq('status', 'novo')
+      if (!active) return
+      const c = count ?? 0
+      if (c > prevCountRef.current) {
+        setPulse(true)
+        setTimeout(() => setPulse(false), 1500)
+      }
+      prevCountRef.current = c
+      setNovoCount(c)
+    }
+
+    refreshCount()
+    const channel = supabase
+      .channel(`shell-orders-${store.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders', filter: `store_id=eq.${store.id}` },
+        refreshCount
+      )
+      .subscribe()
+
+    return () => {
+      active = false
+      supabase.removeChannel(channel)
+    }
+  }, [store.id])
 
   // Destaca "Início" quando está exatamente em /dashboard
   function isActive(href: string) {
@@ -57,6 +98,9 @@ export default function DashboardShell({ store, children }: { store: Store; chil
             onClick={() => setOpen(false)}
           >
             {item.label}
+            {item.href === '/dashboard/pedidos' && novoCount > 0 && (
+              <span className={`nav-badge ${pulse ? 'pulse' : ''}`}>{novoCount}</span>
+            )}
           </Link>
         ))}
 
@@ -81,6 +125,7 @@ export default function DashboardShell({ store, children }: { store: Store; chil
       <div className="mobile-topbar">
         <button className="mobile-menu-btn" onClick={() => setOpen(true)} aria-label="Abrir menu">
           <span /><span /><span />
+          {novoCount > 0 && <span className={`mobile-menu-badge ${pulse ? 'pulse' : ''}`}>{novoCount}</span>}
         </button>
         <div className="mobile-topbar-title">
           cardápio<span>ágil</span>
