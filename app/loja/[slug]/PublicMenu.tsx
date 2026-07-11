@@ -439,6 +439,12 @@ export default function PublicMenu({
         <div className="storefront-announce">📣 {theme.announcement}</div>
       )}
 
+      {!store.delivery_enabled && (store.pickup_enabled || store.dine_in_enabled) && (
+        <div className="storefront-fulfillment">
+          🛍️ Esta loja trabalha {store.pickup_enabled ? 'com retirada no local' : 'para consumo no local'} — <b>sem entrega</b>
+        </div>
+      )}
+
       <div className="storefront-search-row">
         <input className="form-input" placeholder="Busque por um produto" value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
