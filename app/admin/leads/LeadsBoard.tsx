@@ -495,8 +495,20 @@ function LeadCard({
 
       {(lead.segment || lead.monthly_revenue) && (
         <div className="lead-chips">
-          {lead.segment && <span className="lead-chip">🍽️ {lead.segment}</span>}
-          {lead.monthly_revenue && <span className="lead-chip">💰 {lead.monthly_revenue}</span>}
+          {lead.segment && (
+            <span className="lead-chip">
+              {lead.segment === 'Entregador' ? '🛵' : '🍽️'} {lead.segment}
+            </span>
+          )}
+          {lead.monthly_revenue && (
+            <span className="lead-chip">
+              {lead.segment === 'Entregador' ? (
+                ['moto', 'motocicleta'].some(x => lead.monthly_revenue!.toLowerCase().includes(x)) ? '🛵' :
+                ['bike', 'bicicleta'].some(x => lead.monthly_revenue!.toLowerCase().includes(x)) ? '🚲' :
+                ['carro', 'automóvel', 'auto'].some(x => lead.monthly_revenue!.toLowerCase().includes(x)) ? '🚗' : '📦'
+              ) : '💰'} {lead.monthly_revenue}
+            </span>
+          )}
         </div>
       )}
 
@@ -520,7 +532,17 @@ function LeadCard({
         )}
       </div>
 
-      {converted ? (
+      {lead.segment === 'Entregador' ? (
+        <div className="lead-client-box" style={{ background: 'rgba(38, 198, 218, 0.08)', borderColor: 'var(--teal)', borderStyle: 'solid', borderWidth: '1px' }}>
+          <div className="lead-client-info">
+            <span className="lead-client-check" style={{ color: 'var(--teal)', borderColor: 'var(--teal)' }}>🛵</span>
+            <div>
+              <div className="lead-client-title" style={{ color: 'var(--teal)' }}>Cadastro de Entregador</div>
+              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>Candidato aguardando contato</span>
+            </div>
+          </div>
+        </div>
+      ) : converted ? (
         <div className="lead-client-box">
           <div className="lead-client-info">
             <span className="lead-client-check">✓</span>
