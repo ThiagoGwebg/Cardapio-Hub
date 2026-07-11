@@ -810,7 +810,10 @@ body {
   display: flex;
   flex-direction: column;
   z-index: 100;
+  /* rolagem funcional, mas sem a barra grossa aparecendo ao lado do menu */
+  scrollbar-width: none;
 }
+.sidebar::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 .sidebar-logo {
   font-family: 'Nunito', sans-serif;
