@@ -6,11 +6,10 @@ import {
   createOptionGroup,
   deleteOptionGroup,
   createOptions,
-  deleteOption,
   updateProduct,
   deleteProduct,
 } from '../actions'
-import OptionToggle from '../OptionToggle'
+import OptionEditor from '../OptionEditor'
 import GroupPresetFields from '../GroupPresetFields'
 import ProductImagesField from '@/components/ProductImagesField'
 import DeleteProductButton from '../DeleteProductButton'
@@ -33,7 +32,7 @@ export default async function ProductEditPage({ params }: { params: Promise<{ id
 
   const { data: groups } = await supabase
     .from('product_option_groups')
-    .select('id, name, required, min_select, max_select, sort_order, product_options(id, name, price_delta_cents, is_active, sort_order)')
+    .select('id, name, required, min_select, max_select, sort_order, product_options(id, name, price_delta_cents, is_active, sort_order, image_url, description)')
     .eq('product_id', id)
     .order('sort_order', { ascending: true })
 
@@ -104,19 +103,16 @@ export default async function ProductEditPage({ params }: { params: Promise<{ id
             </div>
 
             {options.map((o) => (
-              <div className="cardapio-item" key={o.id}>
-                <div className="ci-info">
-                  <div className="ci-name">
-                    {o.name}
-                    {!o.is_active && <span className="sold-out-badge">Esgotado</span>}
-                  </div>
-                  <div className="ci-cat">{o.price_delta_cents > 0 ? `+ ${fmtCents(o.price_delta_cents)}` : 'sem acréscimo'}</div>
-                </div>
-                <OptionToggle productId={product.id} optionId={o.id} isActive={o.is_active} />
-                <form action={deleteOption.bind(null, product.id, o.id)}>
-                  <button className="ordertype-btn" style={{ flex: 'none', padding: '6px 12px' }} type="submit">Remover</button>
-                </form>
-              </div>
+              <OptionEditor
+                key={o.id}
+                productId={product.id}
+                optionId={o.id}
+                name={o.name}
+                priceDeltaCents={o.price_delta_cents}
+                isActive={o.is_active}
+                imageUrl={o.image_url ?? null}
+                description={o.description ?? null}
+              />
             ))}
 
             <form action={createOptions.bind(null, product.id, g.id)} style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>

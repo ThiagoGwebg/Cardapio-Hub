@@ -4,7 +4,7 @@ import { getStoreUsage } from '@/lib/plan'
 import { IconUtensils } from '@/components/icons'
 import Link from 'next/link'
 import ProductToggle from './ProductToggle'
-import ProductImagesField from '@/components/ProductImagesField'
+import NewProductForm from './NewProductForm'
 import { UsageMeter, ProUpsellBanner } from '@/components/dashboard/ProUpsell'
 import { createProduct } from './actions'
 
@@ -28,13 +28,24 @@ export default async function CardapioPage({
   const atLimit = !usage.isPro && usage.productCount >= usage.maxProducts
   const nearLimit = !usage.isPro && !atLimit && usage.productCount >= usage.maxProducts * 0.8
 
+  const productList = products ?? []
+  const activeCount = productList.filter((p) => p.is_active).length
+
   return (
-    <>
+    <div className="prodmgr">
       <div className="dash-header">
-        <div className="dash-title">Cardápio</div>
-        <span style={{ fontSize: 13, color: 'var(--muted)' }}>
-          {products?.length ?? 0} produto{products?.length === 1 ? '' : 's'}
-        </span>
+        <div>
+          <div className="dash-title">Cardápio</div>
+          <div className="prodmgr-subtitle">
+            {productList.length} produto{productList.length === 1 ? '' : 's'}
+            {productList.length > 0 && (
+              <>
+                {' · '}
+                <span className="prodmgr-sub-active">{activeCount} disponíve{activeCount === 1 ? 'l' : 'is'}</span>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {!usage.isPro && (
@@ -55,74 +66,52 @@ export default async function CardapioPage({
         </div>
       )}
 
-      {!atLimit && (
-      <div className="settings-card">
-        <div className="settings-section-title">Novo produto</div>
-        <form action={createProduct} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Nome</label>
-              <input className="form-input" name="name" required />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Categoria</label>
-              <input className="form-input" name="category" placeholder="Mini Salgados" />
-            </div>
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Preço (R$)</label>
-              <input className="form-input" name="price" type="number" step="0.01" min="0" required />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Descrição</label>
-              <input className="form-input" name="description" />
-            </div>
-          </div>
-          <ProductImagesField
-            name="images"
-            label="Fotos do produto (opcional)"
-            hint="A 1ª foto é a capa. Dá pra adicionar várias — quadradas (600×600) ficam melhor. Até 5 MB cada."
-            max={6}
-          />
-          <button className="save-btn" type="submit" style={{ alignSelf: 'flex-start' }}>
-            Adicionar produto
-          </button>
-        </form>
-      </div>
-      )}
+      {!atLimit && <NewProductForm action={createProduct} />}
 
-      <div className="settings-card">
-        {(products ?? []).map((p) => (
-          <div className="cardapio-item" key={p.id}>
-            {p.image_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img className="ci-thumb" src={p.image_url} alt={p.name} />
-            ) : (
-              <span className="ci-emoji" style={{ color: 'var(--muted)' }}>
-                <IconUtensils size={26} />
-              </span>
-            )}
-            <div className="ci-info">
-              <div className="ci-name">
-                {p.name}
-                {!p.is_active && <span className="sold-out-badge">Esgotado</span>}
+      {productList.length > 0 ? (
+        <div className="prod-list">
+          {productList.map((p) => (
+            <div className={`prod-row ${p.is_active ? '' : 'prod-row--off'}`} key={p.id}>
+              <div className="prod-thumb-wrap">
+                {p.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img className="prod-thumb" src={p.image_url} alt={p.name} />
+                ) : (
+                  <span className="prod-thumb prod-thumb--empty">
+                    <IconUtensils size={22} />
+                  </span>
+                )}
               </div>
-              <div className="ci-cat">
-                {(p.categories as unknown as { name: string } | null)?.name ?? 'Sem categoria'}
+
+              <div className="prod-main">
+                <div className="prod-name">{p.name}</div>
+                <div className="prod-meta">
+                  <span className="prod-cat-chip">
+                    {(p.categories as unknown as { name: string } | null)?.name ?? 'Sem categoria'}
+                  </span>
+                  {!p.is_active && <span className="prod-off-chip">Esgotado</span>}
+                </div>
               </div>
+
+              <div className="prod-price">{fmtCents(p.price_cents)}</div>
+
+              <Link href={`/dashboard/cardapio/${p.id}`} className="prod-edit-btn">
+                Editar
+              </Link>
+
+              <ProductToggle productId={p.id} isActive={p.is_active} />
             </div>
-            <div className="ci-price">{fmtCents(p.price_cents)}</div>
-            <Link href={`/dashboard/cardapio/${p.id}`} className="ordertype-btn" style={{ flex: 'none', padding: '6px 12px', textDecoration: 'none' }}>
-              Editar
-            </Link>
-            <ProductToggle productId={p.id} isActive={p.is_active} />
-          </div>
-        ))}
-        {(products ?? []).length === 0 && (
-          <p style={{ color: 'var(--muted)', fontSize: 13 }}>Nenhum produto cadastrado ainda.</p>
-        )}
-      </div>
-    </>
+          ))}
+        </div>
+      ) : (
+        <div className="prod-empty">
+          <span className="prod-empty-icon">
+            <IconUtensils size={34} />
+          </span>
+          <p className="prod-empty-title">Seu cardápio está vazio</p>
+          <p className="prod-empty-sub">Toque em “Adicionar produto” para cadastrar o primeiro item.</p>
+        </div>
+      )}
+    </div>
   )
 }

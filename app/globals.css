@@ -2115,6 +2115,24 @@ tr:hover td {
 .option-row-right { display: inline-flex; align-items: center; gap: 10px; }
 .option-row-price { font-size: 13px; color: var(--green); font-weight: 600; }
 .option-row input { width: 18px; height: 18px; accent-color: var(--primary); }
+
+/* Editor de variação (painel) — foto de capa + descrição por opção */
+.opt-editor { gap: 12px; }
+.opt-thumb { position: relative; width: 56px; height: 56px; flex-shrink: 0; }
+.opt-thumb img { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border); }
+.opt-thumb-x {
+  position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 999px;
+  background: var(--red, #e11); color: #fff; border: 2px solid var(--surface); cursor: pointer;
+  font-size: 13px; line-height: 1; display: flex; align-items: center; justify-content: center;
+}
+.opt-thumb-add {
+  width: 56px; height: 56px; border-radius: 10px; border: 1px dashed var(--border);
+  background: var(--surface2); color: var(--muted); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; line-height: 1;
+}
+.opt-thumb-add:disabled { cursor: default; opacity: 0.7; }
+.opt-thumb-add span { font-size: 10px; margin-top: 2px; }
+.opt-desc-input { margin-top: 6px; font-size: 13px; padding: 6px 8px; }
 .option-modal-footer { padding: 14px 18px 18px; border-top: 1px solid var(--border); }
 
 /* ===== Acompanhamento do pedido ===== */
