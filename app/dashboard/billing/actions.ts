@@ -2,6 +2,7 @@
 
 import { getCurrentStore } from '@/lib/store'
 import { getStripe } from '@/lib/stripe/client'
+import { getBaseUrl } from '@/lib/baseUrl'
 import { redirect } from 'next/navigation'
 
 export async function openBillingPortal() {
@@ -18,7 +19,7 @@ export async function openBillingPortal() {
   }
 
   const stripe = getStripe()
-  const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const base = getBaseUrl()
 
   const portal = await stripe.billingPortal.sessions.create({
     customer: sub.stripe_customer_id,
