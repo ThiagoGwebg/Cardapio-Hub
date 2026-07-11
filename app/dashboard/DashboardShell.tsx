@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { playNewOrderBeep } from '@/lib/sound'
 import LogoutButton from './LogoutButton'
 import ThemeToggle from './ThemeToggle'
 import './dashboard.css'
@@ -41,9 +42,26 @@ export default function DashboardShell({ store, children }: { store: Store; chil
   const [novoCount, setNovoCount] = useState(0)
   const [pulse, setPulse] = useState(false)
   const prevCountRef = useRef(0)
+  const initedRef = useRef(false)
+  const alertsRef = useRef(false)
   const pathname = usePathname()
 
-  // Contador de pedidos NOVOS em tempo real — visível de qualquer tela do painel.
+  // Estado dos alertas (ligado na página de Notificações) — lido por ref pra o
+  // callback do realtime sempre pegar o valor atual sem re-inscrever o canal.
+  useEffect(() => {
+    const read = () => {
+      alertsRef.current = localStorage.getItem('cardapio-order-alerts') === '1'
+    }
+    read()
+    window.addEventListener('order-alerts-changed', read)
+    window.addEventListener('storage', read)
+    return () => {
+      window.removeEventListener('order-alerts-changed', read)
+      window.removeEventListener('storage', read)
+    }
+  }, [])
+
+  // Contador de pedidos NOVOS em tempo real + alertas — de qualquer tela do painel.
   useEffect(() => {
     const supabase = createClient()
     let active = true
@@ -56,9 +74,19 @@ export default function DashboardShell({ store, children }: { store: Store; chil
         .eq('status', 'novo')
       if (!active) return
       const c = count ?? 0
+
+      // No primeiro carregamento só firma a linha de base (não alerta pedidos já existentes).
+      if (!initedRef.current) {
+        initedRef.current = true
+        prevCountRef.current = c
+        setNovoCount(c)
+        return
+      }
+
       if (c > prevCountRef.current) {
         setPulse(true)
         setTimeout(() => setPulse(false), 1500)
+        if (alertsRef.current) fireOrderAlert(c)
       }
       prevCountRef.current = c
       setNovoCount(c)
@@ -79,6 +107,35 @@ export default function DashboardShell({ store, children }: { store: Store; chil
       supabase.removeChannel(channel)
     }
   }, [store.id])
+
+  // Contador no título da aba (chama atenção quando a aba está em segundo plano).
+  useEffect(() => {
+    document.title = novoCount > 0 ? `🔔 (${novoCount}) Pedidos novos` : 'CardápioÁgil'
+  }, [novoCount])
+
+  // Dispara os alertas de um pedido novo (som + notificação do sistema + vibração).
+  function fireOrderAlert(count: number) {
+    playNewOrderBeep()
+    try {
+      navigator.vibrate?.([200, 100, 200])
+    } catch {
+      /* sem suporte a vibração */
+    }
+    try {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const n = new Notification('🔔 Novo pedido!', {
+          body: count > 1 ? `Você tem ${count} pedidos novos aguardando.` : 'Um novo pedido acabou de chegar.',
+          tag: 'novo-pedido',
+        })
+        n.onclick = () => {
+          window.focus()
+          window.location.href = '/dashboard/pedidos'
+        }
+      }
+    } catch {
+      /* Notification indisponível */
+    }
+  }
 
   // Destaca "Início" quando está exatamente em /dashboard
   function isActive(href: string) {

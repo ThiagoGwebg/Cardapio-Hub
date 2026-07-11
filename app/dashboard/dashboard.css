@@ -724,6 +724,23 @@ html[data-dash-theme="black"] .dashboard {
 .prod-empty-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 15px; color: var(--text); margin-top: 12px; }
 .prod-empty-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
 
+/* Status dos alertas de pedido (página Notificações) */
+.alert-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.alert-status-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.alert-status--on { background: var(--green-l); color: var(--green); }
+.alert-status--on .alert-status-dot { background: var(--green); box-shadow: 0 0 0 3px var(--green-l); }
+.alert-status--off { background: var(--surface3); color: var(--muted); }
+.alert-status--off .alert-status-dot { background: var(--muted2); }
+
 @media (max-width: 700px) {
   .prod-row { gap: 11px; padding: 11px 13px; }
   .prod-thumb, .prod-thumb--empty { width: 48px; height: 48px; }
