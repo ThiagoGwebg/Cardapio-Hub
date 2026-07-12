@@ -12,7 +12,7 @@ export default function LandingFooter() {
           <a href="#pricing">Planos</a>
           <a href="#faq">Dúvidas</a>
           <Link href="/privacidade">Privacidade</Link>
-          <Link href="/entregadores">Quero Entregar</Link>
+          <Link href="/entregadores" className="l-btn-ghost">Quero entregar</Link>
           <Link href="/login">Entrar</Link>
           <Link href="/contato">Fale com a gente</Link>
         </nav>

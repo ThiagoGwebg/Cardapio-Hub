@@ -27,7 +27,7 @@ export async function submitCourier(_prev: CourierFormState, formData: FormData)
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => [], setAll: () => {} } }
+    { cookies: { getAll: () => [], setAll: () => { } } }
   )
 
   const notesParts = [];
@@ -58,7 +58,7 @@ export async function submitCourier(_prev: CourierFormState, formData: FormData)
     whatsapp,
     monthlyRevenue: vehicle,
     segment: 'Entregador',
-  }).catch(() => {})
+  }).catch(() => { })
 
   return { ok: true }
 }

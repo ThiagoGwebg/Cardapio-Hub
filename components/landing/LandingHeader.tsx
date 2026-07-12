@@ -15,6 +15,7 @@ export default function LandingHeader() {
         <a href="#pricing">Planos</a>
         <a href="#faq">Dúvidas</a>
         <div className="l-nav-cta">
+          <Link href="/entregadores" className="l-btn-ghost">Quero entregar</Link>
           <Link href="/login" className="l-btn-ghost">Entrar</Link>
           <Link href="/contato" className="l-btn-primary">Fale com a gente</Link>
         </div>
