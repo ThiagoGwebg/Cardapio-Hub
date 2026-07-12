@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { getCurrentStore } from '@/lib/store'
-import { fmtCents } from '@/lib/format'
+import { fmtCents, spDayStart, SP_TZ } from '@/lib/format'
 import { isStorePro } from '@/lib/plan'
 import ExportCsvButton from './ExportCsvButton'
 
@@ -16,8 +16,8 @@ export default async function CaixaPage() {
   const { supabase, store } = await getCurrentStore()
   const isPro = await isStorePro(supabase, store.id)
 
-  const startOfDay = new Date()
-  startOfDay.setHours(0, 0, 0, 0)
+  // Dia do caixa = dia de calendário em São Paulo (o servidor roda em UTC).
+  const startOfDay = spDayStart(new Date(), 0)
 
   const { data: orders } = await supabase
     .from('orders')
@@ -42,7 +42,7 @@ export default async function CaixaPage() {
     status: o.status,
     pagamento: PAYMENT_LABELS[o.payment_method ?? ''] ?? o.payment_method ?? '',
     valor: (o.subtotal_cents / 100).toFixed(2).replace('.', ','),
-    horario: new Date(o.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    horario: new Date(o.created_at).toLocaleTimeString('pt-BR', { timeZone: SP_TZ, hour: '2-digit', minute: '2-digit' }),
   }))
 
   return (
@@ -70,7 +70,7 @@ export default async function CaixaPage() {
           {isPro ? (
             <ExportCsvButton
               rows={csvRows}
-              filename={`caixa-${new Date().toISOString().slice(0, 10)}.csv`}
+              filename={`caixa-${new Date().toLocaleDateString('en-CA', { timeZone: SP_TZ })}.csv`}
             />
           ) : (
             <Link href="/dashboard/billing" className="ordertype-btn export-locked" style={{ flex: 'none', padding: '6px 14px', textDecoration: 'none' }}>

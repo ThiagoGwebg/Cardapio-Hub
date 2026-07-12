@@ -10,7 +10,7 @@ import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } f
 import InstallPwaButton from '@/components/InstallPwaButton'
 import './loja.css'
 
-type Option = { id: string; name: string; price_delta_cents: number }
+type Option = { id: string; name: string; price_delta_cents: number; image_url?: string | null; description?: string | null }
 type Group = {
   id: string
   name: string
@@ -356,9 +356,7 @@ export default function PublicMenu({
 
   return (
     <div className="storefront storefront-light" style={styleVars}>
-      <link rel="manifest" href={`/loja/${store.slug}/manifest.webmanifest`} />
-      <meta name="theme-color" content={theme.primaryColor || '#FF5722'} />
-      <link rel="apple-touch-icon" href={theme.logoUrl || `/loja/${store.slug}/app-icon.svg`} />
+      {/* manifest, theme-color e apple-touch-icon agora vêm do layout.tsx (head real, com as tags de iOS). */}
       {storeFont && <link rel="stylesheet" href={googleFontHref(storeFont)} />}
 
       <div className="storefront-topbar">
@@ -441,6 +439,12 @@ export default function PublicMenu({
         <div className="storefront-announce">📣 {theme.announcement}</div>
       )}
 
+      {!store.delivery_enabled && (store.pickup_enabled || store.dine_in_enabled) && (
+        <div className="storefront-fulfillment">
+          🛍️ Esta loja trabalha {store.pickup_enabled ? 'com retirada no local' : 'para consumo no local'} — <b>sem entrega</b>
+        </div>
+      )}
+
       <div className="storefront-search-row">
         <input className="form-input" placeholder="Busque por um produto" value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
@@ -504,6 +508,7 @@ export default function PublicMenu({
         </div>
 
         <aside className={`cart-drawer ${cartOpen ? 'open' : ''}`} aria-label="Carrinho">
+          <span className="cart-grip" aria-hidden onClick={() => setCartOpen(false)} />
           <div className="cart-drawer-header">
             <h2 className="cart-drawer-title">Seu Pedido</h2>
             <button className="cart-close" onClick={() => setCartOpen(false)}><IconClose /></button>
@@ -511,10 +516,12 @@ export default function PublicMenu({
 
           {cart.length === 0 ? (
             <div className="cart-empty" style={{ display: 'flex' }}>
+              <span className="cart-empty-emoji" aria-hidden>🛒</span>
               <p>Seu carrinho está vazio</p>
             </div>
           ) : (
             <>
+              <div className="cart-scroll">
               <div className="cart-items" style={{ display: 'flex' }}>
                 {cart.map((item) => (
                   <div className="cart-item" key={item.lineId}>
@@ -542,7 +549,7 @@ export default function PublicMenu({
                 ))}
               </div>
 
-              <div className="cart-footer" style={{ display: 'flex' }}>
+              <div className="cart-form">
                 {/* Tipo de pedido */}
                 {enabledTypes.length > 1 && (
                   <div className="ordertype-row">
@@ -677,27 +684,40 @@ export default function PublicMenu({
                   <input className="form-input" placeholder="Observação (opcional)" value={note} onChange={(e) => setNote(e.target.value)} />
                 </div>
 
-                {error && <p style={{ color: 'var(--red)', fontSize: 12 }}>{error}</p>}
-                {minToReach > 0 && <div className="cart-minimum">Faltam {fmtCents(minToReach)} para o pedido mínimo</div>}
+                {error && <p className="cart-error">{error}</p>}
 
-                <div className="cart-subtotal-row">
-                  <span>Subtotal</span>
-                  <span className="cart-subtotal-value">{fmtCents(subtotal)}</span>
-                </div>
-                {orderType === 'delivery' && (
-                  <div className="cart-subtotal-row">
-                    <span>Entrega{zone ? ` (${zone.neighborhood})` : ''}</span>
-                    <span className="cart-subtotal-value">{deliveryFee ? fmtCents(deliveryFee) : 'Grátis'}</span>
+                <div className="cart-summary">
+                  <div className="cart-sum-row">
+                    <span>Subtotal</span>
+                    <span>{fmtCents(subtotal)}</span>
                   </div>
-                )}
-                <div className="cart-subtotal-row" style={{ fontWeight: 700 }}>
-                  <span>Total</span>
-                  <span className="cart-subtotal-value">{fmtCents(total)}</span>
+                  {orderType === 'delivery' && (
+                    <div className="cart-sum-row">
+                      <span>Entrega{zone ? ` (${zone.neighborhood})` : ''}</span>
+                      <span>{deliveryFee ? fmtCents(deliveryFee) : 'Grátis'}</span>
+                    </div>
+                  )}
                 </div>
+              </div>{/* /cart-form */}
+              </div>{/* /cart-scroll */}
 
-                <button className="checkout-btn" disabled={subtotal < store.min_order_cents || submitting} onClick={checkout}>
-                  {submitting ? 'Enviando...' : 'Confirmar Pedido'}
-                </button>
+              <div className="cart-action-bar">
+                {minToReach > 0 && (
+                  <div className="cart-minimum">Faltam {fmtCents(minToReach)} para o pedido mínimo</div>
+                )}
+                <div className="cart-action-inner">
+                  <div className="cart-action-total">
+                    <span className="cart-action-total-label">Total</span>
+                    <span className="cart-action-total-value">{fmtCents(total)}</span>
+                  </div>
+                  <button
+                    className="checkout-btn"
+                    disabled={subtotal < store.min_order_cents || submitting}
+                    onClick={checkout}
+                  >
+                    {submitting ? 'Enviando...' : 'Confirmar Pedido'}
+                  </button>
+                </div>
               </div>
             </>
           )}
@@ -746,7 +766,14 @@ export default function PublicMenu({
                         const checked = !!sel.find((x) => x.id === o.id)
                         return (
                           <label className="option-row" key={o.id}>
-                            <span className="option-row-name">{o.name}</span>
+                            {o.image_url && (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img className="option-row-thumb" src={o.image_url} alt={o.name} />
+                            )}
+                            <span className="option-row-main">
+                              <span className="option-row-name">{o.name}</span>
+                              {o.description && <span className="option-row-desc">{o.description}</span>}
+                            </span>
                             <span className="option-row-right">
                               {o.price_delta_cents > 0 && <span className="option-row-price">+ {fmtCents(o.price_delta_cents)}</span>}
                               <input

@@ -1,10 +1,8 @@
 import Link from 'next/link'
 import { getCurrentStore } from '@/lib/store'
-import { fmtCents } from '@/lib/format'
+import { fmtCents, spDayStart, spDayKey, spHour, spWeekdayShort } from '@/lib/format'
 import { isStorePro } from '@/lib/plan'
 import { ProLockedSection } from '@/components/dashboard/ProUpsell'
-
-const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
 const ORDER_TYPE_LABELS: Record<string, string> = {
   delivery: 'Entrega',
@@ -29,13 +27,6 @@ type OrderRow = {
   order_type: string | null
   payment_method: string | null
   order_items: { product_name_snapshot: string; quantity: number }[]
-}
-
-function startOfDaysAgo(days: number) {
-  const d = new Date()
-  d.setDate(d.getDate() - days)
-  d.setHours(0, 0, 0, 0)
-  return d
 }
 
 function deltaPct(current: number, previous: number): number | null {
@@ -116,8 +107,10 @@ export default async function DesempenhoPage({
   const period = isPro && [7, 30, 90].includes(requested) ? requested : 7
 
   // Busca o período atual + o anterior de uma vez para calcular a variação.
-  const since = startOfDaysAgo(period - 1)
-  const prevSince = startOfDaysAgo(period * 2 - 1)
+  // Limites ancorados no dia de calendário de São Paulo (servidor roda em UTC).
+  const now = new Date()
+  const since = spDayStart(now, -(period - 1))
+  const prevSince = spDayStart(now, -(period * 2 - 1))
 
   const { data } = await supabase
     .from('orders')
@@ -139,20 +132,15 @@ export default async function DesempenhoPage({
   // Gráfico: diário para 7 dias, semanal para 30/90.
   let chart: { label: string; cents: number }[]
   if (period === 7) {
+    // 7 dias de calendário SP a partir de `since` (sem horário de verão, +24h = próxima meia-noite SP).
+    const dayInstants = Array.from({ length: 7 }, (_, i) => new Date(since.getTime() + i * 86_400_000))
     const byDay = new Map<string, number>()
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(since)
-      d.setDate(since.getDate() + i)
-      byDay.set(d.toDateString(), 0)
-    }
+    for (const d of dayInstants) byDay.set(spDayKey(d), 0)
     current.forEach((o) => {
-      const key = new Date(o.created_at).toDateString()
-      byDay.set(key, (byDay.get(key) ?? 0) + o.subtotal_cents)
+      const key = spDayKey(new Date(o.created_at))
+      if (byDay.has(key)) byDay.set(key, (byDay.get(key) ?? 0) + o.subtotal_cents)
     })
-    chart = Array.from(byDay.entries()).map(([dateStr, cents]) => ({
-      label: DIAS[new Date(dateStr).getDay()],
-      cents,
-    }))
+    chart = dayInstants.map((d) => ({ label: spWeekdayShort(d), cents: byDay.get(spDayKey(d)) ?? 0 }))
   } else {
     const weeks = Math.ceil(period / 7)
     const buckets = new Array<number>(weeks).fill(0)
@@ -179,7 +167,7 @@ export default async function DesempenhoPage({
 
   // Horários de pico (pedidos por hora do dia).
   const byHour = new Array<number>(24).fill(0)
-  current.forEach((o) => byHour[new Date(o.created_at).getHours()]++)
+  current.forEach((o) => byHour[spHour(new Date(o.created_at))]++)
   const maxHour = Math.max(1, ...byHour)
 
   const orderTypes = countBy(current, 'order_type', ORDER_TYPE_LABELS)

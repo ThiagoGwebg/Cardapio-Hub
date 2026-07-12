@@ -181,6 +181,26 @@ export async function createOptions(productId: string, groupId: string, formData
   revalidatePath(`/dashboard/cardapio/${productId}`)
 }
 
+export async function setOptionImage(productId: string, optionId: string, imageUrl: string | null) {
+  const { supabase, store } = await getCurrentStore()
+  await supabase
+    .from('product_options')
+    .update({ image_url: imageUrl || null })
+    .eq('id', optionId)
+    .eq('store_id', store.id)
+  revalidatePath(`/dashboard/cardapio/${productId}`)
+}
+
+export async function setOptionDescription(productId: string, optionId: string, description: string) {
+  const { supabase, store } = await getCurrentStore()
+  await supabase
+    .from('product_options')
+    .update({ description: description.trim() || null })
+    .eq('id', optionId)
+    .eq('store_id', store.id)
+  revalidatePath(`/dashboard/cardapio/${productId}`)
+}
+
 export async function toggleOption(productId: string, optionId: string, isActive: boolean) {
   const { supabase, store } = await getCurrentStore()
   await supabase.from('product_options').update({ is_active: isActive }).eq('id', optionId).eq('store_id', store.id)

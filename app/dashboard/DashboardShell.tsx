@@ -1,10 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import { playNewOrderBeep } from '@/lib/sound'
 import LogoutButton from './LogoutButton'
+import ThemeToggle from './ThemeToggle'
 import './dashboard.css'
+
+const THEME_INIT_SCRIPT = `
+(function () {
+  try {
+    var t = localStorage.getItem('cardapio-dash-theme') || 'light';
+    document.documentElement.setAttribute('data-dash-theme', t);
+  } catch (e) {}
+})();
+`
 
 const NAV_PRINCIPAL = [
   { href: '/dashboard', label: 'Início' },
@@ -23,11 +35,107 @@ const NAV_CONFIG = [
   { href: '/dashboard/ajuda', label: 'Ajuda' },
 ]
 
-type Store = { name: string; address: string | null; is_open: boolean }
+type Store = { id: string; name: string; address: string | null; is_open: boolean }
 
 export default function DashboardShell({ store, children }: { store: Store; children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
+  const [novoCount, setNovoCount] = useState(0)
+  const [pulse, setPulse] = useState(false)
+  const prevCountRef = useRef(0)
+  const initedRef = useRef(false)
+  const alertsRef = useRef(false)
   const pathname = usePathname()
+
+  // Estado dos alertas (ligado na página de Notificações) — lido por ref pra o
+  // callback do realtime sempre pegar o valor atual sem re-inscrever o canal.
+  useEffect(() => {
+    const read = () => {
+      alertsRef.current = localStorage.getItem('cardapio-order-alerts') === '1'
+    }
+    read()
+    window.addEventListener('order-alerts-changed', read)
+    window.addEventListener('storage', read)
+    return () => {
+      window.removeEventListener('order-alerts-changed', read)
+      window.removeEventListener('storage', read)
+    }
+  }, [])
+
+  // Contador de pedidos NOVOS em tempo real + alertas — de qualquer tela do painel.
+  useEffect(() => {
+    const supabase = createClient()
+    let active = true
+
+    async function refreshCount() {
+      const { count } = await supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('store_id', store.id)
+        .eq('status', 'novo')
+      if (!active) return
+      const c = count ?? 0
+
+      // No primeiro carregamento só firma a linha de base (não alerta pedidos já existentes).
+      if (!initedRef.current) {
+        initedRef.current = true
+        prevCountRef.current = c
+        setNovoCount(c)
+        return
+      }
+
+      if (c > prevCountRef.current) {
+        setPulse(true)
+        setTimeout(() => setPulse(false), 1500)
+        if (alertsRef.current) fireOrderAlert(c)
+      }
+      prevCountRef.current = c
+      setNovoCount(c)
+    }
+
+    refreshCount()
+    const channel = supabase
+      .channel(`shell-orders-${store.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders', filter: `store_id=eq.${store.id}` },
+        refreshCount
+      )
+      .subscribe()
+
+    return () => {
+      active = false
+      supabase.removeChannel(channel)
+    }
+  }, [store.id])
+
+  // Contador no título da aba (chama atenção quando a aba está em segundo plano).
+  useEffect(() => {
+    document.title = novoCount > 0 ? `🔔 (${novoCount}) Pedidos novos` : 'CardápioÁgil'
+  }, [novoCount])
+
+  // Dispara os alertas de um pedido novo (som + notificação do sistema + vibração).
+  function fireOrderAlert(count: number) {
+    playNewOrderBeep()
+    try {
+      navigator.vibrate?.([200, 100, 200])
+    } catch {
+      /* sem suporte a vibração */
+    }
+    try {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const n = new Notification('🔔 Novo pedido!', {
+          body: count > 1 ? `Você tem ${count} pedidos novos aguardando.` : 'Um novo pedido acabou de chegar.',
+          tag: 'novo-pedido',
+        })
+        n.onclick = () => {
+          window.focus()
+          window.location.href = '/dashboard/pedidos'
+        }
+      }
+    } catch {
+      /* Notification indisponível */
+    }
+  }
 
   // Destaca "Início" quando está exatamente em /dashboard
   function isActive(href: string) {
@@ -47,6 +155,9 @@ export default function DashboardShell({ store, children }: { store: Store; chil
             onClick={() => setOpen(false)}
           >
             {item.label}
+            {item.href === '/dashboard/pedidos' && novoCount > 0 && (
+              <span className={`nav-badge ${pulse ? 'pulse' : ''}`}>{novoCount}</span>
+            )}
           </Link>
         ))}
 
@@ -67,9 +178,11 @@ export default function DashboardShell({ store, children }: { store: Store; chil
 
   return (
     <div className="dashboard">
+      <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       <div className="mobile-topbar">
         <button className="mobile-menu-btn" onClick={() => setOpen(true)} aria-label="Abrir menu">
           <span /><span /><span />
+          {novoCount > 0 && <span className={`mobile-menu-badge ${pulse ? 'pulse' : ''}`}>{novoCount}</span>}
         </button>
         <div className="mobile-topbar-title">
           cardápio<span>ágil</span>
@@ -92,7 +205,8 @@ export default function DashboardShell({ store, children }: { store: Store; chil
 
         <NavLinks />
 
-        <div style={{ marginTop: 'auto', padding: '18px' }}>
+        <div style={{ marginTop: 'auto', padding: '18px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <ThemeToggle />
           <LogoutButton />
         </div>
       </aside>

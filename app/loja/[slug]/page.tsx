@@ -23,7 +23,7 @@ export default async function LojaPage({ params }: { params: Promise<{ slug: str
   const { data: categories } = await supabase
     .from('categories')
     .select(
-      'id, name, emoji, sort_order, products(id, name, description, price_cents, image_url, images, is_active, sort_order, product_option_groups(id, name, min_select, max_select, required, sort_order, product_options(id, name, price_delta_cents, is_active, sort_order)))'
+      'id, name, emoji, sort_order, products(id, name, description, price_cents, image_url, images, is_active, sort_order, product_option_groups(id, name, min_select, max_select, required, sort_order, product_options(id, name, price_delta_cents, is_active, sort_order, image_url, description)))'
     )
     .eq('store_id', store.id)
     .order('sort_order', { ascending: true })
@@ -48,6 +48,8 @@ export default async function LojaPage({ params }: { params: Promise<{ slug: str
       price_delta_cents: number
       is_active: boolean
       sort_order: number
+      image_url: string | null
+      description: string | null
     }[]
   }
   type RawProduct = {

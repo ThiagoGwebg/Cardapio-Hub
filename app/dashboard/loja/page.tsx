@@ -49,19 +49,26 @@ export default async function LojaPage() {
 
         <div className="settings-card">
           <div className="settings-section-title">Canais de pedido</div>
+          <p className="settings-hint">
+            Escolha como seus clientes recebem os pedidos. <b>Tem entregador/motoboy próprio?</b> Ligue a <b>Entrega</b>.
+            Se você só atende no balcão, deixe apenas a <b>Retirada</b> — o cliente nem vê a opção de entrega no cardápio.
+          </p>
           <div className="toggle-row">
-            <div><div className="toggle-label">Entrega (delivery)</div><div className="toggle-desc">Clientes recebem no endereço</div></div>
+            <div><div className="toggle-label">Entrega (delivery)</div><div className="toggle-desc">Você leva no endereço do cliente com seu próprio entregador/motoboy</div></div>
             <label className="toggle-switch"><input type="checkbox" name="deliveryEnabled" defaultChecked={store.delivery_enabled} /><span className="toggle-slider"></span></label>
           </div>
           <div className="toggle-row">
-            <div><div className="toggle-label">Retirada no local</div><div className="toggle-desc">Cliente busca o pedido</div></div>
+            <div><div className="toggle-label">Retirada no local</div><div className="toggle-desc">O cliente busca o pedido no seu balcão</div></div>
             <label className="toggle-switch"><input type="checkbox" name="pickupEnabled" defaultChecked={store.pickup_enabled} /><span className="toggle-slider"></span></label>
           </div>
           <div className="toggle-row">
-            <div><div className="toggle-label">Pedido na mesa</div><div className="toggle-desc">Via QR code / número da mesa</div></div>
+            <div><div className="toggle-label">Pedido na mesa</div><div className="toggle-desc">Para consumo no local, via QR code / número da mesa</div></div>
             <label className="toggle-switch"><input type="checkbox" name="dineInEnabled" defaultChecked={store.dine_in_enabled} /><span className="toggle-slider"></span></label>
           </div>
-          <div className="form-row" style={{ marginTop: 8 }}>
+          <p className="settings-hint" style={{ marginTop: 12 }}>
+            Os campos abaixo valem quando a <b>Entrega</b> está ligada.
+          </p>
+          <div className="form-row">
             <div className="form-group">
               <label className="form-label">Taxa de entrega padrão (R$)</label>
               <input className="form-input" name="deliveryFee" type="number" step="0.01" min="0" defaultValue={(store.delivery_fee_cents / 100).toFixed(2)} />

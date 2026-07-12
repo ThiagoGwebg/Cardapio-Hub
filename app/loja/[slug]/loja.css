@@ -154,15 +154,137 @@
   }
 }
 
-/* CART SIDEBAR */
+/* ══════════════════════════════════════════
+   CARRINHO / CHECKOUT — bottom sheet estilo iFood
+   Mobile: folha que sobe de baixo, corpo rolável e
+   barra de ação FIXA (Total + Confirmar sempre visível).
+══════════════════════════════════════════ */
 .storefront-light .cart-drawer {
-  background: var(--surface2); /* Light gray like screenshot */
+  background: var(--surface);
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  max-height: 92dvh;
+  border-left: none;
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -10px 44px rgba(0, 0, 0, 0.26);
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.32, 0, 0.08, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.storefront-light .cart-drawer.open {
+  transform: translateY(0);
+  right: 0;
+}
+
+/* Puxador (arrasta pra fechar — visual) */
+.storefront-light .cart-grip {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+  margin: 8px auto 2px;
+  flex-shrink: 0;
+  cursor: pointer;
 }
 
 .storefront-light .cart-drawer-header {
   border-bottom: 1px solid var(--border);
-  padding: 16px;
+  padding: 10px 16px 14px;
+  flex-shrink: 0;
 }
+
+/* Corpo rolável: itens + formulário + resumo */
+.storefront-light .cart-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+/* Dentro do scroll único, os itens não rolam sozinhos */
+.storefront-light .cart-scroll .cart-items {
+  flex: none;
+  overflow: visible;
+  padding: 12px 16px 0;
+}
+.storefront-light .cart-form {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 16px 16px;
+  border-top: none;
+  background: transparent;
+}
+
+/* Resumo (subtotal / entrega) dentro do scroll */
+.storefront-light .cart-summary {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.storefront-light .cart-sum-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13.5px;
+  color: var(--text2);
+}
+.storefront-light .cart-sum-row span:last-child { font-weight: 700; color: var(--text); }
+.storefront-light .cart-error { color: var(--red); font-size: 12.5px; font-weight: 600; margin-top: 8px; }
+
+/* Barra de ação FIXA no rodapé (Total + Confirmar) */
+.storefront-light .cart-action-bar {
+  flex-shrink: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.storefront-light .cart-action-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.storefront-light .cart-action-total {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  flex-shrink: 0;
+}
+.storefront-light .cart-action-total-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.storefront-light .cart-action-total-value {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--text);
+}
+.storefront-light .cart-action-bar .checkout-btn {
+  flex: 1;
+  margin: 0;
+}
+.storefront-light .cart-action-bar .cart-minimum {
+  margin: 0;
+  font-size: 12.5px;
+}
+.storefront-light .cart-empty-emoji { filter: grayscale(0.2); }
 
 .storefront-light .cart-drawer-title {
   color: var(--text);
@@ -213,6 +335,8 @@
     position: sticky;
     top: 24px;
     right: 0;
+    bottom: auto;
+    left: auto;
     width: 360px;
     height: auto;
     max-height: calc(100vh - 48px);
@@ -222,10 +346,18 @@
     display: flex !important;
     opacity: 1 !important;
     pointer-events: all !important;
+    transform: none !important;
     flex-direction: column;
-    overflow-y: auto;
+    overflow: hidden;
   }
-  
+
+  /* No desktop o puxador some e só o corpo interno rola */
+  .storefront-light .cart-grip { display: none; }
+  .storefront-light .cart-action-bar {
+    padding-bottom: 16px;
+    box-shadow: none;
+  }
+
   .storefront-light .cart-overlay {
     display: none !important;
   }
@@ -322,16 +454,42 @@
 }
 .storefront-light .option-row {
   border-bottom: 1px solid var(--border2);
-  padding: 16px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 .storefront-light .option-row:hover {
   background: var(--surface2);
 }
+.storefront-light .option-row-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+}
+.storefront-light .option-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
 .storefront-light .option-row-name {
   color: var(--text);
   font-size: 15px;
+}
+.storefront-light .option-row-desc {
+  color: var(--text2);
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+.storefront-light .option-row-right {
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 /* Fix Checkout/Adicionar Button to use primary color instead of green */
@@ -363,4 +521,19 @@
   width: 100%;
   padding: 12px;
   font-size: 14px;
+}
+
+/* ── Modo app instalado (standalone) ──
+   Com status bar translúcido no iOS o conteúdo vai até o topo; aqui damos o respiro
+   do notch e da barra inferior pra não ficar torto ao abrir como app. */
+@media (display-mode: standalone) {
+  .storefront-topbar {
+    padding-top: calc(10px + env(safe-area-inset-top));
+  }
+  .storefront {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .cart-fab {
+    bottom: calc(20px + env(safe-area-inset-bottom));
+  }
 }

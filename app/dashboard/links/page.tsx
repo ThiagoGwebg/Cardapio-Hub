@@ -1,13 +1,14 @@
 import Link from 'next/link'
 import { getCurrentStore } from '@/lib/store'
 import { isStorePro } from '@/lib/plan'
+import { getBaseUrl } from '@/lib/baseUrl'
 import { ProLockedSection } from '@/components/dashboard/ProUpsell'
 import CopyField from './CopyField'
 
 export default async function LinksPage() {
   const { supabase, store } = await getCurrentStore()
   const isPro = await isStorePro(supabase, store.id)
-  const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const base = getBaseUrl()
   const menuUrl = `${base}/loja/${store.slug}`
   const waUrl = store.whatsapp_number ? `https://wa.me/${store.whatsapp_number.replace(/\D/g, '')}` : ''
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=16&data=${encodeURIComponent(menuUrl)}`
