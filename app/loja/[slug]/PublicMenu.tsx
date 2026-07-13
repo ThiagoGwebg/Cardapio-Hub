@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents, PIX_KEY_TYPE_LABEL } from '@/lib/format'
 import { googleFontHref, DEFAULT_STORE_FONT } from '@/lib/plan'
-import { IconPin, IconUtensils, IconClose } from '@/components/icons'
+import { IconPin, IconUtensils, IconClose, IconSun, IconMoon } from '@/components/icons'
 import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } from '@/lib/orderHistory'
 import InstallPwaButton from '@/components/InstallPwaButton'
 import './loja.css'
@@ -83,6 +83,24 @@ export default function PublicMenu({
   showBranding?: boolean
 }) {
   const router = useRouter()
+  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light')
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`storefront-theme-${store.slug}`)
+    if (saved === 'dark' || saved === 'light') {
+      setThemeMode(saved)
+    } else {
+      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      setThemeMode(isSystemDark ? 'dark' : 'light')
+    }
+  }, [store.slug])
+
+  const toggleThemeMode = () => {
+    const next = themeMode === 'light' ? 'dark' : 'light'
+    setThemeMode(next)
+    localStorage.setItem(`storefront-theme-${store.slug}`, next)
+  }
+
   const [cart, setCart] = useState<CartItem[]>([])
   const [cartOpen, setCartOpen] = useState(false)
   const [modalProduct, setModalProduct] = useState<Product | null>(null)
@@ -355,7 +373,7 @@ export default function PublicMenu({
   const minToReach = store.min_order_cents - subtotal
 
   return (
-    <div className="storefront storefront-light" style={styleVars}>
+    <div className={`storefront storefront-${themeMode}`} style={styleVars}>
       {/* manifest, theme-color e apple-touch-icon agora vêm do layout.tsx (head real, com as tags de iOS). */}
       {storeFont && <link rel="stylesheet" href={googleFontHref(storeFont)} />}
 
@@ -433,6 +451,14 @@ export default function PublicMenu({
             <span>⏱ ~{etaMin} min</span>
           </div>
         </div>
+        <button
+          onClick={toggleThemeMode}
+          className="storefront-theme-toggle"
+          aria-label="Alternar tema"
+          title={themeMode === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'}
+        >
+          {themeMode === 'light' ? <IconMoon size={20} /> : <IconSun size={20} />}
+        </button>
       </header>
 
       {theme.announcement && (
