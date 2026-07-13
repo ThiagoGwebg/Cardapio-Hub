@@ -1,7 +1,12 @@
 import Link from 'next/link'
-import { IconMenu } from '@/components/icons'
+import { IconMenu, IconSun, IconMoon } from '@/components/icons'
 
-export default function LandingHeader() {
+interface LandingHeaderProps {
+  themeMode: 'light' | 'dark'
+  toggleThemeMode: () => void
+}
+
+export default function LandingHeader({ themeMode, toggleThemeMode }: LandingHeaderProps) {
   return (
     <header className="l-nav">
       <Link href="/" className="l-logo">
@@ -18,6 +23,15 @@ export default function LandingHeader() {
           <Link href="/entregadores" className="l-btn-ghost">Quero entregar</Link>
           <Link href="/login" className="l-btn-ghost">Entrar</Link>
           <Link href="/contato" className="l-btn-primary">Fale com a gente</Link>
+          
+          <button
+            onClick={toggleThemeMode}
+            className="l-theme-toggle"
+            aria-label="Alternar tema"
+            title={themeMode === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'}
+          >
+            {themeMode === 'light' ? <IconMoon size={18} /> : <IconSun size={18} />}
+          </button>
         </div>
       </nav>
 

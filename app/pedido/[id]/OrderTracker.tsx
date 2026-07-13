@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents, fmtOrderNumber, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL, PIX_KEY_TYPE_LABEL } from '@/lib/format'
 import { saveOrderToHistory } from '@/lib/orderHistory'
+import '@/app/loja/[slug]/loja.css'
 
 type OrderItem = { name: string; quantity: number; unit_price_cents: number; options: string[] }
 type Order = {
@@ -64,6 +65,22 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const [pixCopied, setPixCopied] = useState(false)
+  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light')
+
+  useEffect(() => {
+    if (order?.store_slug) {
+      const saved = localStorage.getItem(`storefront-theme-${order.store_slug}`)
+      if (saved === 'dark' || saved === 'light') {
+        setThemeMode(saved)
+      } else {
+        const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        setThemeMode(isSystemDark ? 'dark' : 'light')
+      }
+    } else {
+      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      setThemeMode(isSystemDark ? 'dark' : 'light')
+    }
+  }, [order?.store_slug])
 
   const load = useCallback(async () => {
     const supabase = createClient()
@@ -92,7 +109,7 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
 
   if (loading)
     return (
-      <div className="storefront storefront-light track-page">
+      <div className={`storefront storefront-${themeMode} track-page`}>
         <div className="track-shell">
           <div className="track-hero track-hero--loading">
             <span className="track-spinner" />
@@ -103,7 +120,7 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
     )
   if (!order)
     return (
-      <div className="storefront storefront-light track-page">
+      <div className={`storefront storefront-${themeMode} track-page`}>
         <div className="track-shell">
           <div className="track-hero">
             <span className="track-hero-icon">🔍</span>
@@ -128,7 +145,7 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
   })
 
   return (
-    <div className="storefront storefront-light track-page">
+    <div className={`storefront storefront-${themeMode} track-page`}>
       <div className="track-shell">
         {/* Cabeçalho da loja */}
         <div className="track-top">

@@ -1182,3 +1182,141 @@
     align-items: flex-start;
   }
 }
+
+/* ── Landing Page Theme Toggle ── */
+.l-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.l-theme-toggle:hover {
+  border-color: var(--border2);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.landing.light .l-theme-toggle:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* ── Landing Page Light Theme ── */
+.landing.light {
+  --bg: #FFF8F3; /* Premium warm cream */
+  --surface: #FFFFFF;
+  --surface2: #FFF3EC;
+  --surface3: #F1EAE4;
+  --text: #1F1B1A;
+  --text2: #3A3432;
+  --muted: #7A7168;
+  --muted2: #A79E97;
+  --border: #ECE3DB;
+  --border2: #F3ECE6;
+  
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Specific overrides for landing light mode */
+.landing.light .l-nav {
+  background: rgba(255, 248, 243, 0.85);
+  border-bottom: 1px solid var(--border);
+}
+
+.landing.light .l-logo {
+  color: var(--text);
+}
+
+.landing.light .l-nav-links a {
+  color: var(--text2);
+}
+
+.landing.light .l-nav-links a:hover {
+  color: var(--text);
+}
+
+.landing.light .l-btn-ghost {
+  border-color: var(--border);
+  color: var(--text2);
+}
+
+.landing.light .l-btn-ghost:hover {
+  border-color: var(--border2);
+  color: var(--text);
+}
+
+.landing.light .l-nav-toggle-label {
+  color: var(--text);
+}
+
+.landing.light .l-story-grid {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.landing.light .l-feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.landing.light .l-faq-item {
+  border-bottom: 1px solid var(--border);
+}
+
+.landing.light .l-pricing-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.landing.light .l-pricing-card.premium {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.landing.light .l-final-cta .l-btn-primary.large {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.landing.light .l-final-cta .l-btn-primary.large:hover {
+  background: var(--text2);
+}
+
+.landing.light .l-perforation {
+  background-image: linear-gradient(to right, var(--border) 60%, transparent 0%);
+}
+
+.landing.light .l-receipt::before,
+.landing.light .l-receipt::after {
+  background: repeating-linear-gradient(
+    -45deg,
+    #fdfaf3 0 4px,
+    var(--bg) 4px 8px
+  );
+}
+
+/* ── Landing Page Dark Theme ── */
+.landing.dark {
+  --bg: #121212;
+  --surface: #202124;
+  --surface2: #28292C;
+  --surface3: #323337;
+  --text: #E8EAED;
+  --text2: #D2D4D7;
+  --muted: #9AA0A6;
+  --muted2: #80868B;
+  --border: #3C4043;
+  --border2: #444746;
+
+  background: var(--bg);
+  color: var(--text);
+}
+
