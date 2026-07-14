@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import '../landing.css'
 import Link from 'next/link'
 import LandingCourierForm from '@/components/landing/LandingCourierForm'
+import LandingThemeWrapper from '@/components/landing/LandingThemeWrapper'
+import LandingThemeToggle from '@/components/landing/LandingThemeToggle'
 
 export const metadata: Metadata = {
   title: 'Seja Entregador Parceiro — CardápioÁgil',
@@ -10,12 +12,15 @@ export const metadata: Metadata = {
 
 export default function EntregadoresPage() {
   return (
-    <div className="landing">
+    <LandingThemeWrapper>
       <header className="l-nav">
         <Link href="/" className="l-logo">
           cardápio<em>ágil</em>
         </Link>
-        <Link href="/" className="l-btn-ghost">← Voltar</Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <LandingThemeToggle />
+          <Link href="/" className="l-btn-ghost">← Voltar</Link>
+        </div>
       </header>
 
       <section className="l-contato">
@@ -46,6 +51,6 @@ export default function EntregadoresPage() {
           <LandingCourierForm />
         </div>
       </section>
-    </div>
+    </LandingThemeWrapper>
   )
 }

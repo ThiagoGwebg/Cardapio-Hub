@@ -1,12 +1,8 @@
 import Link from 'next/link'
-import { IconMenu, IconSun, IconMoon } from '@/components/icons'
+import { IconMenu } from '@/components/icons'
+import LandingThemeToggle from './LandingThemeToggle'
 
-interface LandingHeaderProps {
-  themeMode: 'light' | 'dark'
-  toggleThemeMode: () => void
-}
-
-export default function LandingHeader({ themeMode, toggleThemeMode }: LandingHeaderProps) {
+export default function LandingHeader() {
   return (
     <header className="l-nav">
       <Link href="/" className="l-logo">
@@ -24,20 +20,16 @@ export default function LandingHeader({ themeMode, toggleThemeMode }: LandingHea
           <Link href="/login" className="l-btn-ghost">Entrar</Link>
           <Link href="/contato" className="l-btn-primary">Fale com a gente</Link>
           
-          <button
-            onClick={toggleThemeMode}
-            className="l-theme-toggle"
-            aria-label="Alternar tema"
-            title={themeMode === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'}
-          >
-            {themeMode === 'light' ? <IconMoon size={18} /> : <IconSun size={18} />}
-          </button>
+          <LandingThemeToggle className="l-theme-toggle l-theme-toggle-desktop" />
         </div>
       </nav>
 
-      <label htmlFor="l-nav-toggle" className="l-nav-toggle-label" aria-label="Abrir menu">
-        <IconMenu />
-      </label>
+      <div className="l-nav-mobile-actions">
+        <LandingThemeToggle className="l-theme-toggle l-theme-toggle-mobile" />
+        <label htmlFor="l-nav-toggle" className="l-nav-toggle-label" aria-label="Abrir menu">
+          <IconMenu />
+        </label>
+      </div>
     </header>
   )
 }
