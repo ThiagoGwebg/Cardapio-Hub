@@ -8,7 +8,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim())
 })
 
-// Network-first: sempre busca a versão mais nova; cai no cache só se estiver offline
+// Network-first: sempre busca a versão mais nova; cai no cache só se estiver offline.
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
   event.respondWith(
