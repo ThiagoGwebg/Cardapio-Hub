@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentStore } from '@/lib/store'
 import { revalidatePath } from 'next/cache'
 
 function nextStatus(current: string, orderType: string): string | null {
@@ -26,4 +27,37 @@ export async function cancelOrder(orderId: string) {
   const supabase = await createClient()
   await supabase.from('orders').update({ status: 'cancelado' }).eq('id', orderId)
   revalidatePath('/dashboard/pedidos')
+}
+
+export type ManualOrderPayload = {
+  order_type: 'pickup' | 'dine_in'
+  status: 'novo' | 'concluido'
+  payment_method: 'cash' | 'card' | 'pix' | null
+  customer_name: string | null
+  customer_phone: string | null
+  customer_note: string | null
+  table_number: string | null
+  items: { product_id: string; quantity: number; options: { option_id: string }[] }[]
+}
+
+// Registra um pedido feito presencialmente (balcão/mesa) via RPC create_manual_order.
+// A loja vem da sessão — o cliente não escolhe o store_id.
+export async function createManualOrder(payload: ManualOrderPayload): Promise<{ error?: string }> {
+  const { supabase, store } = await getCurrentStore()
+
+  const { error } = await supabase.rpc('create_manual_order', {
+    p_store_id: store.id,
+    p_payload: payload,
+  })
+
+  if (error) {
+    if (error.message.includes('limite_pedidos_mes')) {
+      return { error: 'Você atingiu o limite de 60 pedidos do mês no plano Lite. Assine o Pro para registrar pedidos ilimitados.' }
+    }
+    return { error: error.message }
+  }
+
+  revalidatePath('/dashboard/pedidos')
+  revalidatePath('/dashboard/caixa')
+  return {}
 }

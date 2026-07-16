@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { getCurrentStore } from '@/lib/store'
 import { fmtCents } from '@/lib/format'
 import { getStoreUsage } from '@/lib/plan'
@@ -31,6 +32,9 @@ export default async function PedidosPage() {
       <SignupTracker />
       <div className="dash-header">
         <div className="dash-title">Pedidos</div>
+        <Link href="/dashboard/pedidos/novo" className="save-btn" style={{ textDecoration: 'none' }}>
+          + Registrar pedido
+        </Link>
       </div>
 
       {!usage.isPro && (

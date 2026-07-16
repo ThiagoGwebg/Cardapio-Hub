@@ -749,3 +749,232 @@ html[data-dash-theme="black"] .dashboard {
   .prod-row .ci-toggle-label { display: none; }
   .prod-edit-btn { padding: 7px 12px; }
 }
+
+/* ===== Registrar pedido manual (presencial) ===== */
+.dash-subtitle {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.mo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .mo-grid { grid-template-columns: 1fr; }
+}
+
+.mo-prod-list {
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.mo-cat-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted2);
+  padding: 12px 0 4px;
+}
+
+.mo-prod-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 2px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+.mo-prod-row:hover .mo-prod-name { color: var(--primary); }
+
+.mo-prod-name {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.mo-prod-price {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.mo-prod-add {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-l);
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.mo-opts {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin: 8px 0;
+}
+
+.mo-opt-group { margin-bottom: 10px; }
+
+.mo-opt-group-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text2);
+  margin-bottom: 4px;
+}
+.mo-opt-group-rule {
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.mo-opt-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+.mo-opt-name { font-size: 13px; }
+.mo-opt-price {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.mo-cart-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.mo-cart-info { flex: 1; min-width: 0; }
+.mo-cart-name { font-size: 13.5px; font-weight: 600; color: var(--text); }
+.mo-cart-opts { font-size: 12px; color: var(--muted); }
+
+.mo-cart-qty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.mo-qty-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-weight: 800;
+  cursor: pointer;
+  line-height: 1;
+}
+.mo-qty-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+.mo-cart-price {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  min-width: 70px;
+  text-align: right;
+}
+
+.mo-subtotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.mo-subtotal b { color: var(--text); font-size: 15px; }
+
+.mo-done-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+  cursor: pointer;
+  line-height: 1.5;
+}
+.mo-done-check input { margin-top: 3px; }
+.mo-done-check b { color: var(--text2); }
+
+.mo-error {
+  background: color-mix(in srgb, #e5484d 10%, transparent);
+  border: 1px solid color-mix(in srgb, #e5484d 35%, transparent);
+  color: #e5484d;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.mo-submit {
+  width: 100%;
+  padding: 12px;
+  font-size: 14.5px;
+}
+
+/* Miniaturas no seletor de produtos do pedido manual */
+.mo-prod-thumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+.mo-prod-thumb--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface2);
+  color: var(--muted2);
+}
+
+.mo-opt-thumb {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+
+.mo-opt-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.mo-opt-desc {
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.35;
+}
