@@ -110,7 +110,7 @@ export default function DashboardShell({ store, children }: { store: Store; chil
 
   // Contador no título da aba (chama atenção quando a aba está em segundo plano).
   useEffect(() => {
-    document.title = novoCount > 0 ? `🔔 (${novoCount}) Pedidos novos` : 'CardápioÁgil'
+    document.title = novoCount > 0 ? `🔔 (${novoCount}) Pedidos novos` : 'Cardápio Hub'
   }, [novoCount])
 
   // Dispara os alertas de um pedido novo (som + notificação do sistema + vibração).

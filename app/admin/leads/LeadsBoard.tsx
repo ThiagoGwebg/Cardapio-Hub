@@ -687,7 +687,7 @@ function CredentialsModal({ credentials, onClose }: { credentials: Credentials; 
 
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
   const message = [
-    `Olá${credentials.leadName ? ' ' + credentials.leadName.split(' ')[0] : ''}! 🎉 Sua conta no CardápioÁgil está pronta!`,
+    `Olá${credentials.leadName ? ' ' + credentials.leadName.split(' ')[0] : ''}! 🎉 Sua conta no Cardápio Hub está pronta!`,
     '',
     `🔗 Acesse: ${origin}/login`,
     `📧 E-mail: ${credentials.email}`,

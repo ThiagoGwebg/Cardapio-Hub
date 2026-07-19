@@ -4,8 +4,8 @@ import Link from 'next/link'
 import LandingCourierForm from '@/components/landing/LandingCourierForm'
 
 export const metadata: Metadata = {
-  title: 'Seja Entregador Parceiro — CardápioÁgil',
-  description: 'Cadastre-se para fazer entregas para os restaurantes parceiros do CardápioÁgil na sua região.',
+  title: 'Seja Entregador Parceiro — Cardápio Hub',
+  description: 'Cadastre-se para fazer entregas para os restaurantes parceiros do Cardápio Hub na sua região.',
 }
 
 export default function EntregadoresPage() {
@@ -13,7 +13,7 @@ export default function EntregadoresPage() {
     <div className="landing">
       <header className="l-nav">
         <Link href="/" className="l-logo">
-          cardápio<em>ágil</em>
+          cardápio<em>hub</em>
         </Link>
         <Link href="/" className="l-btn-ghost">← Voltar</Link>
       </header>
@@ -22,7 +22,7 @@ export default function EntregadoresPage() {
         <div className="l-contato-inner">
           <div className="l-contato-head">
             <div className="l-eyebrow">Seja Parceiro</div>
-            <h1 className="l-h2">Faça entregas com o CardápioÁgil</h1>
+            <h1 className="l-h2">Faça entregas com o Cardápio Hub</h1>
             <p className="l-section-sub">
               Cadastre-se para prestar serviços de entrega diretamente para os restaurantes parceiros na sua região. 
               Aqui, você negocia direto e fica com o controle do seu trabalho.

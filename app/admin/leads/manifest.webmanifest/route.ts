@@ -4,9 +4,9 @@ import { NextResponse } from 'next/server'
 // e abrir em modo standalone (cara de app).
 export function GET() {
   const manifest = {
-    name: 'Leads · CardápioÁgil',
+    name: 'Leads · Cardápio Hub',
     short_name: 'Leads',
-    description: 'Painel de leads do CardápioÁgil — acompanhe quem pediu contato.',
+    description: 'Painel de leads do Cardápio Hub — acompanhe quem pediu contato.',
     start_url: '/admin/leads?pwa=1',
     scope: '/admin/leads',
     display: 'standalone',

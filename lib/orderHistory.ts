@@ -1,4 +1,4 @@
-const KEY = 'cardapioagil_orders'
+const KEY = 'cardapiohub_orders'
 const MAX = 20
 
 export type OrderHistoryEntry = {

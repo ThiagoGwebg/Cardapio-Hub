@@ -978,3 +978,247 @@ html[data-dash-theme="black"] .dashboard {
   color: var(--muted);
   line-height: 1.35;
 }
+
+/* ===== Lista de pedidos (substitui o kanban) ===== */
+.ol-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.ol-search { flex: 1; max-width: 360px; }
+
+.ol-filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+  scrollbar-width: none;
+}
+.ol-filters::-webkit-scrollbar { display: none; }
+
+.ol-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.ol-chip.active {
+  border-color: var(--primary);
+  background: var(--primary-l);
+  color: var(--primary);
+}
+.ol-chip-count {
+  background: var(--surface3);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+}
+.ol-chip.active .ol-chip-count {
+  background: var(--primary);
+  color: #fff;
+}
+.ol-chip-attention:not(.active) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.ol-chip-attention:not(.active) .ol-chip-count {
+  background: var(--primary);
+  color: #fff;
+}
+
+.ol-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ol-empty {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 24px 4px;
+}
+
+.ol-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.ol-status-novo       { border-left-color: var(--primary); }
+.ol-status-preparando { border-left-color: var(--blue); }
+.ol-status-pronto     { border-left-color: var(--green); }
+.ol-status-a_caminho  { border-left-color: var(--teal); }
+.ol-status-concluido  { border-left-color: var(--green); opacity: .82; }
+.ol-status-cancelado  { border-left-color: var(--red); opacity: .65; }
+
+.ol-row-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.ol-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.ol-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ol-name-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.ol-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ol-num {
+  font-size: 12px;
+  color: var(--muted2);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.ol-sub {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.ol-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.ol-elapsed {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  min-height: 14px;
+}
+
+.ol-pill {
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.ol-pill-new    { background: var(--primary-l); color: var(--primary); }
+.ol-pill-prep   { background: var(--blue-l); color: var(--blue); }
+.ol-pill-ready  { background: var(--green-l); color: var(--green); }
+.ol-pill-route  { background: var(--teal-l); color: var(--teal); }
+.ol-pill-done   { background: var(--green-l); color: var(--green); }
+.ol-pill-cancel { background: var(--red-l); color: var(--red); }
+
+.ol-detail {
+  border-top: 1px solid var(--border);
+  padding: 12px 14px;
+  background: var(--surface2);
+}
+.ol-detail-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.ol-addr {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.ol-items {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+.ol-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.ol-advance { flex: 1; width: auto; }
+.ol-notify { width: auto; padding: 0 12px; }
+.ol-detail-link {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+.ol-cancel {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--red-l);
+  color: var(--red);
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+@media (max-width: 560px) {
+  .ol-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+  .ol-search { max-width: none; }
+}
+
+/* Pedidos agendados (encomendas) */
+.ol-status-agendado { border-left-color: #8b5cf6; }
+.ol-pill-sched { background: rgba(139, 92, 246, .14); color: #8b5cf6; }
+html[data-dash-theme="dark"] .dashboard .ol-pill-sched,
+html[data-dash-theme="black"] .dashboard .ol-pill-sched {
+  background: rgba(167, 139, 250, .18);
+  color: #b6a3f8;
+}
+.ol-sched-line { font-weight: 700; color: #8b5cf6; }
+html[data-dash-theme="dark"] .dashboard .ol-sched-line,
+html[data-dash-theme="black"] .dashboard .ol-sched-line { color: #b6a3f8; }
+
+/* Chegou a hora da encomenda: destaca em laranja até iniciar o preparo */
+.ol-row.ol-due { border-left-color: var(--primary); }
+.ol-row.ol-due .ol-sched-line,
+.ol-row.ol-due .ol-elapsed { color: var(--primary); font-weight: 700; }

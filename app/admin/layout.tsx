@@ -5,7 +5,7 @@ import './admin.css'
 
 export const metadata: Metadata = {
   manifest: '/admin/manifest.webmanifest',
-  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Painel CardápioÁgil' },
+  appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Painel Cardápio Hub' },
   icons: { apple: '/admin/app-icon.svg' },
   robots: { index: false, follow: false },
 }

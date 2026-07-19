@@ -1,4 +1,4 @@
-# Roteiro de atendimento — CardápioÁgil
+# Roteiro de atendimento — Cardápio Hub
 
 Guia pra ligação/WhatsApp com o lead que preencheu o formulário da landing.
 Objetivo: entender o negócio do cliente, mostrar valor e colocar a loja no ar **junto com ele**.
@@ -10,7 +10,7 @@ Objetivo: entender o negócio do cliente, mostrar valor e colocar a loja no ar *
 
 ## 1. Abertura (quebra-gelo)
 
-> "Oi, [nome]! Aqui é o [seu nome] do CardápioÁgil. Você deixou seus dados no nosso site
+> "Oi, [nome]! Aqui é o [seu nome] do Cardápio Hub. Você deixou seus dados no nosso site
 > pedindo pra colocar seu cardápio no ar — tô te ligando pra te ajudar com isso, tudo bem?
 > Só uns minutinhos."
 
@@ -33,7 +33,7 @@ Entenda o negócio antes de falar do produto:
 
 Conecte com a dor que ele acabou de descrever:
 
-- **"O CardápioÁgil é um cardápio digital com link próprio da sua loja.** Seu cliente abre no
+- **"O Cardápio Hub é um cardápio digital com link próprio da sua loja.** Seu cliente abre no
   celular, monta o pedido, e ele cai direto num painel pra você — sem você anotar nada no bloquinho."
 - **"Não tem taxa por pedido.** Diferente de iFood e afins, você não paga comissão por venda."
 - **"Tem painel de pedidos, caixa e desempenho** — você vê quanto vendeu no dia, quais produtos saem mais."

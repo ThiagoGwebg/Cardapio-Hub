@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { fmtCents, PIX_KEY_TYPE_LABEL } from '@/lib/format'
+import { fmtCents, PIX_KEY_TYPE_LABEL, friendlyOrderError } from '@/lib/format'
 import { googleFontHref, DEFAULT_STORE_FONT } from '@/lib/plan'
 import { IconPin, IconUtensils, IconClose, IconSun, IconMoon } from '@/components/icons'
 import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } from '@/lib/orderHistory'
@@ -357,7 +357,7 @@ export default function PublicMenu({
       if (rpcError.message.includes('limite_pedidos_mes')) {
         return setError('A loja atingiu o limite de pedidos do mês. Tente novamente mais tarde.')
       }
-      return setError(rpcError.message)
+      return setError(friendlyOrderError(rpcError.message))
     }
 
     saveOrderToHistory({

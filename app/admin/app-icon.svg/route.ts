@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-// Ícone da PWA do painel admin: raio (marca) sobre o gradiente laranja do CardápioÁgil.
+// Ícone da PWA do painel admin: raio (marca) sobre o gradiente laranja do Cardápio Hub.
 export function GET() {
   const svg = `<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
   <defs>

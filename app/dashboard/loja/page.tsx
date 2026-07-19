@@ -161,7 +161,7 @@ export default async function LojaPage() {
                 <p className="pro-lock-text">
                   Deixe o cardápio com a sua cara: escolha a <strong>cor principal</strong>, a{' '}
                   <strong>fonte</strong> e publique um <strong>aviso promocional</strong> no topo do
-                  cardápio. No Pro, o selo &quot;Feito com CardápioÁgil&quot; também some da sua página.
+                  cardápio. No Pro, o selo &quot;Feito com Cardápio Hub&quot; também some da sua página.
                 </p>
                 <a href="/dashboard/billing" className="save-btn pro-lock-btn">Assinar Pro</a>
               </div>

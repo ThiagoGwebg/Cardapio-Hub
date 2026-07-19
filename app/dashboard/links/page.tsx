@@ -68,7 +68,7 @@ export default async function LinksPage() {
       {!isPro && (
         <p style={{ fontSize: 12, color: 'var(--muted2)', marginTop: 4 }}>
           Assinando o <Link href="/dashboard/billing" style={{ color: 'var(--primary)' }}>Pro</Link>, o
-          selo &quot;Feito com CardápioÁgil&quot; também é removido do seu cardápio público.
+          selo &quot;Feito com Cardápio Hub&quot; também é removido do seu cardápio público.
         </p>
       )}
     </>

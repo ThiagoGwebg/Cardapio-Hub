@@ -5,7 +5,7 @@ import { spMonthStart } from '@/lib/format'
 import StoresBoard, { type AdminStore } from './StoresBoard'
 
 export const metadata: Metadata = {
-  title: 'Lojas — Admin CardápioÁgil',
+  title: 'Lojas — Admin Cardápio Hub',
   robots: { index: false, follow: false },
 }
 

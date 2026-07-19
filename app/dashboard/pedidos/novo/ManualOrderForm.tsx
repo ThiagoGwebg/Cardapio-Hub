@@ -45,6 +45,8 @@ export default function ManualOrderForm({ menu, disabled = false }: { menu: Cate
   const [note, setNote] = useState('')
   const [payment, setPayment] = useState<Payment | ''>('')
   const [markDone, setMarkDone] = useState(false)
+  const [scheduleOn, setScheduleOn] = useState(false)
+  const [scheduledFor, setScheduledFor] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -142,16 +144,23 @@ export default function ManualOrderForm({ menu, disabled = false }: { menu: Cate
     setError(null)
     if (cart.length === 0) return setError('Adicione ao menos um item ao pedido.')
     if (orderType === 'dine_in' && !tableNumber.trim()) return setError('Informe o número da mesa.')
+    if (scheduleOn) {
+      if (!scheduledFor) return setError('Informe a data e o horário do agendamento.')
+      if (new Date(scheduledFor).getTime() < Date.now() - 5 * 60_000) {
+        return setError('O horário do agendamento já passou.')
+      }
+    }
 
     setSubmitting(true)
     const { error: err } = await createManualOrder({
       order_type: orderType,
-      status: markDone ? 'concluido' : 'novo',
+      status: markDone && !scheduleOn ? 'concluido' : 'novo',
       payment_method: payment || null,
       customer_name: customerName.trim() || null,
       customer_phone: customerPhone.trim() || null,
       customer_note: note.trim() || null,
       table_number: orderType === 'dine_in' ? tableNumber.trim() : null,
+      scheduled_for: scheduleOn && scheduledFor ? new Date(scheduledFor).toISOString() : null,
       items: cart.map((i) => ({
         product_id: i.productId,
         quantity: i.qty,
@@ -347,12 +356,40 @@ export default function ManualOrderForm({ menu, disabled = false }: { menu: Cate
             <input className="form-input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Ex.: sem cebola" />
           </div>
 
-          <label className="mo-done-check">
-            <input type="checkbox" checked={markDone} onChange={(e) => setMarkDone(e.target.checked)} />
+          <label className="mo-done-check" style={{ marginBottom: 10 }}>
+            <input
+              type="checkbox"
+              checked={scheduleOn}
+              onChange={(e) => {
+                setScheduleOn(e.target.checked)
+                if (e.target.checked) setMarkDone(false)
+              }}
+            />
             <span>
-              Registrar como <b>concluído</b> (venda já entregue — não entra no preparo)
+              📅 <b>Agendar</b> este pedido (encomenda para data/hora combinada)
             </span>
           </label>
+
+          {scheduleOn && (
+            <div className="form-group">
+              <label className="form-label">Data e horário combinados</label>
+              <input
+                type="datetime-local"
+                className="form-input"
+                value={scheduledFor}
+                onChange={(e) => setScheduledFor(e.target.value)}
+              />
+            </div>
+          )}
+
+          {!scheduleOn && (
+            <label className="mo-done-check">
+              <input type="checkbox" checked={markDone} onChange={(e) => setMarkDone(e.target.checked)} />
+              <span>
+                Registrar como <b>concluído</b> (venda já entregue — não entra no preparo)
+              </span>
+            </label>
+          )}
         </div>
 
         {error && <div className="mo-error">{error}</div>}

@@ -4,9 +4,9 @@ import { NextResponse } from 'next/server'
 // start_url aponta pros leads pra já abrir na tela de alertas de novos leads.
 export function GET() {
   const manifest = {
-    name: 'CardápioÁgil · Painel',
+    name: 'Cardápio Hub · Painel',
     short_name: 'Painel',
-    description: 'Painel do time CardápioÁgil — leads, lojas e visão geral.',
+    description: 'Painel do time Cardápio Hub — leads, lojas e visão geral.',
     start_url: '/admin/leads?pwa=1',
     scope: '/admin',
     display: 'standalone',

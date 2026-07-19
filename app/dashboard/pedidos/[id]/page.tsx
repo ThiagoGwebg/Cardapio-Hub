@@ -1,10 +1,11 @@
 import { getCurrentStore } from '@/lib/store'
-import { fmtCents, fmtOrderNumber, fmtSince, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL } from '@/lib/format'
+import { fmtCents, fmtOrderNumber, fmtSince, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL, SP_TZ } from '@/lib/format'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PrintButton from './PrintButton'
 
 const STATUS_DOT: Record<string, string> = {
+  agendado: 'dot-pending',
   novo: 'dot-pending',
   preparando: 'dot-prep',
   pronto: 'dot-ready',
@@ -14,7 +15,9 @@ const STATUS_DOT: Record<string, string> = {
 }
 
 function fmtDateTime(iso: string) {
+  // Fuso fixo da loja: o servidor roda em UTC (Vercel) e mostraria a hora errada.
   return new Date(iso).toLocaleString('pt-BR', {
+    timeZone: SP_TZ,
     day: '2-digit',
     month: '2-digit',
     hour: '2-digit',
@@ -29,7 +32,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const { data: order } = await supabase
     .from('orders')
     .select(
-      'id, order_number, status, order_type, payment_method, change_for_cents, customer_name, customer_phone, customer_note, subtotal_cents, delivery_fee_cents, discount_cents, total_cents, coupon_code, table_number, address_cep, address_street, address_number, address_complement, address_neighborhood, address_reference, created_at, order_items(id, product_name_snapshot, quantity, unit_price_cents, order_item_options(name_snapshot, group_name_snapshot))'
+      'id, order_number, status, order_type, payment_method, change_for_cents, customer_name, customer_phone, customer_note, subtotal_cents, delivery_fee_cents, discount_cents, total_cents, coupon_code, table_number, address_cep, address_street, address_number, address_complement, address_neighborhood, address_reference, created_at, scheduled_for, order_items(id, product_name_snapshot, quantity, unit_price_cents, order_item_options(name_snapshot, group_name_snapshot))'
     )
     .eq('id', id)
     .eq('store_id', store.id)
@@ -94,6 +97,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <div className="order-tags" style={{ marginBottom: 12 }}>
           <span className={`status-dot ${STATUS_DOT[order.status] ?? ''}`} style={{ marginRight: 4 }} />
           <span className="order-tag">{STATUS_LABEL[order.status]}</span>
+          {order.scheduled_for && <span className="order-tag">📅 Agendado para {fmtDateTime(order.scheduled_for)}</span>}
           <span className="order-tag">{ORDER_TYPE_LABEL[order.order_type]}</span>
           {order.payment_method && <span className="order-tag">{PAYMENT_LABEL[order.payment_method]}</span>}
         </div>

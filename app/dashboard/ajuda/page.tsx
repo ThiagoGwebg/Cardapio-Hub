@@ -100,8 +100,8 @@ export default function AjudaPage() {
         </div>
         <div style={{ fontSize: 12, color: 'var(--muted)' }}>
           Entre em contato pelo e-mail{' '}
-          <a href="mailto:suporte@cardapioagil.com.br" style={{ color: 'var(--primary)', fontWeight: 600 }}>
-            suporte@cardapioagil.com.br
+          <a href="mailto:suporte@cardapiohub.com.br" style={{ color: 'var(--primary)', fontWeight: 600 }}>
+            suporte@cardapiohub.com.br
           </a>
         </div>
       </div>

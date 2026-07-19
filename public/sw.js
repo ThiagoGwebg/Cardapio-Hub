@@ -1,4 +1,4 @@
-const CACHE = 'cardapioagil-v1'
+const CACHE = 'cardapiohub-v1'
 
 self.addEventListener('install', (event) => {
   self.skipWaiting()

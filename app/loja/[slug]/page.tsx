@@ -16,7 +16,7 @@ export default async function LojaPage({ params }: { params: Promise<{ slug: str
 
   if (!store) notFound()
 
-  // Selo "Feito com CardápioÁgil" aparece só em lojas Free (white-label é Pro).
+  // Selo "Feito com Cardápio Hub" aparece só em lojas Free (white-label é Pro).
   // subscriptions não é legível pelo anon (RLS), então usamos o client admin no servidor.
   const isPro = await isStorePro(createAdminClient(), store.id)
 

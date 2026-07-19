@@ -46,7 +46,7 @@ export default function PixKeyField({
         </div>
       </div>
       <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>
-        Essa é só a sua chave Pix — não pedimos dado bancário nenhum. O CardápioÁgil não recebe nem retém esse
+        Essa é só a sua chave Pix — não pedimos dado bancário nenhum. O Cardápio Hub não recebe nem retém esse
         dinheiro; ele cai direto na sua conta quando o cliente paga.
       </p>
     </div>

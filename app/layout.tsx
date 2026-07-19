@@ -3,7 +3,7 @@ import './globals.css'
 import Analytics from '@/components/analytics/Analytics'
 
 export const metadata: Metadata = {
-  title: 'CardápioÁgil',
+  title: 'Cardápio Hub',
   description: 'Cardápio digital e painel de gestão para pequenos negócios',
 }
 

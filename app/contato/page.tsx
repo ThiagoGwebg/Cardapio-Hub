@@ -4,7 +4,7 @@ import Link from 'next/link'
 import LandingLeadForm from '@/components/landing/LandingLeadForm'
 
 export const metadata: Metadata = {
-  title: 'Fale com a gente — CardápioÁgil',
+  title: 'Fale com a gente — Cardápio Hub',
   description: 'Deixe seus dados e o nosso time coloca seu cardápio digital no ar com você.',
 }
 
@@ -13,7 +13,7 @@ export default function ContatoPage() {
     <div className="landing">
       <header className="l-nav">
         <Link href="/" className="l-logo">
-          cardápio<em>ágil</em>
+          cardápio<em>hub</em>
         </Link>
         <Link href="/" className="l-btn-ghost">← Voltar</Link>
       </header>

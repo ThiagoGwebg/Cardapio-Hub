@@ -10,7 +10,7 @@ export default function LandingHeader({ themeMode, toggleThemeMode }: LandingHea
   return (
     <header className="l-nav">
       <Link href="/" className="l-logo">
-        cardápio<em>ágil</em>
+        cardápio<em>hub</em>
       </Link>
 
       <input type="checkbox" id="l-nav-toggle" className="l-nav-toggle-input" />

@@ -62,7 +62,7 @@ export default function AdminNav({ email }: { email: string }) {
       <Link href="/admin" className="adm-brand">
         <span className="adm-brand-mark">⚡</span>
         <span className="adm-brand-text">
-          CardápioÁgil
+          Cardápio Hub
           <small>Painel do time</small>
         </span>
       </Link>

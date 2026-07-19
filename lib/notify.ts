@@ -7,7 +7,7 @@
 // Para ligar (na Vercel → Settings → Environment Variables):
 //   RESEND_API_KEY   = re_xxx           (chave da conta Resend — resend.com)
 //   SALES_EMAIL      = voce@dominio.com (pra onde chega o aviso; fallback: ADMIN_EMAILS)
-//   LEAD_EMAIL_FROM  = "CardápioÁgil <onboarding@resend.dev>"  (opcional)
+//   LEAD_EMAIL_FROM  = "Cardápio Hub <onboarding@resend.dev>"  (opcional)
 //
 // WhatsApp fica pronto pra plugar depois no bloco marcado no final.
 
@@ -52,7 +52,7 @@ export async function notifyNewLead(lead: LeadNotification): Promise<void> {
 async function sendLeadEmail(lead: LeadNotification): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY
   const to = process.env.SALES_EMAIL || (process.env.ADMIN_EMAILS || '').split(',')[0]?.trim()
-  const from = process.env.LEAD_EMAIL_FROM || 'CardápioÁgil <onboarding@resend.dev>'
+  const from = process.env.LEAD_EMAIL_FROM || 'Cardápio Hub <onboarding@resend.dev>'
 
   if (!apiKey || !to) {
     // Sem credenciais configuradas ainda — registra e segue.
@@ -64,13 +64,13 @@ async function sendLeadEmail(lead: LeadNotification): Promise<void> {
   const waDigits = (lead.whatsapp || '').replace(/\D/g, '')
   const waLink = waDigits
     ? `https://wa.me/${waDigits.length <= 11 ? '55' + waDigits : waDigits}?text=${encodeURIComponent(
-        `Oi ${lead.name}! Vi seu interesse no CardápioÁgil 🍔`
+        `Oi ${lead.name}! Vi seu interesse no Cardápio Hub 🍔`
       )}`
     : ''
 
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:520px;margin:auto">
-      <h2 style="color:#FF5722;margin:0 0 12px">🍔 Novo lead no CardápioÁgil</h2>
+      <h2 style="color:#FF5722;margin:0 0 12px">🍔 Novo lead no Cardápio Hub</h2>
       <table style="width:100%;border-collapse:collapse;font-size:14px">
         <tr><td style="padding:6px 0;color:#777">Nome</td><td style="padding:6px 0"><b>${esc(lead.name)}</b></td></tr>
         <tr><td style="padding:6px 0;color:#777">WhatsApp</td><td style="padding:6px 0"><b>${esc(lead.whatsapp)}</b></td></tr>

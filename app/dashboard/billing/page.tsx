@@ -16,7 +16,7 @@ const FEATURES: { label: string; free: string; pro: string }[] = [
   { label: 'Logo e banner personalizados', free: '✓', pro: '✓' },
   { label: 'Cor e fonte do cardápio', free: '—', pro: '✓' },
   { label: 'Aviso promocional no cardápio', free: '—', pro: '✓' },
-  { label: 'Selo "Feito com CardápioÁgil"', free: 'Com selo', pro: 'Sem selo' },
+  { label: 'Selo "Feito com Cardápio Hub"', free: 'Com selo', pro: 'Sem selo' },
   { label: 'Clientes fiéis (CRM + WhatsApp)', free: '—', pro: '✓' },
   { label: 'Notificações de pedido por WhatsApp', free: '—', pro: '✓' },
   { label: 'QR Code para imprimir', free: '—', pro: '✓' },

@@ -36,7 +36,7 @@ export default function LandingPricing() {
           <ul className="l-plan-list">
             <li>Produtos e pedidos ilimitados</li>
             <li>Cores, fontes e aviso promocional no cardápio</li>
-            <li>Sua marca, sem selo CardápioÁgil</li>
+            <li>Sua marca, sem selo Cardápio Hub</li>
             <li>Clientes fiéis (CRM) + relatórios avançados de 30/90 dias</li>
             <li>Notificações de pedido por WhatsApp</li>
             <li>Vários usuários e mais de uma loja na mesma conta</li>

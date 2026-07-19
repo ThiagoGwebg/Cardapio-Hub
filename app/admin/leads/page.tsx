@@ -5,7 +5,7 @@ import { fetchLeads } from './actions'
 import LeadsBoard from './LeadsBoard'
 
 export const metadata: Metadata = {
-  title: 'Leads — CardápioÁgil',
+  title: 'Leads — Cardápio Hub',
   manifest: '/admin/leads/manifest.webmanifest',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Leads' },
   icons: { apple: '/admin/leads/app-icon.svg' },

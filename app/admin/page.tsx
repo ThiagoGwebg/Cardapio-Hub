@@ -6,7 +6,7 @@ import { PLAN_LIMITS } from '@/lib/stripe/plans'
 import { fmtCents, fmtOrderNumber, spDayKey, spMonthStart, SP_TZ, ORDER_TYPE_LABEL, STATUS_LABEL } from '@/lib/format'
 
 export const metadata: Metadata = {
-  title: 'Admin — CardápioÁgil',
+  title: 'Admin — Cardápio Hub',
   robots: { index: false, follow: false },
 }
 
@@ -169,7 +169,7 @@ export default async function AdminHomePage() {
       <h1 className="adm-title">Visão geral</h1>
       <p className="adm-subtitle">
         {now.toLocaleDateString('pt-BR', { timeZone: SP_TZ, weekday: 'long', day: 'numeric', month: 'long' })} · o
-        pulso do CardápioÁgil num lugar só.
+        pulso do Cardápio Hub num lugar só.
       </p>
 
       <div className="adm-stats">

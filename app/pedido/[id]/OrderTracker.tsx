@@ -41,6 +41,8 @@ const STEP_ICON: Record<string, string> = {
 
 function heroFor(status: string, orderType: string): { icon: string; title: string; sub: string } {
   switch (status) {
+    case 'agendado':
+      return { icon: '📅', title: 'Pedido agendado', sub: 'A loja vai preparar seu pedido na data e hora combinadas.' }
     case 'novo':
       return { icon: '✅', title: 'Pedido recebido!', sub: 'A loja já foi avisada e vai começar o preparo.' }
     case 'preparando':

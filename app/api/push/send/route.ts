@@ -21,13 +21,33 @@ export async function POST(req: NextRequest) {
     // Sem chaves configuradas ainda — não faz nada (degradação segura).
     return NextResponse.json({ ok: false, reason: 'vapid-not-configured' })
   }
-  webpush.setVapidDetails(process.env.VAPID_SUBJECT || 'mailto:contato@cardapioagil.com.br', pub, priv)
+  webpush.setVapidDetails(process.env.VAPID_SUBJECT || 'mailto:contato@cardapiohub.com.br', pub, priv)
 
   const body = await req.json().catch(() => ({} as Record<string, unknown>))
   const storeId = body.store_id as string | undefined
+  const orderId = body.order_id as string | undefined
   if (!storeId) return NextResponse.json({ error: 'no store' }, { status: 400 })
 
   const admin = createAdminClient()
+
+  // O gatilho dispara AFTER INSERT, quando o pedido ainda está com total_cents = 0
+  // (a create_order só grava o valor final num UPDATE posterior). O pg_net envia o
+  // HTTP após o commit, então relemos o pedido do banco para ter o total correto —
+  // caso contrário a notificação mostraria "R$ 0,00".
+  let customerName = body.customer_name as string | undefined
+  let totalCents = body.total_cents as number | undefined
+  if (orderId) {
+    const { data: order } = await admin
+      .from('orders')
+      .select('customer_name, total_cents')
+      .eq('id', orderId)
+      .maybeSingle()
+    if (order) {
+      customerName = order.customer_name || customerName
+      totalCents = order.total_cents ?? totalCents
+    }
+  }
+
   const { data: subs } = await admin
     .from('push_subscriptions')
     .select('endpoint, subscription')
@@ -36,9 +56,9 @@ export async function POST(req: NextRequest) {
 
   const payload = JSON.stringify({
     title: '🔔 Novo pedido!',
-    body: body.customer_name
-      ? `${body.customer_name} • ${fmt(body.total_cents as number)}`
-      : 'Você recebeu um novo pedido.',
+    body: customerName
+      ? `${customerName} • ${fmt(totalCents)}`
+      : `Você recebeu um novo pedido • ${fmt(totalCents)}`,
     url: '/dashboard/pedidos',
   })
 

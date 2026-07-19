@@ -2,8 +2,8 @@ import Link from 'next/link'
 import '../landing.css'
 
 export const metadata = {
-  title: 'Política de Privacidade — CardápioÁgil',
-  description: 'Como o CardápioÁgil coleta, usa e protege seus dados.',
+  title: 'Política de Privacidade — Cardápio Hub',
+  description: 'Como o Cardápio Hub coleta, usa e protege seus dados.',
 }
 
 export default function PrivacyPage() {
@@ -11,7 +11,7 @@ export default function PrivacyPage() {
     <div className="landing">
       <header className="l-nav">
         <Link href="/" className="l-logo">
-          cardápio<em>ágil</em>
+          cardápio<em>hub</em>
         </Link>
       </header>
 
@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           <section>
             <h2 style={sectionTitle}>1. Quem somos</h2>
             <p>
-              Esta política descreve como o <strong>CardápioÁgil</strong> (&quot;nós&quot;), plataforma de
+              Esta política descreve como o <strong>Cardápio Hub</strong> (&quot;nós&quot;), plataforma de
               cardápio digital e gestão de pedidos para pequenos negócios de alimentação, coleta,
               usa, compartilha e protege os dados pessoais de lojistas que usam o painel e de
               clientes finais que fazem pedidos pelo cardápio público, em conformidade com a Lei

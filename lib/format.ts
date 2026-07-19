@@ -82,6 +82,39 @@ export function fmtSince(date: string | Date) {
   return `há ${years} ${years === 1 ? 'ano' : 'anos'}`
 }
 
+// Tempo decorrido curto no formato operacional (ex.: "5 min", "2 h 40 min", "3 d").
+export function fmtElapsed(date: string | Date, now: number): string {
+  const t = typeof date === 'string' ? new Date(date).getTime() : date.getTime()
+  const min = Math.max(0, Math.floor((now - t) / 60_000))
+  if (min < 1) return 'agora'
+  if (min < 60) return `${min} min`
+  const h = Math.floor(min / 60)
+  if (h < 24) return `${h} h ${min % 60} min`
+  return `${Math.floor(h / 24)} d`
+}
+
+// Tempo até um horário futuro (ex.: "em 45 min", "em 2 h", "em 3 d"); "agora" se já chegou.
+export function fmtUntil(date: string | Date, now: number): string {
+  const t = typeof date === 'string' ? new Date(date).getTime() : date.getTime()
+  if (t <= now) return 'agora'
+  const min = Math.ceil((t - now) / 60_000)
+  if (min < 60) return `em ${min} min`
+  const h = Math.floor(min / 60)
+  if (h < 24) return `em ${h} h${min % 60 ? ` ${min % 60} min` : ''}`
+  return `em ${Math.floor(h / 24)} d`
+}
+
+// Horário agendado no fuso da loja (ex.: "18/07 15:00").
+export function fmtScheduledFor(iso: string): string {
+  return new Date(iso).toLocaleString('pt-BR', {
+    timeZone: SP_TZ,
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 export const ORDER_TYPE_LABEL: Record<string, string> = {
   delivery: 'Entrega',
   pickup: 'Retirada',
@@ -101,7 +134,19 @@ export const PIX_KEY_TYPE_LABEL: Record<string, string> = {
   random: 'Chave aleatória',
 }
 
+// Erros de negócio que a RPC create_order/create_manual_order lança em português
+// e que são seguros de mostrar ao cliente. Qualquer outra coisa (erro técnico do
+// Postgres, mensagem vazia) vira uma mensagem genérica — nunca vazamos detalhe do banco.
+const SAFE_ORDER_ERROR = /^(Loja |Entrega indispon|Retirada indispon|Pedido |Carrinho vazio|Informe o endere|Produto indispon|Op(ç|c)|Escolha as op|M(á|a)ximo de|Cupom )/i
+
+export function friendlyOrderError(message?: string | null): string {
+  const msg = (message ?? '').trim()
+  if (msg && SAFE_ORDER_ERROR.test(msg)) return msg
+  return 'Não foi possível registrar o pedido. Revise os itens e tente novamente.'
+}
+
 export const STATUS_LABEL: Record<string, string> = {
+  agendado: 'Agendado',
   novo: 'Recebido',
   preparando: 'Em preparo',
   pronto: 'Pronto',

@@ -5,7 +5,7 @@ export default function LandingFooter() {
     <footer className="l-footer">
       <div className="l-footer-inner">
         <Link href="/" className="l-logo">
-          cardápio<em>ágil</em>
+          cardápio<em>hub</em>
         </Link>
         <nav className="l-footer-links">
           <a href="#features">Funcionalidades</a>
@@ -16,7 +16,7 @@ export default function LandingFooter() {
           <Link href="/login">Entrar</Link>
           <Link href="/contato">Fale com a gente</Link>
         </nav>
-        <span className="l-footer-copy">© 2026 CardápioÁgil. Todos os direitos reservados.</span>
+        <span className="l-footer-copy">© 2026 Cardápio Hub. Todos os direitos reservados.</span>
       </div>
     </footer>
   )
