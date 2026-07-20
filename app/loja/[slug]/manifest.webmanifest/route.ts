@@ -44,8 +44,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
     categories: ['food', 'shopping'],
     start_url: `/loja/${store.slug}?pwa=1`,
     scope: `/loja/${store.slug}`,
+    // Só "standalone" — "minimal-ui" faz o Chrome mostrar aquela barra com o "✕" e a URL
+    // por cima do app quando ele decide usar o modo alternativo em vez do standalone puro.
     display: 'standalone',
-    display_override: ['standalone', 'minimal-ui'],
+    display_override: ['standalone'],
     orientation: 'portrait',
     // Splash claro combinando com o cardápio (antes era escuro e piscava preto ao abrir).
     background_color: '#ffffff',
