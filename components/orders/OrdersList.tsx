@@ -142,6 +142,13 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
   // Relógio só no cliente (evita mismatch de hidratação); atualiza a cada 30s.
   const [now, setNow] = useState<number | null>(null)
   const unlockedRef = useRef(false)
+  // Lido por ref pra o callback do realtime sempre pegar o valor atual sem
+  // precisar re-inscrever o canal (evita destruir/recriar a conexão no meio
+  // do handshake sempre que o som é alternado ou sincronizado do localStorage).
+  const soundOnRef = useRef(soundOn)
+  useEffect(() => {
+    soundOnRef.current = soundOn
+  }, [soundOn])
 
   useEffect(() => {
     // setTimeout (e não requestAnimationFrame): rAF pausa em aba de segundo
@@ -173,7 +180,7 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'orders', filter: `store_id=eq.${storeId}` },
         () => {
-          if (soundOn && unlockedRef.current) playNewOrderBeep()
+          if (soundOnRef.current && unlockedRef.current) playNewOrderBeep()
           setFlash(true)
           setTimeout(() => setFlash(false), 2000)
           router.refresh()
@@ -184,14 +191,11 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
         { event: 'UPDATE', schema: 'public', table: 'orders', filter: `store_id=eq.${storeId}` },
         () => router.refresh()
       )
-      .subscribe((status, err) => {
-        // eslint-disable-next-line no-console
-        console.log('[realtime debug] orders channel status:', status, err)
-      })
+      .subscribe()
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [storeId, router, soundOn])
+  }, [storeId, router])
 
   function toggleSound() {
     setSoundOn((prev) => {
