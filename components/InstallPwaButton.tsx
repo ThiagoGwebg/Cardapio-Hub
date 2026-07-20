@@ -76,6 +76,25 @@ export default function InstallPwaButton({
       })
       .catch(() => {})
 
+    // O <script> no <head> do layout raiz tenta capturar o beforeinstallprompt antes
+    // mesmo desse componente montar (evita o Chrome cair no aviso automático dele por
+    // termos chamado preventDefault() tarde demais). Se já capturou, usa direto;
+    // senão fica ouvindo tanto o evento "bip-captured" quanto o próprio evento nativo
+    // (fallback, caso o script do <head> não tenha rodado por algum motivo).
+    const w = window as unknown as { __bipEvent?: BeforeInstallPromptEvent }
+    if (w.__bipEvent) {
+      setDeferredPrompt(w.__bipEvent)
+      setCanInstall(true)
+    }
+
+    const onCaptured = () => {
+      if (w.__bipEvent) {
+        setDeferredPrompt(w.__bipEvent)
+        setCanInstall(true)
+      }
+    }
+    window.addEventListener('bip-captured', onCaptured)
+
     const handler = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
@@ -87,6 +106,7 @@ export default function InstallPwaButton({
     window.addEventListener('appinstalled', onInstalled)
 
     return () => {
+      window.removeEventListener('bip-captured', onCaptured)
       window.removeEventListener('beforeinstallprompt', handler)
       window.removeEventListener('appinstalled', onInstalled)
     }
