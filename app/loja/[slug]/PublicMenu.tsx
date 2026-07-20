@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents, PIX_KEY_TYPE_LABEL, friendlyOrderError } from '@/lib/format'
 import { googleFontHref, DEFAULT_STORE_FONT } from '@/lib/plan'
 import { IconPin, IconUtensils, IconClose, IconSun, IconMoon } from '@/components/icons'
 import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } from '@/lib/orderHistory'
+import { loadCart, saveCart, clearCart } from '@/lib/cartStorage'
 import InstallPwaButton from '@/components/InstallPwaButton'
 import './loja.css'
 
@@ -102,7 +103,10 @@ export default function PublicMenu({
   }
 
   const [cart, setCart] = useState<CartItem[]>([])
+  const [cartHydrated, setCartHydrated] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [modalProduct, setModalProduct] = useState<Product | null>(null)
   const [modalSel, setModalSel] = useState<Record<string, Option[]>>({})
   const [modalNote, setModalNote] = useState('')
@@ -122,6 +126,28 @@ export default function PublicMenu({
     const raf = requestAnimationFrame(() => setMyOrders(getOrderHistoryForStore(store.slug)))
     return () => cancelAnimationFrame(raf)
   }, [store.slug])
+
+  // Recupera o carrinho salvo localmente pra não perder o pedido ao recarregar a página.
+  useEffect(() => {
+    const saved = loadCart<CartItem[]>(store.slug)
+    if (saved && saved.length > 0) setCart(saved)
+    setCartHydrated(true)
+  }, [store.slug])
+
+  useEffect(() => {
+    if (!cartHydrated) return
+    saveCart(store.slug, cart)
+  }, [store.slug, cart, cartHydrated])
+
+  useEffect(() => () => {
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+  }, [])
+
+  function showToast(msg: string) {
+    setToast(msg)
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setToast(null), 2200)
+  }
 
   const enabledTypes = useMemo(() => {
     const t: OrderType[] = []
@@ -302,9 +328,14 @@ export default function PublicMenu({
       if (existing) return prev.map((i) => (i.lineId === key ? { ...i, qty: i.qty + 1 } : i))
       return [...prev, { lineId: key, productId: p.id, name: p.name, base_cents: p.price_cents, options, qty: 1, note }]
     })
+    showToast(`${p.name} adicionado ao carrinho`)
   }
 
   function changeQty(lineId: string, delta: number) {
+    const item = cart.find((i) => i.lineId === lineId)
+    if (item && delta < 0 && item.qty + delta <= 0) {
+      showToast(`${item.name} removido do carrinho`)
+    }
     setCart((prev) =>
       prev.map((i) => (i.lineId === lineId ? { ...i, qty: i.qty + delta } : i)).filter((i) => i.qty > 0)
     )
@@ -367,6 +398,8 @@ export default function PublicMenu({
       createdAt: new Date().toISOString(),
     })
 
+    setCart([])
+    clearCart(store.slug)
     router.push(`/pedido/${orderId}`)
   }
 
@@ -864,6 +897,12 @@ export default function PublicMenu({
           <span className="cart-count">{totalItems} {totalItems === 1 ? 'item' : 'itens'}</span>
         </span>
       </button>
+
+      {toast && (
+        <div className="storefront-toast" role="status">
+          {toast}
+        </div>
+      )}
     </div>
   )
 }

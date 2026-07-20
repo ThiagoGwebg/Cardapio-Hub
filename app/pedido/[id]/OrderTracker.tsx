@@ -39,6 +39,11 @@ const STEP_ICON: Record<string, string> = {
   concluido: '🎉',
 }
 
+function estimatedArrival(createdAt: string, etaMin: number) {
+  const arrival = new Date(new Date(createdAt).getTime() + etaMin * 60000)
+  return arrival.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+}
+
 function heroFor(status: string, orderType: string): { icon: string; title: string; sub: string } {
   switch (status) {
     case 'agendado':
@@ -105,7 +110,7 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
 
   useEffect(() => {
     load()
-    const t = setInterval(load, 20000)
+    const t = setInterval(load, 15000)
     return () => clearInterval(t)
   }, [load])
 
@@ -176,6 +181,7 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
               <div className="track-eta">
                 <span className="track-eta-label">Tempo estimado</span>
                 <span className="track-eta-value">~{eta} min</span>
+                <span className="track-eta-clock">Previsão: até {estimatedArrival(order.created_at, eta)}</span>
               </div>
             )}
           </div>
