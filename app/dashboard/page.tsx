@@ -3,6 +3,7 @@ import { fmtCents, fmtSince, spDayStart } from '@/lib/format'
 import { getStoreUsage } from '@/lib/plan'
 import Link from 'next/link'
 import OnboardingChecklist from '@/components/dashboard/OnboardingChecklist'
+import SignupTracker from '@/components/analytics/SignupTracker'
 
 export default async function DashboardHomePage() {
   const { supabase, store } = await getCurrentStore()
@@ -42,6 +43,7 @@ export default async function DashboardHomePage() {
 
   return (
     <>
+      <SignupTracker />
       <div className="dash-header">
         <div className="dash-title">Início</div>
       </div>

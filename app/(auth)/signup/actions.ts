@@ -52,5 +52,5 @@ export async function signup(formData: FormData) {
     return { error: 'Conta criada, mas houve um erro ao criar a loja: ' + storeError.message }
   }
 
-  redirect('/dashboard/pedidos?bemvindo=1')
+  redirect('/dashboard?bemvindo=1')
 }

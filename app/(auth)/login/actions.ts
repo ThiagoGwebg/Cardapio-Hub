@@ -20,5 +20,5 @@ export async function login(formData: FormData) {
   if (isAdminEmail(email)) {
     redirect('/admin')
   }
-  redirect('/dashboard/pedidos')
+  redirect('/dashboard')
 }

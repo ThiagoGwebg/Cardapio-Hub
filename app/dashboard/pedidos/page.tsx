@@ -4,7 +4,6 @@ import { fmtCents } from '@/lib/format'
 import { getStoreUsage } from '@/lib/plan'
 import { UsageMeter, ProUpsellBanner } from '@/components/dashboard/ProUpsell'
 import OrdersList from '@/components/orders/OrdersList'
-import SignupTracker from '@/components/analytics/SignupTracker'
 
 export default async function PedidosPage() {
   const { supabase, store } = await getCurrentStore()
@@ -29,7 +28,6 @@ export default async function PedidosPage() {
 
   return (
     <>
-      <SignupTracker />
       <div className="dash-header">
         <div className="dash-title">Pedidos</div>
         <Link href="/dashboard/pedidos/novo" className="save-btn" style={{ textDecoration: 'none' }}>
