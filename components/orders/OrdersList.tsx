@@ -184,7 +184,10 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
         { event: 'UPDATE', schema: 'public', table: 'orders', filter: `store_id=eq.${storeId}` },
         () => router.refresh()
       )
-      .subscribe()
+      .subscribe((status, err) => {
+        // eslint-disable-next-line no-console
+        console.log('[realtime debug] orders channel status:', status, err)
+      })
     return () => {
       supabase.removeChannel(channel)
     }
