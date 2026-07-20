@@ -41,3 +41,11 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# service worker gerado pelo next-pwa (build) — não editar à mão
+/public/sw.js
+/public/sw.js.map
+/public/swe-worker-*.js
+/public/worker-*.js
+/public/workbox-*.js
+/public/fallback-*.js

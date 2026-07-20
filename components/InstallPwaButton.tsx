@@ -7,6 +7,14 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
+type Benefit = { icon: string; text: string }
+
+const DEFAULT_BENEFITS: Benefit[] = [
+  { icon: '⚡', text: 'Abre na hora, sem precisar buscar o site' },
+  { icon: '📋', text: 'Seus pedidos ficam salvos e fáceis de acompanhar' },
+  { icon: '💾', text: 'Leve — não ocupa espaço como um app de loja' },
+]
+
 function isIos() {
   if (typeof navigator === 'undefined') return false
   return /iphone|ipad|ipod/i.test(navigator.userAgent)
@@ -20,15 +28,37 @@ function isStandalone() {
   )
 }
 
-export default function InstallPwaButton({ storeName, appIconSrc }: { storeName: string; appIconSrc: string }) {
+export default function InstallPwaButton({
+  storeName,
+  appIconSrc,
+  scope = '/loja/',
+  title,
+  subtitle = 'Peça em segundos, direto da tela inicial',
+  benefits = DEFAULT_BENEFITS,
+}: {
+  storeName: string
+  appIconSrc: string
+  /** Escopo do service worker (cada seção do site — loja, painel — regista o próprio). */
+  scope?: string
+  title?: string
+  subtitle?: string
+  benefits?: Benefit[]
+}) {
+  const [mounted, setMounted] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  // Fica true assim que o navegador oferecer instalação nesta sessão — mesmo depois do
+  // evento já ter sido consumido (não dá pra chamar .prompt() duas vezes no mesmo evento),
+  // o botão continua disponível e cai pras instruções manuais em vez de sumir.
+  const [canInstall, setCanInstall] = useState(false)
   const [installed, setInstalled] = useState(false)
   const [cardOpen, setCardOpen] = useState(false)
   const [installing, setInstalling] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js', { scope: '/loja/' }).catch(() => {})
+      navigator.serviceWorker.register('/sw.js', { scope }).catch(() => {})
     }
 
     if (isStandalone()) {
@@ -36,9 +66,20 @@ export default function InstallPwaButton({ storeName, appIconSrc }: { storeName:
       return
     }
 
+    // Sinal extra (Chrome/Android) pra pegar o caso de já instalado mas aberto fora do
+    // modo standalone (ex.: abriu um link e caiu na aba normal do navegador).
+    const nav = navigator as Navigator & { getInstalledRelatedApps?: () => Promise<unknown[]> }
+    nav.getInstalledRelatedApps
+      ?.()
+      .then((apps) => {
+        if (apps?.length) setInstalled(true)
+      })
+      .catch(() => {})
+
     const handler = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
+      setCanInstall(true)
     }
     window.addEventListener('beforeinstallprompt', handler)
 
@@ -49,10 +90,11 @@ export default function InstallPwaButton({ storeName, appIconSrc }: { storeName:
       window.removeEventListener('beforeinstallprompt', handler)
       window.removeEventListener('appinstalled', onInstalled)
     }
-  }, [])
+  }, [scope])
 
+  if (!mounted) return null
   if (installed) return null
-  if (!deferredPrompt && !isIos()) return null
+  if (!canInstall && !isIos()) return null
 
   async function confirmInstall() {
     if (!deferredPrompt) return
@@ -60,10 +102,14 @@ export default function InstallPwaButton({ storeName, appIconSrc }: { storeName:
     await deferredPrompt.prompt()
     const { outcome } = await deferredPrompt.userChoice
     setInstalling(false)
-    if (outcome === 'accepted') setInstalled(true)
     setDeferredPrompt(null)
+    if (outcome === 'accepted') setInstalled(true)
     setCardOpen(false)
   }
+
+  const showNativeStep = !!deferredPrompt
+  const showIosSteps = isIos() && !showNativeStep
+  const showManualSteps = !isIos() && !showNativeStep
 
   return (
     <>
@@ -84,33 +130,28 @@ export default function InstallPwaButton({ storeName, appIconSrc }: { storeName:
                 <img src={appIconSrc} alt={storeName} />
               </div>
               <div>
-                <div className="pwa-card-title">{storeName}</div>
-                <div className="pwa-card-subtitle">Peça em segundos, direto da tela inicial</div>
+                <div className="pwa-card-title">{title || storeName}</div>
+                <div className="pwa-card-subtitle">{subtitle}</div>
               </div>
             </div>
 
             <div className="pwa-benefits">
-              <div className="pwa-benefit">
-                <span className="pwa-benefit-icon">⚡</span>
-                <span>Abre na hora, sem precisar buscar o site</span>
-              </div>
-              <div className="pwa-benefit">
-                <span className="pwa-benefit-icon">📋</span>
-                <span>Seus pedidos ficam salvos e fáceis de acompanhar</span>
-              </div>
-              <div className="pwa-benefit">
-                <span className="pwa-benefit-icon">💾</span>
-                <span>Leve — não ocupa espaço como um app de loja</span>
-              </div>
+              {benefits.map((b) => (
+                <div className="pwa-benefit" key={b.text}>
+                  <span className="pwa-benefit-icon">{b.icon}</span>
+                  <span>{b.text}</span>
+                </div>
+              ))}
             </div>
 
-            {isIos() && !deferredPrompt ? (
+            {showIosSteps ? (
               <>
                 <div className="pwa-ios-steps">
                   <div className="pwa-ios-step">
                     <span className="pwa-ios-step-num">1</span>
                     <span>
-                      Toque no ícone <span className="pwa-ios-glyph">⬆️</span> <b>Compartilhar</b> na barra do Safari
+                      Toque no ícone <span className="pwa-ios-glyph">⬆️</span> <b>Compartilhar</b> na barra do
+                      Safari
                     </span>
                   </div>
                   <div className="pwa-ios-step">
@@ -121,7 +162,29 @@ export default function InstallPwaButton({ storeName, appIconSrc }: { storeName:
                   </div>
                   <div className="pwa-ios-step">
                     <span className="pwa-ios-step-num">3</span>
-                    <span>Toque em <b>Adicionar</b> — pronto!</span>
+                    <span>
+                      Toque em <b>Adicionar</b> — pronto!
+                    </span>
+                  </div>
+                </div>
+                <button className="pwa-install-btn" onClick={() => setCardOpen(false)}>
+                  Entendi
+                </button>
+              </>
+            ) : showManualSteps ? (
+              <>
+                <div className="pwa-ios-steps">
+                  <div className="pwa-ios-step">
+                    <span className="pwa-ios-step-num">1</span>
+                    <span>
+                      Abra o menu <b>⋮</b> do navegador
+                    </span>
+                  </div>
+                  <div className="pwa-ios-step">
+                    <span className="pwa-ios-step-num">2</span>
+                    <span>
+                      Toque em <b>&quot;Instalar app&quot;</b> ou <b>&quot;Adicionar à tela inicial&quot;</b>
+                    </span>
                   </div>
                 </div>
                 <button className="pwa-install-btn" onClick={() => setCardOpen(false)}>

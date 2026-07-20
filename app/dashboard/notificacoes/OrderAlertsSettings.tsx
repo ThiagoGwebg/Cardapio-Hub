@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { playNewOrderBeep } from '@/lib/sound'
-import { subscribeToPush, type PushResult } from '@/lib/push'
+import { activatePush, type ActivateResult } from '@/lib/onesignal'
 
 const KEY = 'cardapio-order-alerts'
 
-export default function OrderAlertsSettings() {
+export default function OrderAlertsSettings({ storeId }: { storeId: string }) {
   const [enabled, setEnabled] = useState(false)
   const [perm, setPerm] = useState<NotificationPermission | 'unsupported'>('default')
-  const [pushStatus, setPushStatus] = useState<PushResult | null>(null)
+  const [pushStatus, setPushStatus] = useState<ActivateResult | null>(null)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
@@ -19,26 +19,15 @@ export default function OrderAlertsSettings() {
   }, [])
 
   async function activate() {
-    // Este clique é o "gesto" que libera áudio e permite pedir permissão de notificação.
-    let granted = true
-    if ('Notification' in window && Notification.permission !== 'granted') {
-      try {
-        const p = await Notification.requestPermission()
-        setPerm(p)
-        granted = p === 'granted'
-      } catch {
-        granted = false
-      }
-    }
+    // Este clique é o "gesto" que libera áudio e conta como pedido de permissão —
+    // o OneSignal cuida do prompt nativo e da tag store_id (pra receber o push certo).
+    const result = await activatePush('dashboard', { store_id: storeId, role: 'lojista' })
+    setPushStatus(result)
+    setPerm('Notification' in window ? Notification.permission : 'unsupported')
+
     localStorage.setItem(KEY, '1')
     setEnabled(true)
     window.dispatchEvent(new Event('order-alerts-changed'))
-
-    // Inscreve o aparelho pra push (funciona com o app fechado, se permitido).
-    if (granted) {
-      const r = await subscribeToPush()
-      setPushStatus(r)
-    }
 
     // Teste imediato pro lojista ver/ouvir que ativou.
     playNewOrderBeep()
@@ -47,7 +36,7 @@ export default function OrderAlertsSettings() {
     } catch {
       /* sem vibração */
     }
-    if (granted && 'Notification' in window) {
+    if (result === 'ok' && 'Notification' in window) {
       try {
         new Notification('✅ Alertas ativados', { body: 'Você será avisado quando chegar um pedido novo.' })
       } catch {
@@ -88,11 +77,13 @@ export default function OrderAlertsSettings() {
         <p style={{ fontSize: 12, marginTop: 10, color: pushStatus === 'ok' ? 'var(--green)' : 'var(--muted)' }}>
           {pushStatus === 'ok'
             ? '✅ Push ativo — você é avisado até com o app fechado.'
-            : pushStatus === 'no-key'
-              ? '⚠️ Push com app fechado ainda não configurado no servidor (faltam as chaves). Com a aba aberta, o alerta já funciona.'
+            : pushStatus === 'no-app-id'
+              ? '⚠️ Push com app fechado ainda não configurado no servidor (falta o OneSignal). Com a aba aberta, o alerta já funciona.'
               : pushStatus === 'unsupported'
                 ? 'Este navegador não suporta push com app fechado. Com a aba aberta, o alerta funciona.'
-                : 'Não deu pra ativar o push com app fechado agora. Com a aba aberta, o alerta funciona.'}
+                : pushStatus === 'denied'
+                  ? 'Notificações bloqueadas — libere nas permissões do site pra receber push com app fechado.'
+                  : 'Não deu pra ativar o push com app fechado agora. Com a aba aberta, o alerta funciona.'}
         </p>
       )}
 

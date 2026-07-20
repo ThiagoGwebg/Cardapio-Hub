@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import webpush from 'web-push'
 
 export const runtime = 'nodejs'
 
@@ -8,20 +7,21 @@ function fmt(cents?: number) {
   return 'R$ ' + ((cents || 0) / 100).toFixed(2).replace('.', ',')
 }
 
-// Chamado pelo gatilho do banco (pg_net) a cada pedido novo. Envia o push
-// pra todos os aparelhos inscritos da loja. Protegido por segredo compartilhado.
+// Chamado pelo gatilho do banco (pg_net) a cada pedido novo — mesmo contrato de sempre
+// (URL, header x-push-secret e body), só a entrega que agora é via OneSignal em vez de
+// web-push. O aparelho do lojista se marca com a tag store_id ao ativar os alertas
+// (lib/onesignal.ts), então mandamos filtrando por essa tag.
 export async function POST(req: NextRequest) {
   if (req.headers.get('x-push-secret') !== process.env.PUSH_HOOK_SECRET) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   }
 
-  const pub = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
-  const priv = process.env.VAPID_PRIVATE_KEY
-  if (!pub || !priv) {
+  const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID
+  const apiKey = process.env.ONESIGNAL_REST_API_KEY
+  if (!appId || !apiKey) {
     // Sem chaves configuradas ainda — não faz nada (degradação segura).
-    return NextResponse.json({ ok: false, reason: 'vapid-not-configured' })
+    return NextResponse.json({ ok: false, reason: 'onesignal-not-configured' })
   }
-  webpush.setVapidDetails(process.env.VAPID_SUBJECT || 'mailto:contato@cardapiohub.com.br', pub, priv)
 
   const body = await req.json().catch(() => ({} as Record<string, unknown>))
   const storeId = body.store_id as string | undefined
@@ -48,32 +48,28 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const { data: subs } = await admin
-    .from('push_subscriptions')
-    .select('endpoint, subscription')
-    .eq('store_id', storeId)
-  if (!subs?.length) return NextResponse.json({ ok: true, sent: 0 })
-
-  const payload = JSON.stringify({
-    title: '🔔 Novo pedido!',
-    body: customerName
-      ? `${customerName} • ${fmt(totalCents)}`
-      : `Você recebeu um novo pedido • ${fmt(totalCents)}`,
-    url: '/dashboard/pedidos',
+  const res = await fetch('https://api.onesignal.com/notifications', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Key ${apiKey}`,
+    },
+    body: JSON.stringify({
+      app_id: appId,
+      filters: [{ field: 'tag', key: 'store_id', relation: '=', value: storeId }],
+      headings: { en: '🔔 Novo pedido!' },
+      contents: {
+        en: customerName ? `${customerName} • ${fmt(totalCents)}` : `Você recebeu um novo pedido • ${fmt(totalCents)}`,
+      },
+      web_url: 'https://cardapioagil.vercel.app/dashboard/pedidos',
+    }),
   })
 
-  const dead: string[] = []
-  await Promise.all(
-    subs.map(async (s) => {
-      try {
-        await webpush.sendNotification(s.subscription as unknown as import('web-push').PushSubscription, payload)
-      } catch (e) {
-        const code = (e as { statusCode?: number })?.statusCode
-        if (code === 404 || code === 410) dead.push(s.endpoint)
-      }
-    })
-  )
-  if (dead.length) await admin.from('push_subscriptions').delete().in('endpoint', dead)
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '')
+    return NextResponse.json({ ok: false, error: detail }, { status: 502 })
+  }
 
-  return NextResponse.json({ ok: true, sent: subs.length - dead.length })
+  const data = await res.json().catch(() => ({}))
+  return NextResponse.json({ ok: true, recipients: data.recipients ?? 0 })
 }

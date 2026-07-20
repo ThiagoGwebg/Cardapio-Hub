@@ -6,5 +6,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  // Manifest e ícone da PWA ficam de fora: precisam responder sem sessão (o navegador
+  // busca esses arquivos por conta própria pra decidir se oferece instalar o app).
+  matcher: ['/dashboard', '/dashboard/((?!manifest\\.webmanifest|app-icon\\.svg).*)'],
 }

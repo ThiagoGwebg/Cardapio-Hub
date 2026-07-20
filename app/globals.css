@@ -2600,6 +2600,52 @@ tr:hover td {
   cursor: pointer;
 }
 
+/* ===== Banner contextual de notificações (PushNotificationPrompt) =====
+   Global de propósito: usado tanto no Admin (dentro de .dashboard) quanto na Loja/
+   rastreador de pedido (dentro de .storefront) — ambos escopos definem as mesmas
+   variáveis de tema, então o banner herda a cor certa em qualquer um dos dois. */
+.push-prompt {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 420px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 14px 14px 14px 16px;
+  animation: push-prompt-in 0.22s cubic-bezier(0.25, 0.8, 0.3, 1.1);
+}
+@keyframes push-prompt-in {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.push-prompt-icon { font-size: 22px; flex-shrink: 0; }
+.push-prompt-body { flex: 1; min-width: 0; }
+.push-prompt-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 13.5px; color: var(--text); }
+.push-prompt-sub { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.push-prompt-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.push-prompt-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 6px;
+}
+.push-prompt-close:hover { color: var(--text); }
+
+@media (max-width: 700px) {
+  .push-prompt { left: 12px; right: 12px; padding: 12px; }
+  .push-prompt-sub { display: none; }
+}
+
 /* ===== Acompanhamento: salvar link ===== */
 .track-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .track-copy-btn {

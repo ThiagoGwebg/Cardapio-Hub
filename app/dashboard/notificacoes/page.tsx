@@ -1,13 +1,16 @@
+import { getCurrentStore } from '@/lib/store'
 import OrderAlertsSettings from './OrderAlertsSettings'
 
-export default function NotificacoesPage() {
+export default async function NotificacoesPage() {
+  const { store } = await getCurrentStore()
+
   return (
     <>
       <div className="dash-header">
         <div className="dash-title">Notificações</div>
       </div>
 
-      <OrderAlertsSettings />
+      <OrderAlertsSettings storeId={store.id} />
     </>
   )
 }

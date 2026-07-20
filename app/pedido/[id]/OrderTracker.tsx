@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents, fmtOrderNumber, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL, PIX_KEY_TYPE_LABEL } from '@/lib/format'
 import { saveOrderToHistory } from '@/lib/orderHistory'
+import PushNotificationPrompt from '@/components/PushNotificationPrompt'
 import '@/app/loja/[slug]/loja.css'
 
 type OrderItem = { name: string; quantity: number; unit_price_cents: number; options: string[] }
@@ -273,6 +274,16 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
           Guarde este link pra acompanhar depois. No cardápio, toque em <b>“Meus pedidos”</b> no topo pra ver seus pedidos deste navegador.
         </p>
       </div>
+
+      {!canceled && order.status !== 'concluido' && (
+        <PushNotificationPrompt
+          scope="pedido"
+          tags={{ role: 'cliente', store_slug: order.store_slug, order_id: order.id }}
+          storageKey={order.id}
+          title="Quer saber quando seu pedido avançar?"
+          subtitle="Ative as notificações e acompanhe sem precisar ficar atualizando a página."
+        />
+      )}
     </div>
   )
 }

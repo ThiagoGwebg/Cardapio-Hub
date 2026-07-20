@@ -741,6 +741,10 @@ html[data-dash-theme="black"] .dashboard {
 .alert-status--off { background: var(--surface3); color: var(--muted); }
 .alert-status--off .alert-status-dot { background: var(--muted2); }
 
+/* Botão de instalar o painel — mesma pílula usada na loja, só que ocupando a largura
+   da barra lateral pra ficar alinhado com o toggle de tema e o botão de sair. */
+.sidebar .install-pwa-btn { width: 100%; justify-content: center; }
+
 @media (max-width: 700px) {
   .prod-row { gap: 11px; padding: 11px 13px; }
   .prod-thumb, .prod-thumb--empty { width: 48px; height: 48px; }
