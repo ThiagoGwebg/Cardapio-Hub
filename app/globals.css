@@ -2599,18 +2599,6 @@ tr:hover td {
   font-size: 13px;
   cursor: pointer;
 }
-.my-order-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--border);
-  color: var(--text);
-  text-decoration: none;
-  font-size: 14px;
-}
-.my-order-row:last-child { border-bottom: none; }
-.my-order-date { font-size: 12px; color: var(--muted); }
 
 /* ===== Acompanhamento: salvar link ===== */
 .track-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }

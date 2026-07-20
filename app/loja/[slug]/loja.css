@@ -627,6 +627,56 @@ body:has(.storefront-dark) {
   box-shadow: none !important;
 }
 
+/* Lista "Meus pedidos" */
+.my-order-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s;
+}
+.my-order-card:last-child { border-bottom: none; }
+.my-order-card:hover { background: var(--surface2); }
+
+.my-order-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.my-order-icon.is-active { background: var(--primary-l); }
+.my-order-icon.is-done { background: var(--green-l); }
+.my-order-icon.is-canceled { background: var(--red-l); }
+
+.my-order-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.my-order-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.my-order-sub { font-size: 12px; color: var(--muted); }
+
+.my-order-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+.my-order-status {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--surface2);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.my-order-status.is-active { background: var(--primary-l); color: var(--primary); }
+.my-order-status.is-done { background: var(--green-l); color: var(--green); }
+.my-order-status.is-canceled { background: var(--red-l); color: var(--red); }
+.my-order-total { font-size: 13.5px; font-weight: 800; color: var(--text); }
+
 /* Toast de feedback do carrinho (adicionar/remover item) */
 .storefront-toast {
   position: fixed;

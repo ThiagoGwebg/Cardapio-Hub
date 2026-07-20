@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { fmtCents, PIX_KEY_TYPE_LABEL, friendlyOrderError } from '@/lib/format'
+import { fmtCents, fmtOrderNumber, STATUS_LABEL, PIX_KEY_TYPE_LABEL, friendlyOrderError } from '@/lib/format'
 import { googleFontHref, DEFAULT_STORE_FONT } from '@/lib/plan'
 import { IconPin, IconUtensils, IconClose, IconSun, IconMoon } from '@/components/icons'
 import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } from '@/lib/orderHistory'
@@ -72,6 +72,18 @@ function unitOf(item: CartItem) {
   return item.base_cents + item.options.reduce((s, o) => s + o.price_delta_cents, 0)
 }
 
+type OrderSummary = { status: string; order_number: number | null; total_cents: number; item_count: number }
+
+const ORDER_STATUS_META: Record<string, { icon: string; cls: string }> = {
+  agendado: { icon: '📅', cls: 'is-pending' },
+  novo: { icon: '🧾', cls: 'is-pending' },
+  preparando: { icon: '👨‍🍳', cls: 'is-active' },
+  pronto: { icon: '📦', cls: 'is-active' },
+  a_caminho: { icon: '🛵', cls: 'is-active' },
+  concluido: { icon: '🎉', cls: 'is-done' },
+  cancelado: { icon: '✖️', cls: 'is-canceled' },
+}
+
 export default function PublicMenu({
   store,
   menu,
@@ -121,11 +133,44 @@ export default function PublicMenu({
   const [activeCategory, setActiveCategory] = useState(menu[0]?.id ?? '')
   const [myOrders, setMyOrders] = useState<OrderHistoryEntry[]>([])
   const [myOrdersOpen, setMyOrdersOpen] = useState(false)
+  const [orderSummaries, setOrderSummaries] = useState<Record<string, OrderSummary>>({})
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => setMyOrders(getOrderHistoryForStore(store.slug)))
     return () => cancelAnimationFrame(raf)
   }, [store.slug])
+
+  // Busca status/total atualizados de cada pedido pra enriquecer a lista "Meus pedidos".
+  useEffect(() => {
+    if (!myOrdersOpen || myOrders.length === 0) return
+    let cancelled = false
+    const supabase = createClient()
+    Promise.all(
+      myOrders.map((o) =>
+        supabase
+          .rpc('get_order', { p_id: o.id })
+          .then(({ data }: { data: { status: string; order_number: number | null; total_cents: number; items?: { quantity: number }[] } | null }) => ({ id: o.id, data }))
+      )
+    ).then((results) => {
+      if (cancelled) return
+      setOrderSummaries((prev) => {
+        const next = { ...prev }
+        for (const r of results) {
+          if (!r.data) continue
+          next[r.id] = {
+            status: r.data.status,
+            order_number: r.data.order_number,
+            total_cents: r.data.total_cents,
+            item_count: (r.data.items ?? []).reduce((s, it) => s + it.quantity, 0),
+          }
+        }
+        return next
+      })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [myOrdersOpen, myOrders])
 
   // Recupera o carrinho salvo localmente pra não perder o pedido ao recarregar a página.
   useEffect(() => {
@@ -434,14 +479,30 @@ export default function PublicMenu({
               <button className="cart-close" onClick={() => setMyOrdersOpen(false)}><IconClose /></button>
             </div>
             <div className="option-modal-body">
-              {myOrders.map((o) => (
-                <a key={o.id} href={`/pedido/${o.id}`} className="my-order-row">
-                  <span>Pedido #{o.id.slice(0, 8)}</span>
-                  <span className="my-order-date">
-                    {new Date(o.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </a>
-              ))}
+              {myOrders.map((o) => {
+                const summary = orderSummaries[o.id]
+                const meta = summary ? ORDER_STATUS_META[summary.status] ?? ORDER_STATUS_META.novo : null
+                return (
+                  <a key={o.id} href={`/pedido/${o.id}`} className="my-order-card">
+                    <span className={`my-order-icon ${meta?.cls ?? ''}`}>{meta?.icon ?? '🧾'}</span>
+                    <span className="my-order-main">
+                      <span className="my-order-title">
+                        Pedido {summary ? fmtOrderNumber(summary.order_number, o.id) : `#${o.id.slice(0, 8)}`}
+                      </span>
+                      <span className="my-order-sub">
+                        {new Date(o.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                        {summary ? ` · ${summary.item_count} ${summary.item_count === 1 ? 'item' : 'itens'}` : ''}
+                      </span>
+                    </span>
+                    <span className="my-order-right">
+                      <span className={`my-order-status ${meta?.cls ?? ''}`}>
+                        {summary ? STATUS_LABEL[summary.status] ?? summary.status : 'Carregando…'}
+                      </span>
+                      {summary && <span className="my-order-total">{fmtCents(summary.total_cents)}</span>}
+                    </span>
+                  </a>
+                )
+              })}
             </div>
           </div>
         </div>
