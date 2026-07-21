@@ -2743,7 +2743,14 @@ body:has(.storefront) { background: #FFF8F3; }
 /* ── Topbar / cabeçalho ── */
 .storefront .storefront-topbar {
   background: rgba(255, 248, 243, 0.9);
-  backdrop-filter: blur(8px);
+}
+/* A blurred, translucent sticky bar re-rasterizes the backdrop on every scroll
+   frame, which freezes scroll/touch on Android and older iPhones. Keep the
+   frosted look only on larger screens, where it's cheap. */
+@media (min-width: 900px) {
+  .storefront .storefront-topbar {
+    backdrop-filter: blur(8px);
+  }
 }
 
 .storefront .storefront-name {

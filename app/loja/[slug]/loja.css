@@ -211,10 +211,15 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /* Fechado, a folha fica fora da tela; sem isto, se o transform não a
+     esconder (ex.: engine sem suporte), ela rouba os toques no rodapé do
+     cardápio — o menu fica "sem responder ao toque" no terço inferior. */
+  pointer-events: none;
 }
 .storefront .cart-drawer.open {
   transform: translateY(0);
   right: 0;
+  pointer-events: auto;
 }
 
 /* Puxador (arrasta pra fechar — visual) */

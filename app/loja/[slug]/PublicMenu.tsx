@@ -594,7 +594,7 @@ export default function PublicMenu({
                       <div className="product-img">
                         {p.image_url ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={p.image_url} alt={p.name} />
+                          <img src={p.image_url} alt={p.name} loading="lazy" decoding="async" />
                         ) : (
                           <span className="p-emoji" style={{ color: 'var(--muted)' }}>
                             <IconUtensils size={36} />
@@ -888,7 +888,7 @@ export default function PublicMenu({
                           <label className="option-row" key={o.id}>
                             {o.image_url && (
                               // eslint-disable-next-line @next/next/no-img-element
-                              <img className="option-row-thumb" src={o.image_url} alt={o.name} />
+                              <img className="option-row-thumb" src={o.image_url} alt={o.name} loading="lazy" decoding="async" />
                             )}
                             <span className="option-row-main">
                               <span className="option-row-name">{o.name}</span>
