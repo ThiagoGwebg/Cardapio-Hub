@@ -13,6 +13,7 @@ export default function InstallAppButton() {
   const [installed, setInstalled] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
   const [showIosHelp, setShowIosHelp] = useState(false)
+  const [installing, setInstalling] = useState(false)
 
   useEffect(() => {
     // Registra o service worker no escopo /admin — requisito do Chrome pra oferecer a instalação
@@ -56,13 +57,15 @@ export default function InstallAppButton() {
 
   async function handleClick() {
     if (deferred) {
-      await deferred.prompt()
+      setInstalling(true)
       try {
+        await deferred.prompt()
         const choice = await deferred.userChoice
         if (choice.outcome === 'accepted') setInstalled(true)
       } catch {
         /* ignore */
       }
+      setInstalling(false)
       setDeferred(null)
     } else {
       // iOS/Safari não tem instalação programática — mostra o passo a passo.
@@ -72,13 +75,17 @@ export default function InstallAppButton() {
 
   return (
     <>
-      <button className="adm-install" onClick={handleClick} title="Instalar o painel como app">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="7 10 12 15 17 10" />
-          <line x1="12" y1="15" x2="12" y2="3" />
-        </svg>
-        <span>Instalar app</span>
+      <button className="adm-install" onClick={handleClick} disabled={installing} title="Instalar o painel como app">
+        {installing ? (
+          <span className="btn-spinner" aria-hidden />
+        ) : (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        )}
+        <span>{installing ? 'Abrindo…' : 'Instalar app'}</span>
       </button>
 
       {showIosHelp && (

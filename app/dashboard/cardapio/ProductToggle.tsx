@@ -1,10 +1,18 @@
 'use client'
 
 import { useTransition } from 'react'
+import { toast } from 'sonner'
 import { toggleProduct } from './actions'
 
 export default function ProductToggle({ productId, isActive }: { productId: string; isActive: boolean }) {
   const [pending, startTransition] = useTransition()
+
+  function handleChange(checked: boolean) {
+    startTransition(async () => {
+      await toggleProduct(productId, checked)
+      toast.success(checked ? 'Produto disponível novamente.' : 'Produto marcado como esgotado.')
+    })
+  }
 
   return (
     <div className="ci-toggle-wrap">
@@ -16,7 +24,7 @@ export default function ProductToggle({ productId, isActive }: { productId: stri
           type="checkbox"
           checked={isActive}
           disabled={pending}
-          onChange={(e) => startTransition(() => toggleProduct(productId, e.target.checked))}
+          onChange={(e) => handleChange(e.target.checked)}
         />
         <span className="toggle-slider"></span>
       </label>

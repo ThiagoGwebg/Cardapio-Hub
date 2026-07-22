@@ -55,7 +55,14 @@ export default function SignupPage() {
         {state.message && <p style={{ color: 'var(--green)', fontSize: 12 }}>{state.message}</p>}
 
         <button className="save-btn" type="submit" disabled={pending}>
-          {pending ? 'Criando...' : 'Criar loja'}
+          {pending ? (
+            <>
+              <span className="btn-spinner" aria-hidden />
+              Criando…
+            </>
+          ) : (
+            'Criar loja'
+          )}
         </button>
 
         <p style={{ fontSize: 12, color: 'var(--muted)', textAlign: 'center' }}>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { fmtCents } from '@/lib/format'
 import { IconUtensils } from '@/components/icons'
@@ -168,7 +169,12 @@ export default function ManualOrderForm({ menu, disabled = false }: { menu: Cate
       })),
     })
     setSubmitting(false)
-    if (err) return setError(err)
+    if (err) {
+      setError(err)
+      toast.error(err)
+      return
+    }
+    toast.success('Pedido registrado com sucesso!')
     router.push('/dashboard/pedidos')
   }
 
@@ -395,7 +401,14 @@ export default function ManualOrderForm({ menu, disabled = false }: { menu: Cate
         {error && <div className="mo-error">{error}</div>}
 
         <button type="button" className="save-btn mo-submit" disabled={submitting || disabled || cart.length === 0} onClick={submit}>
-          {submitting ? 'Registrando…' : `Registrar pedido${subtotal > 0 ? ` — ${fmtCents(subtotal)}` : ''}`}
+          {submitting ? (
+            <>
+              <span className="btn-spinner" aria-hidden />
+              Registrando…
+            </>
+          ) : (
+            `Registrar pedido${subtotal > 0 ? ` — ${fmtCents(subtotal)}` : ''}`
+          )}
         </button>
       </div>
     </div>

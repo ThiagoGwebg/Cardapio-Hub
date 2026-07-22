@@ -19,7 +19,10 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Config Turbopack explícita (mesmo vazia) para o Next 16 não tratar o
+  // `webpack` injetado pelo next-pwa como erro fatal ao rodar `next dev`.
+  // Em dev o PWA está desligado, então não há nada de Workbox a migrar.
+  turbopack: {},
 };
 
 export default withPWA(nextConfig);

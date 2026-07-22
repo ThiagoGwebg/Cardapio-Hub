@@ -3781,3 +3781,53 @@ body:has(.storefront) {
   object-fit: cover;
   display: block;
 }
+
+/* ============================================================
+   Micro-interações de botões — feedback tátil, estados de
+   desabilitado e spinner de loading reutilizável.
+   Aplicado às classes de botão usadas nos componentes de ação.
+   ============================================================ */
+
+/* Base tátil para TODOS os botões clicáveis do sistema. Garante uma
+   transição suave e o efeito de clique mesmo em botões sem classe própria.
+   Botões com transição já definida na sua classe mantêm a sua (esta é só o piso). */
+button {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']) {
+  cursor: pointer;
+}
+
+/* Efeito de clique (press) — sensação de "resposta ao toque". */
+button:not(:disabled):active,
+[role='button']:not([aria-disabled='true']):active {
+  transform: scale(0.97);
+}
+
+/* Estado desabilitado consistente (inclui durante o loading). */
+button:disabled,
+[role='button'][aria-disabled='true'] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+button:disabled:hover,
+[role='button'][aria-disabled='true']:hover {
+  transform: none;
+}
+
+/* Spinner reutilizável para conteúdo de botão em loading. */
+.btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+  margin-right: 7px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: btnSpin 0.7s linear infinite;
+}
+@keyframes btnSpin { to { transform: rotate(360deg); } }

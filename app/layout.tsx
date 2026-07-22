@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
+import { Toaster } from 'sonner'
 import './globals.css'
 import Analytics from '@/components/analytics/Analytics'
 
@@ -44,6 +45,7 @@ export default function RootLayout({
       <body>
         <Analytics />
         {children}
+        <Toaster position="top-center" richColors closeButton />
       </body>
     </html>
   )

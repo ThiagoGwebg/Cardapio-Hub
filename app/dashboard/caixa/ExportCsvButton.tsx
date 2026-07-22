@@ -1,5 +1,7 @@
 'use client'
 
+import { toast } from 'sonner'
+
 type Row = Record<string, string | number>
 
 /** Gera e baixa um CSV no navegador a partir das linhas já carregadas na página. */
@@ -20,6 +22,7 @@ export default function ExportCsvButton({ rows, filename }: { rows: Row[]; filen
     a.download = filename
     a.click()
     URL.revokeObjectURL(url)
+    toast.success(`CSV exportado (${rows.length} ${rows.length === 1 ? 'linha' : 'linhas'}).`)
   }
 
   return (

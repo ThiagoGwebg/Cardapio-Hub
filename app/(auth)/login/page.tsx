@@ -43,7 +43,14 @@ export default function LoginPage() {
         {state.error && <p style={{ color: 'var(--red)', fontSize: 12 }}>{state.error}</p>}
 
         <button className="save-btn" type="submit" disabled={pending}>
-          {pending ? 'Entrando...' : 'Entrar'}
+          {pending ? (
+            <>
+              <span className="btn-spinner" aria-hidden />
+              Entrando…
+            </>
+          ) : (
+            'Entrar'
+          )}
         </button>
 
         <p style={{ fontSize: 12, color: 'var(--muted)', textAlign: 'center' }}>
