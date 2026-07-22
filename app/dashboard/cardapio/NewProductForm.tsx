@@ -74,7 +74,14 @@ export default function NewProductForm({
         />
         <div className="prod-form-actions">
           <button className="save-btn" type="submit" disabled={pending}>
-            {pending ? 'Salvando…' : 'Adicionar produto'}
+            {pending ? (
+              <>
+                <span className="btn-spinner" aria-hidden />
+                Salvando…
+              </>
+            ) : (
+              'Adicionar produto'
+            )}
           </button>
           <button type="button" className="prod-form-cancel" onClick={() => setOpen(false)} disabled={pending}>
             Cancelar

@@ -106,7 +106,7 @@ export default function LandingCourierForm() {
         </label>
 
         <button className="l-lead-submit" type="submit" disabled={pending}>
-          {pending ? 'Enviando...' : <>CADASTRAR PERFIL <span aria-hidden="true">→</span></>}
+          {pending ? <><span className="btn-spinner" aria-hidden />Enviando…</> : <>CADASTRAR PERFIL <span aria-hidden="true">→</span></>}
         </button>
       </form>
     </div>

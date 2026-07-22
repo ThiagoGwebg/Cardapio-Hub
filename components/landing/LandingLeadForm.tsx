@@ -102,7 +102,7 @@ export default function LandingLeadForm() {
         </label>
 
         <button className="l-lead-submit" type="submit" disabled={pending}>
-          {pending ? 'Enviando...' : <>TESTE AGORA <span aria-hidden="true">→</span></>}
+          {pending ? <><span className="btn-spinner" aria-hidden />Enviando…</> : <>TESTE AGORA <span aria-hidden="true">→</span></>}
         </button>
       </form>
     </div>

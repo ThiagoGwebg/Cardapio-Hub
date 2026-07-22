@@ -13,6 +13,7 @@ import OptionEditor from '../OptionEditor'
 import GroupPresetFields from '../GroupPresetFields'
 import ProductImagesField from '@/components/ProductImagesField'
 import DeleteProductButton from '../DeleteProductButton'
+import SubmitButton from '@/components/ui/SubmitButton'
 
 export default async function ProductEditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -76,7 +77,7 @@ export default async function ProductEditPage({ params }: { params: Promise<{ id
             hint="A 1ª foto é a capa. Toque em ★ capa numa foto pra promovê-la. Até 5 MB cada."
             max={6}
           />
-          <button className="save-btn" type="submit" style={{ alignSelf: 'flex-start' }}>Salvar alterações</button>
+          <SubmitButton className="save-btn" style={{ alignSelf: 'flex-start' }}>Salvar alterações</SubmitButton>
         </form>
       </div>
 
@@ -98,7 +99,7 @@ export default async function ProductEditPage({ params }: { params: Promise<{ id
                 </span>
               </span>
               <form action={deleteOptionGroup.bind(null, product.id, g.id)}>
-                <button className="ordertype-btn" style={{ flex: 'none', padding: '6px 12px' }} type="submit">Excluir grupo</button>
+                <SubmitButton className="ordertype-btn" style={{ flex: 'none', padding: '6px 12px' }} pendingLabel="Excluindo…">Excluir grupo</SubmitButton>
               </form>
             </div>
 
@@ -126,7 +127,7 @@ export default async function ProductEditPage({ params }: { params: Promise<{ id
                 required
               />
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                <button className="save-btn" type="submit" style={{ marginBottom: 0 }}>Adicionar opções</button>
+                <SubmitButton className="save-btn" style={{ marginBottom: 0 }} pendingLabel="Adicionando…">Adicionar opções</SubmitButton>
                 <span style={{ fontSize: 11.5, color: 'var(--muted)' }}>
                   Cole a lista inteira de uma vez. Sem valor = sem acréscimo.
                 </span>
@@ -144,7 +145,7 @@ export default async function ProductEditPage({ params }: { params: Promise<{ id
             <input className="form-input" name="name" placeholder="Ex.: Escolha os Salgadinhos, Tamanho, Adicionais" required />
           </div>
           <GroupPresetFields />
-          <button className="save-btn" type="submit" style={{ alignSelf: 'flex-start' }}>Criar grupo</button>
+          <SubmitButton className="save-btn" style={{ alignSelf: 'flex-start' }} pendingLabel="Criando…">Criar grupo</SubmitButton>
         </form>
       </div>
 

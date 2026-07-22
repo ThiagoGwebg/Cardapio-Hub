@@ -7,6 +7,7 @@ import PixKeyField from '@/components/PixKeyField'
 import ImageUploadField from '@/components/ImageUploadField'
 import ProCustomizationPanel from './ProCustomizationPanel'
 import { ProLockedSection } from '@/components/dashboard/ProUpsell'
+import SubmitButton from '@/components/ui/SubmitButton'
 
 export default async function LojaPage({ searchParams }: { searchParams: Promise<{ mp?: string }> }) {
   const { supabase, store } = await getCurrentStore()
@@ -87,7 +88,7 @@ export default async function LojaPage({ searchParams }: { searchParams: Promise
               Para o pagamento online funcionar, o checkout da loja precisa estar no modo <b>“pelo sistema”</b> (não WhatsApp).
             </p>
           )}
-          <button type="submit" className="save-btn" style={{ marginTop: 12 }}>Salvar pagamento online</button>
+          <SubmitButton className="save-btn" style={{ marginTop: 12 }}>Salvar pagamento online</SubmitButton>
         </form>
       </div>
 
@@ -211,7 +212,7 @@ export default async function LojaPage({ searchParams }: { searchParams: Promise
           </div>
         </div>
 
-        <button className="save-btn" type="submit">Salvar alterações</button>
+        <SubmitButton className="save-btn">Salvar alterações</SubmitButton>
       </form>
 
       <div className="settings-card" style={{ marginTop: 20 }}>
@@ -228,7 +229,7 @@ export default async function LojaPage({ searchParams }: { searchParams: Promise
               </div>
             </div>
             <form action={deleteZone.bind(null, z.id)}>
-              <button className="ordertype-btn" style={{ flex: 'none', padding: '6px 12px' }} type="submit">Remover</button>
+              <SubmitButton className="ordertype-btn" style={{ flex: 'none', padding: '6px 12px' }} pendingLabel="Removendo…">Remover</SubmitButton>
             </form>
           </div>
         ))}
@@ -245,7 +246,7 @@ export default async function LojaPage({ searchParams }: { searchParams: Promise
             <label className="form-label">Mín. (R$)</label>
             <input className="form-input" name="zoneMin" type="number" step="0.01" min="0" defaultValue="0" />
           </div>
-          <button className="save-btn" type="submit" style={{ marginBottom: 0 }}>Adicionar</button>
+          <SubmitButton className="save-btn" style={{ marginBottom: 0 }} pendingLabel="Adicionando…">Adicionar</SubmitButton>
         </form>
       </div>
     </>

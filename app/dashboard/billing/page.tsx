@@ -4,6 +4,7 @@ import { getStoreUsage } from '@/lib/plan'
 import { LITE_PRICE_LABEL } from '@/lib/stripe/plans'
 import { UsageMeter } from '@/components/dashboard/ProUpsell'
 import { openBillingPortal } from './actions'
+import SubmitButton from '@/components/ui/SubmitButton'
 
 const ERROR_MESSAGES: Record<string, string> = {
   stripe_not_configured: 'Cobrança ainda não configurada (faltam as chaves do Stripe).',
@@ -85,7 +86,7 @@ export default async function BillingPage({
 
         {isPro ? (
           <form action={openBillingPortal}>
-            <button className="save-btn" type="submit">Gerenciar assinatura</button>
+            <SubmitButton className="save-btn" pendingLabel="Abrindo…">Gerenciar assinatura</SubmitButton>
           </form>
         ) : (
           <Link href="/contato" className="save-btn" style={{ marginTop: 12, display: 'inline-block' }}>

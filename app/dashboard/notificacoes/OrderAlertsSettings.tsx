@@ -11,6 +11,7 @@ export default function OrderAlertsSettings({ storeId }: { storeId: string }) {
   const [perm, setPerm] = useState<NotificationPermission | 'unsupported'>('default')
   const [pushStatus, setPushStatus] = useState<ActivateResult | null>(null)
   const [ready, setReady] = useState(false)
+  const [activating, setActivating] = useState(false)
 
   useEffect(() => {
     setEnabled(localStorage.getItem(KEY) === '1')
@@ -19,6 +20,8 @@ export default function OrderAlertsSettings({ storeId }: { storeId: string }) {
   }, [])
 
   async function activate() {
+    if (activating) return
+    setActivating(true)
     // Este clique é o "gesto" que libera áudio e conta como pedido de permissão —
     // o OneSignal cuida do prompt nativo e da tag store_id (pra receber o push certo).
     const result = await activatePush('dashboard', { store_id: storeId, role: 'lojista' })
@@ -43,6 +46,7 @@ export default function OrderAlertsSettings({ storeId }: { storeId: string }) {
         /* ignore */
       }
     }
+    setActivating(false)
   }
 
   function deactivate() {
@@ -89,8 +93,15 @@ export default function OrderAlertsSettings({ storeId }: { storeId: string }) {
 
       <div style={{ display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap' }}>
         {!enabled ? (
-          <button className="save-btn" onClick={activate} style={{ marginBottom: 0 }}>
-            🔔 Ativar alertas
+          <button className="save-btn" onClick={activate} disabled={activating} style={{ marginBottom: 0 }}>
+            {activating ? (
+              <>
+                <span className="btn-spinner" aria-hidden />
+                Ativando…
+              </>
+            ) : (
+              '🔔 Ativar alertas'
+            )}
           </button>
         ) : (
           <>
