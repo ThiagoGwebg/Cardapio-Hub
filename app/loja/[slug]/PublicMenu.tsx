@@ -4,7 +4,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents, fmtOrderNumber, STATUS_LABEL, PIX_KEY_TYPE_LABEL, friendlyOrderError } from '@/lib/format'
-import { googleFontHref, DEFAULT_STORE_FONT } from '@/lib/plan'
+import { googleFontHref } from '@/lib/plan'
+import { buildStorefrontVars, sanitizeMenuLayout, type StoreTheme } from '@/lib/storeTheme'
 import { IconPin, IconUtensils, IconClose, IconSun, IconMoon } from '@/components/icons'
 import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } from '@/lib/orderHistory'
 import { loadCart, saveCart, clearCart } from '@/lib/cartStorage'
@@ -40,7 +41,7 @@ type Store = {
   address: string | null
   min_order_cents: number
   is_open: boolean
-  theme: { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font?: string; announcement?: string } | null
+  theme: StoreTheme | null
   delivery_enabled: boolean
   pickup_enabled: boolean
   dine_in_enabled: boolean
@@ -52,6 +53,9 @@ type Store = {
   accepts_pix: boolean
   pix_key: string | null
   pix_key_type: string | null
+  checkout_mode?: string
+  online_payment_enabled?: boolean
+  mp_connected?: boolean
 }
 
 type SelectedOption = { option_id: string; name: string; price_delta_cents: number }
@@ -72,7 +76,7 @@ function unitOf(item: CartItem) {
   return item.base_cents + item.options.reduce((s, o) => s + o.price_delta_cents, 0)
 }
 
-type OrderSummary = { status: string; order_number: number | null; total_cents: number; item_count: number }
+type OrderSummary = { status: string; payment_status?: string | null; order_number: number | null; total_cents: number; item_count: number }
 
 const ORDER_STATUS_META: Record<string, { icon: string; cls: string }> = {
   agendado: { icon: '📅', cls: 'is-pending' },
@@ -149,7 +153,7 @@ export default function PublicMenu({
       myOrders.map((o) =>
         supabase
           .rpc('get_order', { p_id: o.id })
-          .then(({ data }: { data: { status: string; order_number: number | null; total_cents: number; items?: { quantity: number }[] } | null }) => ({ id: o.id, data }))
+          .then(({ data }: { data: { status: string; payment_status?: string | null; order_number: number | null; total_cents: number; items?: { quantity: number }[] } | null }) => ({ id: o.id, data }))
       )
     ).then((results) => {
       if (cancelled) return
@@ -159,6 +163,7 @@ export default function PublicMenu({
           if (!r.data) continue
           next[r.id] = {
             status: r.data.status,
+            payment_status: r.data.payment_status,
             order_number: r.data.order_number,
             total_cents: r.data.total_cents,
             item_count: (r.data.items ?? []).reduce((s, it) => s + it.quantity, 0),
@@ -249,21 +254,29 @@ export default function PublicMenu({
   }
   const [coupon, setCoupon] = useState('')
 
+  // Pix pago dentro do app (Mercado Pago): a loja está no modo sistema, com pagamento
+  // online ligado e conta conectada. Nesse caso o Pix vira online (QR na tela do pedido).
+  const onlinePix =
+    store.checkout_mode === 'system' && !!store.online_payment_enabled && !!store.mp_connected
+
   const payments = useMemo(() => {
     const p: Payment[] = []
-    if (store.accepts_pix) p.push('pix')
+    if (store.accepts_pix || onlinePix) p.push('pix')
     if (store.accepts_cash) p.push('cash')
     if (store.accepts_card) p.push('card')
     return p
-  }, [store])
+  }, [store, onlinePix])
   const [payment, setPayment] = useState<Payment | ''>('')
   const [changeFor, setChangeFor] = useState('')
   const [pixCopied, setPixCopied] = useState(false)
 
-  const theme = store.theme ?? {}
-  const storeFont = theme.font && theme.font !== DEFAULT_STORE_FONT ? theme.font : ''
-  const styleVars = { '--primary': theme.primaryColor || undefined } as React.CSSProperties
-  if (storeFont) (styleVars as Record<string, string>)['--store-font'] = `"${storeFont}"`
+  const theme: StoreTheme = store.theme ?? {}
+  // Fonte Google Fonts a carregar (vazio = fonte padrão do sistema, sem <link>).
+  const storeFont = theme.font && theme.font !== 'Nunito' ? theme.font : ''
+  // Paleta avançada + fonte viram CSS custom properties na raiz do storefront.
+  const styleVars = buildStorefrontVars(theme)
+  // Layout escolhido no painel Pro (default = 'list', igual ao visual atual).
+  const menuLayout = sanitizeMenuLayout(theme.menuLayout)
 
   const filteredMenu = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -451,7 +464,7 @@ export default function PublicMenu({
   const minToReach = store.min_order_cents - subtotal
 
   return (
-    <div className={`storefront storefront-${themeMode}`} style={styleVars}>
+    <div className={`storefront storefront-${themeMode} menu-layout-${menuLayout}`} style={styleVars}>
       {/* manifest, theme-color e apple-touch-icon agora vêm do layout.tsx (head real, com as tags de iOS). */}
       {storeFont && <link rel="stylesheet" href={googleFontHref(storeFont)} />}
 
@@ -481,10 +494,17 @@ export default function PublicMenu({
             <div className="option-modal-body">
               {myOrders.map((o) => {
                 const summary = orderSummaries[o.id]
+                const isAwaitingPayment = summary?.payment_status === 'pending'
                 const meta = summary ? ORDER_STATUS_META[summary.status] ?? ORDER_STATUS_META.novo : null
+                const icon = isAwaitingPayment ? '⏳' : meta?.icon ?? '🧾'
+                const statusLabel = isAwaitingPayment
+                  ? 'Aguardando pagamento'
+                  : summary
+                    ? STATUS_LABEL[summary.status] ?? summary.status
+                    : 'Carregando…'
                 return (
                   <a key={o.id} href={`/pedido/${o.id}`} className="my-order-card">
-                    <span className={`my-order-icon ${meta?.cls ?? ''}`}>{meta?.icon ?? '🧾'}</span>
+                    <span className={`my-order-icon ${isAwaitingPayment ? 'is-pending' : meta?.cls ?? ''}`}>{icon}</span>
                     <span className="my-order-main">
                       <span className="my-order-title">
                         Pedido {summary ? fmtOrderNumber(summary.order_number, o.id) : `#${o.id.slice(0, 8)}`}
@@ -495,8 +515,8 @@ export default function PublicMenu({
                       </span>
                     </span>
                     <span className="my-order-right">
-                      <span className={`my-order-status ${meta?.cls ?? ''}`}>
-                        {summary ? STATUS_LABEL[summary.status] ?? summary.status : 'Carregando…'}
+                      <span className={`my-order-status ${isAwaitingPayment ? 'is-pending' : meta?.cls ?? ''}`}>
+                        {statusLabel}
                       </span>
                       {summary && <span className="my-order-total">{fmtCents(summary.total_cents)}</span>}
                     </span>
@@ -774,7 +794,16 @@ export default function PublicMenu({
                     <input className="form-input" type="number" step="0.01" placeholder="Troco para quanto? (opcional)" value={changeFor} onChange={(e) => setChangeFor(e.target.value)} />
                   </div>
                 )}
-                {payment === 'pix' && store.pix_key && (
+                {payment === 'pix' && onlinePix && (
+                  <div className="pix-key-box">
+                    <span className="pix-key-label">Pagamento via Pix pelo app</span>
+                    <p className="pix-key-hint">
+                      Ao finalizar, o QR Code do Pix aparece na próxima tela. O pedido só é enviado
+                      para a loja depois que o pagamento é confirmado automaticamente.
+                    </p>
+                  </div>
+                )}
+                {payment === 'pix' && !onlinePix && store.pix_key && (
                   <div className="pix-key-box">
                     <span className="pix-key-label">
                       Chave Pix da loja{store.pix_key_type ? ` (${PIX_KEY_TYPE_LABEL[store.pix_key_type]})` : ''}

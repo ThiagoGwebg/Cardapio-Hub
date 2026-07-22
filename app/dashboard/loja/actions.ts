@@ -3,9 +3,15 @@
 import { getCurrentStore } from '@/lib/store'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { isStorePro, DEFAULT_STORE_FONT } from '@/lib/plan'
+import {
+  type StoreTheme,
+  sanitizeHexColor,
+  sanitizeMenuLayout,
+  DEFAULT_PRIMARY_COLOR,
+  DEFAULT_SECONDARY_COLOR,
+  DEFAULT_ACCENT_COLOR,
+} from '@/lib/storeTheme'
 import { revalidatePath } from 'next/cache'
-
-type Theme = { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font?: string; announcement?: string }
 
 /**
  * Remove do Storage o arquivo antigo quando a imagem é trocada/removida,
@@ -34,19 +40,36 @@ export async function updateStore(formData: FormData) {
   const is_open = formData.get('isOpen') === 'on'
   const min_order = Number(formData.get('minOrder') || 0)
 
-  // Logo e banner: liberados em todos os planos.
-  // Cor e fonte: só no Pro — no Free preservamos os valores atuais (gate no servidor).
-  const current = (store.theme ?? {}) as Theme
+  // Regra de planos para os metadados visuais salvos no JSONB `stores.theme`:
+  //  • Logo e banner: liberados em TODOS os planos.
+  //  • Personalização avançada (cores primária/secundária/accent, fonte, layout do
+  //    cardápio e aviso promocional): EXCLUSIVA do Pro. No Free preservamos os valores
+  //    atuais — o gate acontece aqui no servidor, nunca confiamos só na UI.
+  const current = (store.theme ?? {}) as StoreTheme
   const pro = await isStorePro(supabase, store.id)
 
-  const theme: Theme = {
+  const theme: StoreTheme = {
     logoUrl: String(formData.get('logoUrl') || ''),
     bannerUrl: String(formData.get('bannerUrl') || ''),
+
+    // Cores: só no Pro. Todo hex passa por sanitização (#rgb/#rrggbb) antes de salvar,
+    // caindo no padrão se vier algo inválido. No Free, mantém o que já estava.
     primaryColor: pro
-      ? String(formData.get('primaryColor') || current.primaryColor || '#FF5722')
-      : current.primaryColor || '#FF5722',
+      ? sanitizeHexColor(String(formData.get('primaryColor') || ''), current.primaryColor || DEFAULT_PRIMARY_COLOR)
+      : current.primaryColor || DEFAULT_PRIMARY_COLOR,
+    secondaryColor: pro
+      ? sanitizeHexColor(String(formData.get('secondaryColor') || ''), current.secondaryColor || DEFAULT_SECONDARY_COLOR)
+      : current.secondaryColor,
+    accentColor: pro
+      ? sanitizeHexColor(String(formData.get('accentColor') || ''), current.accentColor || DEFAULT_ACCENT_COLOR)
+      : current.accentColor,
+
     // Fonte: só no Pro. No Free preserva o valor atual (undefined = fonte padrão).
     font: pro ? String(formData.get('font') || current.font || DEFAULT_STORE_FONT) : current.font,
+
+    // Layout do cardápio (grid/list): só no Pro. Valor desconhecido cai no default.
+    menuLayout: pro ? sanitizeMenuLayout(String(formData.get('menuLayout') || '')) : current.menuLayout,
+
     // Aviso promocional: só no Pro (string vazia oculta o aviso).
     announcement: pro
       ? String(formData.get('announcement') || '').trim().slice(0, 120) || undefined
@@ -80,6 +103,18 @@ export async function updateStore(formData: FormData) {
     })
     .eq('id', store.id)
 
+  revalidatePath('/dashboard/loja')
+  revalidatePath(`/loja/${store.slug}`)
+}
+
+// Ação dedicada só pro pagamento online — separada do updateStore pra que conectar o Mercado Pago
+// (que navega pra fora do form) não faça o lojista perder as outras edições não salvas.
+export async function updateOnlinePayment(formData: FormData) {
+  const { supabase, store } = await getCurrentStore()
+  await supabase
+    .from('stores')
+    .update({ online_payment_enabled: formData.get('onlinePaymentEnabled') === 'on' })
+    .eq('id', store.id)
   revalidatePath('/dashboard/loja')
   revalidatePath(`/loja/${store.slug}`)
 }

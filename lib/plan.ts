@@ -41,6 +41,8 @@ export async function getStoreUsage(supabase: SupabaseClient, storeId: string): 
       .select('id', { count: 'exact', head: true })
       .eq('store_id', storeId)
       .neq('status', 'cancelado')
+      // Só conta vendas reais: pedidos aguardando/sem pagamento confirmado não entram no limite.
+      .in('payment_status', ['not_required', 'paid'])
       .gte('created_at', monthStart.toISOString()),
   ])
 

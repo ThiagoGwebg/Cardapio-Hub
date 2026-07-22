@@ -720,3 +720,69 @@ body:has(.storefront-dark) {
   from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+
+/* ══════════════════════════════════════════
+   PERSONALIZAÇÃO AVANÇADA (PRO)
+   Layout do cardápio + paleta secundária/accent.
+   O layout padrão é "list" (sem override) para que lojas
+   antigas mantenham exatamente a aparência atual.
+══════════════════════════════════════════ */
+
+/* ── Layout GRADE: cartões verticais compactos, foto no topo ── */
+.storefront.menu-layout-grid .products-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (min-width: 760px) {
+  .storefront.menu-layout-grid .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.storefront.menu-layout-grid .product-card {
+  flex-direction: column;
+  height: auto;
+}
+.storefront.menu-layout-grid .product-img {
+  width: 100%;
+  height: 160px;
+  order: 0;
+  border-left: none;
+  border-bottom: 1px solid var(--border2);
+  margin: 0;
+  border-radius: 0;
+}
+.storefront.menu-layout-grid .product-info {
+  padding: 14px;
+}
+
+/* ── Layout LISTA: garante 1 cartão largo por linha ── */
+@media (min-width: 601px) {
+  .storefront.menu-layout-list .products-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Paleta: cor de destaque (accent) no aviso promocional ── */
+.storefront .storefront-announce {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--accent-rgb, 245, 158, 11), 0.16),
+    rgba(var(--accent-rgb, 245, 158, 11), 0.05)
+  );
+  border-color: rgba(var(--accent-rgb, 245, 158, 11), 0.4);
+}
+
+/* ── Paleta: cor secundária em realces sutis ── */
+.storefront .section-label::after {
+  background: linear-gradient(
+    90deg,
+    rgba(var(--secondary-rgb, 14, 165, 233), 0.55),
+    transparent
+  );
+}
+.storefront .menu-nav-item.active {
+  box-shadow: 0 4px 10px rgba(var(--primary-rgb, 255, 87, 34), 0.28);
+}
+.storefront .storefront-status.is-open .storefront-status-dot {
+  box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 14, 165, 233), 0.18);
+}

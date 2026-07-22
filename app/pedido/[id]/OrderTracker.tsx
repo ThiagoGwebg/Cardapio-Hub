@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents, fmtOrderNumber, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL, PIX_KEY_TYPE_LABEL } from '@/lib/format'
 import { saveOrderToHistory } from '@/lib/orderHistory'
@@ -20,6 +20,15 @@ type Order = {
   discount_cents: number
   total_cents: number
   payment_method: string | null
+  payment_status?: string | null
+  payment?: {
+    method: string | null
+    status: string | null
+    qr_code: string | null
+    qr_code_base64: string | null
+    ticket_url: string | null
+    expires_at: string | null
+  } | null
   store_name: string
   store_slug: string
   estimated_prep_min: number
@@ -74,6 +83,9 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
   const [copied, setCopied] = useState(false)
   const [pixCopied, setPixCopied] = useState(false)
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light')
+  const [payError, setPayError] = useState(false)
+  // Relógio só pra detectar a expiração do Pix sem chamar Date.now() no render (pureza do React).
+  const [now, setNow] = useState(0)
 
   useEffect(() => {
     if (order?.store_slug) {
@@ -109,11 +121,46 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
     })
   }
 
+  // Enquanto aguarda pagamento, atualiza mais rápido pra confirmar assim que cair o Pix.
+  const awaitingPayment = order?.payment_status === 'pending'
   useEffect(() => {
     load()
-    const t = setInterval(load, 15000)
+    const tick = () => {
+      setNow(Date.now())
+      load()
+    }
+    const t = setInterval(tick, awaitingPayment ? 4000 : 15000)
     return () => clearInterval(t)
-  }, [load])
+  }, [load, awaitingPayment])
+
+  // Gera a cobrança Pix quando falta QR OU quando o QR atual já expirou (aí o servidor cria um novo).
+  const pay = order?.payment
+  const chargeExpired = !!pay?.expires_at && now > 0 && new Date(pay.expires_at).getTime() < now
+  const needsCharge = awaitingPayment && (!pay?.qr_code || chargeExpired)
+
+  const payInFlightRef = useRef(false)
+  const generatePix = useCallback(async () => {
+    if (payInFlightRef.current) return
+    payInFlightRef.current = true
+    setPayError(false)
+    try {
+      const res = await fetch(`/api/orders/${orderId}/pay`, { method: 'POST' })
+      if (!res.ok) {
+        // fetch NÃO rejeita em 4xx/5xx: precisamos checar res.ok pra não travar no spinner.
+        setPayError(true)
+        return
+      }
+      await load()
+    } catch {
+      setPayError(true)
+    } finally {
+      payInFlightRef.current = false
+    }
+  }, [orderId, load])
+
+  useEffect(() => {
+    if (needsCharge && !payError) generatePix()
+  }, [needsCharge, payError, generatePix])
 
   if (loading)
     return (
@@ -138,6 +185,95 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
         </div>
       </div>
     )
+
+  // Pedido com pagamento online pendente: mostra o Pix e segura o pedido até confirmar.
+  if (awaitingPayment) {
+    const initialLetter = (order.store_name || '?').trim().charAt(0).toUpperCase()
+    const showQr = !!pay?.qr_code && !chargeExpired
+    return (
+      <div className={`storefront storefront-${themeMode} track-page`}>
+        <div className="track-shell">
+          <div className="track-top">
+            <div className="track-store-badge">{initialLetter}</div>
+            <div className="track-top-info">
+              <div className="track-store">{order.store_name}</div>
+              <div className="track-order-num">Pedido {fmtOrderNumber(order.order_number, order.id)}</div>
+            </div>
+          </div>
+
+          <div className="track-hero">
+            <span className="track-hero-icon">⏳</span>
+            <div className="track-hero-title">Pague com Pix pra confirmar</div>
+            <div className="track-hero-sub">
+              Seu pedido só é enviado para a loja depois do pagamento — e a confirmação é automática.
+            </div>
+          </div>
+
+          <div className="track-card">
+            {payError ? (
+              <div className="track-hero">
+                <span className="track-hero-icon">⚠️</span>
+                <div className="track-hero-sub" style={{ marginBottom: 12 }}>
+                  Não foi possível gerar o Pix agora. Verifique sua conexão e tente de novo.
+                </div>
+                <button className="track-copy-btn" onClick={() => setPayError(false)}>
+                  Tentar novamente
+                </button>
+              </div>
+            ) : showQr ? (
+              <>
+                {pay?.qr_code_base64 && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={`data:image/png;base64,${pay.qr_code_base64}`}
+                    alt="QR Code Pix"
+                    style={{ width: 220, height: 220, maxWidth: '100%', display: 'block', margin: '4px auto 12px' }}
+                  />
+                )}
+                <div className="pix-key-box">
+                  <span className="pix-key-label">Pix copia e cola</span>
+                  <div className="pix-key-row">
+                    <span className="pix-key-value">{pay!.qr_code}</span>
+                    <button
+                      className="pix-copy-btn"
+                      onClick={() => {
+                        navigator.clipboard.writeText(pay!.qr_code!)
+                        setPixCopied(true)
+                        setTimeout(() => setPixCopied(false), 2000)
+                      }}
+                    >
+                      {pixCopied ? '✓' : 'Copiar'}
+                    </button>
+                  </div>
+                  <p className="pix-key-hint">
+                    No app do seu banco, escolha Pix e pague pelo QR Code ou pelo copia e cola. Assim que
+                    o pagamento cair, esta tela atualiza sozinha.
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="track-hero track-hero--loading">
+                <span className="track-spinner" />
+                <div className="track-hero-sub">Gerando seu Pix…</div>
+              </div>
+            )}
+
+            <div className="track-totals">
+              <div className="track-total-row track-total-final">
+                <span>Total</span>
+                <span>{fmtCents(order.total_cents)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="track-actions">
+            <a className="track-back-btn" href={`/loja/${order.store_slug}`}>Voltar ao cardápio</a>
+          </div>
+          <p className="track-hint">Guarde este link para acompanhar o pedido depois do pagamento.</p>
+        </div>
+      </div>
+    )
+  }
 
   const flow = order.order_type === 'delivery' ? FLOW_DELIVERY : FLOW_OTHER
   const canceled = order.status === 'cancelado'

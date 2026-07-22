@@ -150,6 +150,13 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
     soundOnRef.current = soundOn
   }, [soundOn])
 
+  // Ids já visíveis (pedidos pagos/sem pagamento). Usado pra tocar o alerta de
+  // "pedido novo" quando um pagamento é confirmado e o pedido aparece pela 1ª vez.
+  const knownIdsRef = useRef<Set<string>>(new Set(orders.map((o) => o.id)))
+  useEffect(() => {
+    knownIdsRef.current = new Set(orders.map((o) => o.id))
+  }, [orders])
+
   useEffect(() => {
     // setTimeout (e não requestAnimationFrame): rAF pausa em aba de segundo
     // plano, e o painel costuma ficar aberto em background esperando pedido.
@@ -179,7 +186,9 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'orders', filter: `store_id=eq.${storeId}` },
-        () => {
+        (payload) => {
+          // Pedido aguardando pagamento online ainda não é visível — não alerta.
+          if ((payload.new as { payment_status?: string })?.payment_status === 'pending') return
           if (soundOnRef.current && unlockedRef.current) playNewOrderBeep()
           setFlash(true)
           setTimeout(() => setFlash(false), 2000)
@@ -189,7 +198,16 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'orders', filter: `store_id=eq.${storeId}` },
-        () => router.refresh()
+        (payload) => {
+          const row = payload.new as { id?: string; payment_status?: string }
+          // Pagamento confirmado agora: o pedido "aparece" pela 1ª vez → trata como novo.
+          if (row?.payment_status === 'paid' && row.id && !knownIdsRef.current.has(row.id)) {
+            if (soundOnRef.current && unlockedRef.current) playNewOrderBeep()
+            setFlash(true)
+            setTimeout(() => setFlash(false), 2000)
+          }
+          router.refresh()
+        }
       )
       .subscribe()
     return () => {

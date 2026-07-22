@@ -1,16 +1,27 @@
 import { getCurrentStore } from '@/lib/store'
 import { fmtCents } from '@/lib/format'
-import { isStorePro, STORE_FONTS, DEFAULT_STORE_FONT } from '@/lib/plan'
-import { updateStore, addZone, deleteZone } from './actions'
+import { isStorePro } from '@/lib/plan'
+import type { StoreTheme } from '@/lib/storeTheme'
+import { updateStore, updateOnlinePayment, addZone, deleteZone } from './actions'
 import PixKeyField from '@/components/PixKeyField'
 import ImageUploadField from '@/components/ImageUploadField'
+import ProCustomizationPanel from './ProCustomizationPanel'
+import { ProLockedSection } from '@/components/dashboard/ProUpsell'
 
-type Theme = { primaryColor?: string; logoUrl?: string; bannerUrl?: string; font?: string; announcement?: string }
-
-export default async function LojaPage() {
+export default async function LojaPage({ searchParams }: { searchParams: Promise<{ mp?: string }> }) {
   const { supabase, store } = await getCurrentStore()
-  const theme = (store.theme ?? {}) as Theme
+  const theme = (store.theme ?? {}) as StoreTheme
   const isPro = await isStorePro(supabase, store.id)
+  const { mp } = await searchParams
+
+  const mpBanner =
+    mp === 'connected'
+      ? { kind: 'ok', text: 'Mercado Pago conectado! Agora você já pode receber pagamentos pelo app.' }
+      : mp === 'error'
+        ? { kind: 'err', text: 'Não foi possível conectar o Mercado Pago. Tente novamente.' }
+        : mp === 'config_error'
+          ? { kind: 'err', text: 'O pagamento online ainda não está configurado no servidor. Fale com o suporte.' }
+          : null
 
   const { data: zones } = await supabase
     .from('delivery_zones')
@@ -22,6 +33,62 @@ export default async function LojaPage() {
     <>
       <div className="dash-header">
         <div className="dash-title">Minha Loja</div>
+      </div>
+
+      {mpBanner && (
+        <div
+          className="settings-card"
+          style={{
+            borderColor: mpBanner.kind === 'ok' ? '#16a34a' : '#dc2626',
+            color: mpBanner.kind === 'ok' ? '#166534' : '#991b1b',
+          }}
+        >
+          {mpBanner.text}
+        </div>
+      )}
+
+      {/* Card à parte do form principal: conectar o Mercado Pago navega pra fora, então não pode
+          arrastar junto as edições não salvas dos outros campos. Toggle tem ação própria. */}
+      <div className="settings-card">
+        <div className="settings-section-title">Pagamento online (Pix pelo app)</div>
+        <p className="settings-hint">
+          Receba o pagamento do cliente <b>dentro do app</b>, direto na sua conta Mercado Pago. O
+          pedido só cai aqui no painel <b>depois que o pagamento é confirmado</b> — sem risco de
+          calote. O dinheiro cai na sua conta; o Cardápio Hub não cobra comissão por pedido.
+        </p>
+
+        <div className="toggle-row">
+          <div>
+            <div className="toggle-label">Conta Mercado Pago</div>
+            <div className="toggle-desc">{store.mp_connected ? '✓ Conectada' : 'Nenhuma conta conectada ainda.'}</div>
+          </div>
+          <a className="save-btn" href="/api/mp/oauth/start" style={{ textDecoration: 'none' }}>
+            {store.mp_connected ? 'Reconectar' : 'Conectar Mercado Pago'}
+          </a>
+        </div>
+
+        <form action={updateOnlinePayment}>
+          <div className="toggle-row">
+            <div>
+              <div className="toggle-label">Receber Pix pelo app</div>
+              <div className="toggle-desc">
+                {store.mp_connected
+                  ? 'O cliente paga o Pix na hora e o pedido é liberado automaticamente.'
+                  : 'Conecte sua conta Mercado Pago para ativar.'}
+              </div>
+            </div>
+            <label className="toggle-switch">
+              <input type="checkbox" name="onlinePaymentEnabled" defaultChecked={store.online_payment_enabled} disabled={!store.mp_connected} />
+              <span className="toggle-slider"></span>
+            </label>
+          </div>
+          {store.checkout_mode !== 'system' && (
+            <p className="settings-hint" style={{ marginTop: 12 }}>
+              Para o pagamento online funcionar, o checkout da loja precisa estar no modo <b>“pelo sistema”</b> (não WhatsApp).
+            </p>
+          )}
+          <button type="submit" className="save-btn" style={{ marginTop: 12 }}>Salvar pagamento online</button>
+        </form>
       </div>
 
       <form action={updateStore}>
@@ -120,54 +187,21 @@ export default async function LojaPage() {
             defaultUrl={theme.bannerUrl || ''}
           />
 
-          <div className="pro-block">
-            <div className="pro-block-head">
-              <span>Cores e fonte</span>
-              {!isPro && <span className="pro-badge">Pro</span>}
-            </div>
-
-            {isPro ? (
-              <>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Cor principal</label>
-                    <input className="form-input" name="primaryColor" type="color" defaultValue={theme.primaryColor || '#FF5722'} style={{ height: 40, padding: 4 }} />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Fonte do cardápio</label>
-                    <select className="form-input" name="font" defaultValue={theme.font || DEFAULT_STORE_FONT}>
-                      {STORE_FONTS.map((f) => (
-                        <option key={f.value} value={f.value}>{f.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                <div className="form-group" style={{ marginTop: 8 }}>
-                  <label className="form-label">Aviso promocional no cardápio</label>
-                  <input
-                    className="form-input"
-                    name="announcement"
-                    maxLength={120}
-                    placeholder='Ex.: "Frete grátis acima de R$ 50 hoje!"'
-                    defaultValue={theme.announcement || ''}
-                  />
-                  <p style={{ fontSize: 11, color: 'var(--muted2)', marginTop: 4 }}>
-                    Aparece em destaque no topo do cardápio público. Deixe vazio para ocultar.
-                  </p>
-                </div>
-              </>
-            ) : (
-              <div className="pro-lock">
-                <p className="pro-lock-text">
-                  Deixe o cardápio com a sua cara: escolha a <strong>cor principal</strong>, a{' '}
-                  <strong>fonte</strong> e publique um <strong>aviso promocional</strong> no topo do
-                  cardápio. No Pro, o selo &quot;Feito com Cardápio Hub&quot; também some da sua página.
-                </p>
-                <a href="/dashboard/billing" className="save-btn pro-lock-btn">Assinar Pro</a>
-              </div>
-            )}
-          </div>
         </div>
+
+        {/* Personalização avançada — exclusiva Pro. No Free, uma prévia bloqueada com CTA. */}
+        {isPro ? (
+          <div className="settings-card">
+            <ProCustomizationPanel theme={theme} />
+          </div>
+        ) : (
+          <ProLockedSection
+            title="Personalização avançada"
+            text="Escolha a tipografia, monte uma paleta com cor primária, secundária e de destaque, defina o layout do cardápio e publique um aviso promocional. O selo “Feito com Cardápio Hub” também some da sua página."
+          >
+            <ProCustomizationPanel theme={theme} />
+          </ProLockedSection>
+        )}
 
         <div className="settings-card">
           <div className="settings-section-title">Status</div>
