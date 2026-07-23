@@ -3,6 +3,8 @@
 import { useActionState } from 'react'
 import Link from 'next/link'
 import { login } from './actions'
+import LandingThemeWrapper from '@/components/landing/LandingThemeWrapper'
+import LandingThemeToggle from '@/components/landing/LandingThemeToggle'
 
 type State = { error: string | null }
 
@@ -13,15 +15,26 @@ export default function LoginPage() {
   )
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 24,
-      }}
-    >
+    <LandingThemeWrapper>
+      <header className="l-nav">
+        <Link href="/" className="l-logo">
+          cardápio<em>ágil</em>
+        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <LandingThemeToggle />
+          <Link href="/" className="l-btn-ghost">← Voltar</Link>
+        </div>
+      </header>
+
+      <div
+        style={{
+          minHeight: 'calc(100vh - 65px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 24,
+        }}
+      >
       <form
         action={formAction}
         className="settings-card"
@@ -57,6 +70,7 @@ export default function LoginPage() {
           Ainda não tem loja? <Link href="/contato" style={{ color: 'var(--primary)' }}>Fale com a gente</Link>
         </p>
       </form>
-    </div>
+      </div>
+    </LandingThemeWrapper>
   )
 }

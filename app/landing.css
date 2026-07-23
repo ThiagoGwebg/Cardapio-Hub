@@ -1320,3 +1320,21 @@
   color: var(--text);
 }
 
+
+/* Mobile Actions */
+.l-theme-toggle-mobile {
+  display: none;
+}
+@media (max-width: 860px) {
+  .l-theme-toggle-desktop {
+    display: none;
+  }
+  .l-theme-toggle-mobile {
+    display: flex;
+  }
+  .l-nav-mobile-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
