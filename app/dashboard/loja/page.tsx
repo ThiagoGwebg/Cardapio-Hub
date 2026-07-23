@@ -83,11 +83,6 @@ export default async function LojaPage({ searchParams }: { searchParams: Promise
               <span className="toggle-slider"></span>
             </label>
           </div>
-          {store.checkout_mode !== 'system' && (
-            <p className="settings-hint" style={{ marginTop: 12 }}>
-              Para o pagamento online funcionar, o checkout da loja precisa estar no modo <b>“pelo sistema”</b> (não WhatsApp).
-            </p>
-          )}
           <SubmitButton className="save-btn" style={{ marginTop: 12 }}>Salvar pagamento online</SubmitButton>
         </form>
       </div>

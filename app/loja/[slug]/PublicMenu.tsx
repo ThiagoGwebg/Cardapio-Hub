@@ -254,10 +254,9 @@ export default function PublicMenu({
   }
   const [coupon, setCoupon] = useState('')
 
-  // Pix pago dentro do app (Mercado Pago): a loja está no modo sistema, com pagamento
-  // online ligado e conta conectada. Nesse caso o Pix vira online (QR na tela do pedido).
-  const onlinePix =
-    store.checkout_mode === 'system' && !!store.online_payment_enabled && !!store.mp_connected
+  // Pix pago dentro do app (Mercado Pago): loja com pagamento online ligado e conta
+  // conectada. Nesse caso o Pix vira online (QR na tela do pedido).
+  const onlinePix = !!store.online_payment_enabled && !!store.mp_connected
 
   const payments = useMemo(() => {
     const p: Payment[] = []
