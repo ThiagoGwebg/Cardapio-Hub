@@ -783,7 +783,13 @@ export default function PublicMenu({
                   <div className="ordertype-row">
                     {payments.map((p) => (
                       <button key={p} type="button" className={`ordertype-btn ${payment === p ? 'active' : ''}`} onClick={() => setPayment(p)}>
-                        {p === 'cash' ? 'Dinheiro' : p === 'card' ? 'Cartão' : 'Pix'}
+                        {p === 'cash'
+                          ? 'Dinheiro'
+                          : p === 'card'
+                            ? 'Cartão na entrega'
+                            : onlinePix
+                              ? 'Pix — pagar agora'
+                              : 'Pix'}
                       </button>
                     ))}
                   </div>
