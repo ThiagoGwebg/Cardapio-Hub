@@ -2,7 +2,8 @@ import { getCurrentStore } from '@/lib/store'
 import { fmtCents } from '@/lib/format'
 import { isStorePro } from '@/lib/plan'
 import type { StoreTheme } from '@/lib/storeTheme'
-import { updateStore, updateOnlinePayment, addZone, deleteZone } from './actions'
+import { updateStore, updateOnlinePayment, disconnectMercadoPago, addZone, deleteZone } from './actions'
+import DisconnectMpButton from './DisconnectMpButton'
 import PixKeyField from '@/components/PixKeyField'
 import ImageUploadField from '@/components/ImageUploadField'
 import ProCustomizationPanel from './ProCustomizationPanel'
@@ -63,9 +64,12 @@ export default async function LojaPage({ searchParams }: { searchParams: Promise
             <div className="toggle-label">Conta Mercado Pago</div>
             <div className="toggle-desc">{store.mp_connected ? '✓ Conectada' : 'Nenhuma conta conectada ainda.'}</div>
           </div>
-          <a className="save-btn" href="/api/mp/oauth/start" style={{ textDecoration: 'none' }}>
-            {store.mp_connected ? 'Reconectar' : 'Conectar Mercado Pago'}
-          </a>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <a className="save-btn" href="/api/mp/oauth/start" style={{ textDecoration: 'none' }}>
+              {store.mp_connected ? 'Reconectar' : 'Conectar Mercado Pago'}
+            </a>
+            {store.mp_connected && <DisconnectMpButton action={disconnectMercadoPago} />}
+          </div>
         </div>
 
         <form action={updateOnlinePayment}>

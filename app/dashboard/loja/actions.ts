@@ -119,6 +119,27 @@ export async function updateOnlinePayment(formData: FormData) {
   revalidatePath(`/loja/${store.slug}`)
 }
 
+/**
+ * Desvincula a conta Mercado Pago da loja: apaga as credenciais OAuth e desliga o
+ * pagamento online. Precisa do admin client porque `store_payment_credentials` tem
+ * RLS deny-all (nem o dono da loja lê/apaga direto) — a autorização vem de
+ * getCurrentStore(), que garante que é o dono logado.
+ */
+export async function disconnectMercadoPago() {
+  const { supabase, store } = await getCurrentStore()
+
+  await createAdminClient().from('store_payment_credentials').delete().eq('store_id', store.id)
+
+  // Desliga o toggle junto: deixar ligado sem conta conectada só confunde a UI.
+  await supabase
+    .from('stores')
+    .update({ mp_connected: false, online_payment_enabled: false })
+    .eq('id', store.id)
+
+  revalidatePath('/dashboard/loja')
+  revalidatePath(`/loja/${store.slug}`)
+}
+
 export async function addZone(formData: FormData) {
   const { supabase, store } = await getCurrentStore()
   const neighborhood = String(formData.get('neighborhood') || '').trim()
