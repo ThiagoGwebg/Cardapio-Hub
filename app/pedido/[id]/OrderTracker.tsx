@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
+import { AlertTriangle, Check, Copy, Lock, QrCode, RefreshCw, ShieldCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents, fmtOrderNumber, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL, PIX_KEY_TYPE_LABEL } from '@/lib/format'
 import { saveOrderToHistory } from '@/lib/orderHistory'
@@ -84,6 +85,7 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
   const [pixCopied, setPixCopied] = useState(false)
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light')
   const [payError, setPayError] = useState(false)
+  const [retrying, setRetrying] = useState(false)
   // Relógio só pra detectar a expiração do Pix sem chamar Date.now() no render (pureza do React).
   const [now, setNow] = useState(0)
 
@@ -132,6 +134,16 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
     const t = setInterval(tick, awaitingPayment ? 4000 : 15000)
     return () => clearInterval(t)
   }, [load, awaitingPayment])
+
+  // Relógio de 1s enquanto aguarda o Pix: mantém o contador regressivo fluido sem disparar
+  // load() a cada segundo — o polling do pedido continua no efeito acima, a cada 4s.
+  useEffect(() => {
+    if (!awaitingPayment) return
+    // Sem setState síncrono aqui: o primeiro tick vem em 1s e `now` já nasce 0
+    // (o contador só aparece quando há relógio, evitando render impuro na montagem).
+    const t = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(t)
+  }, [awaitingPayment])
 
   // Gera a cobrança Pix quando falta QR OU quando o QR atual já expirou (aí o servidor cria um novo).
   const pay = order?.payment
@@ -190,6 +202,13 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
   if (awaitingPayment) {
     const initialLetter = (order.store_name || '?').trim().charAt(0).toUpperCase()
     const showQr = !!pay?.qr_code && !chargeExpired
+
+    // Contador regressivo do Pix (o servidor gera com 30 min de validade).
+    const secondsLeft =
+      pay?.expires_at && now > 0
+        ? Math.max(0, Math.floor((new Date(pay.expires_at).getTime() - now) / 1000))
+        : 0
+    const countdown = `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, '0')}`
     return (
       <div className={`storefront storefront-${themeMode} track-page`}>
         <div className="track-shell">
@@ -201,69 +220,117 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
             </div>
           </div>
 
-          <div className="track-hero">
-            <span className="track-hero-icon">⏳</span>
-            <div className="track-hero-title">Pague com Pix pra confirmar</div>
-            <div className="track-hero-sub">
-              Seu pedido só é enviado para a loja depois do pagamento — e a confirmação é automática.
+          {/* Valor em primeiro lugar: o cliente precisa saber quanto vai pagar antes do QR. */}
+          <div className="pay-hero">
+            <span className="pay-hero-label">Total a pagar</span>
+            <div className="pay-hero-value">{fmtCents(order.total_cents)}</div>
+            <div className="pay-hero-sub">
+              O pedido é enviado à loja assim que o pagamento cair — a confirmação é automática.
             </div>
+            {showQr && secondsLeft > 0 && (
+              <div className={`pay-timer ${secondsLeft <= 300 ? 'pay-timer--urgent' : ''}`}>
+                <span className="pay-timer-dot" aria-hidden />
+                Este Pix expira em {countdown}
+              </div>
+            )}
           </div>
 
           <div className="track-card">
             {payError ? (
-              <div className="track-hero">
-                <span className="track-hero-icon">⚠️</span>
-                <div className="track-hero-sub" style={{ marginBottom: 12 }}>
-                  Não foi possível gerar o Pix agora. Verifique sua conexão e tente de novo.
-                </div>
-                <button className="track-copy-btn" onClick={() => setPayError(false)}>
-                  Tentar novamente
+              <div className="pay-state">
+                <span className="pay-state-icon pay-state-icon--error" aria-hidden>
+                  <AlertTriangle size={26} strokeWidth={2} />
+                </span>
+                <div className="pay-state-title">Não foi possível gerar o Pix</div>
+                <div className="pay-state-sub">Verifique sua conexão e tente novamente.</div>
+                <button
+                  className="pay-retry-btn"
+                  disabled={retrying}
+                  onClick={() => {
+                    setRetrying(true)
+                    setPayError(false)
+                    setTimeout(() => setRetrying(false), 1200)
+                  }}
+                >
+                  {retrying ? (
+                    <>
+                      <span className="pay-btn-spinner" aria-hidden />
+                      Gerando…
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw size={15} strokeWidth={2.2} />
+                      Tentar novamente
+                    </>
+                  )}
                 </button>
               </div>
             ) : showQr ? (
               <>
+                <div className="pay-section-head">
+                  <QrCode size={16} strokeWidth={2.2} />
+                  <span>Escaneie o QR Code</span>
+                </div>
+
                 {pay?.qr_code_base64 && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={`data:image/png;base64,${pay.qr_code_base64}`}
-                    alt="QR Code Pix"
-                    style={{ width: 220, height: 220, maxWidth: '100%', display: 'block', margin: '4px auto 12px' }}
-                  />
+                  <div className="pay-qr-frame">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`data:image/png;base64,${pay.qr_code_base64}`} alt="QR Code para pagamento via Pix" />
+                  </div>
                 )}
+
+                <div className="pay-divider"><span>ou copie o código</span></div>
+
                 <div className="pix-key-box">
                   <span className="pix-key-label">Pix copia e cola</span>
                   <div className="pix-key-row">
                     <span className="pix-key-value">{pay!.qr_code}</span>
-                    <button
-                      className="pix-copy-btn"
-                      onClick={() => {
-                        navigator.clipboard.writeText(pay!.qr_code!)
-                        setPixCopied(true)
-                        setTimeout(() => setPixCopied(false), 2000)
-                      }}
-                    >
-                      {pixCopied ? '✓' : 'Copiar'}
-                    </button>
                   </div>
+                  <button
+                    className={`pay-copy-btn ${pixCopied ? 'is-copied' : ''}`}
+                    onClick={() => {
+                      navigator.clipboard.writeText(pay!.qr_code!)
+                      setPixCopied(true)
+                      setTimeout(() => setPixCopied(false), 2000)
+                    }}
+                  >
+                    {pixCopied ? (
+                      <>
+                        <Check size={16} strokeWidth={2.6} />
+                        Código copiado!
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={16} strokeWidth={2.2} />
+                        Copiar código Pix
+                      </>
+                    )}
+                  </button>
                   <p className="pix-key-hint">
-                    No app do seu banco, escolha Pix e pague pelo QR Code ou pelo copia e cola. Assim que
-                    o pagamento cair, esta tela atualiza sozinha.
+                    No app do seu banco, escolha Pix e pague pelo QR Code ou pelo copia e cola. Esta tela
+                    atualiza sozinha assim que o pagamento for confirmado.
                   </p>
                 </div>
               </>
             ) : (
-              <div className="track-hero track-hero--loading">
+              <div className="pay-state">
                 <span className="track-spinner" />
-                <div className="track-hero-sub">Gerando seu Pix…</div>
+                <div className="pay-state-title" style={{ marginTop: 14 }}>Gerando seu Pix…</div>
+                <div className="pay-state-sub">Leva só um instante.</div>
               </div>
             )}
+          </div>
 
-            <div className="track-totals">
-              <div className="track-total-row track-total-final">
-                <span>Total</span>
-                <span>{fmtCents(order.total_cents)}</span>
-              </div>
-            </div>
+          {/* Sinais de segurança: reduzem o abandono na hora de pagar. */}
+          <div className="pay-trust">
+            <span className="pay-trust-item">
+              <ShieldCheck size={14} strokeWidth={2.2} />
+              Processado pelo Mercado Pago
+            </span>
+            <span className="pay-trust-item">
+              <Lock size={14} strokeWidth={2.2} />
+              Ambiente seguro
+            </span>
           </div>
 
           <div className="track-actions">
