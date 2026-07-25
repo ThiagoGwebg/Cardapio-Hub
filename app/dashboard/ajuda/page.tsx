@@ -1,3 +1,4 @@
+import { Lightbulb, Mail, Rocket } from 'lucide-react'
 import Link from 'next/link'
 
 export default function AjudaPage() {
@@ -10,7 +11,7 @@ export default function AjudaPage() {
       {/* Guia rápido */}
       <div className="help-guide-card">
         <div className="help-guide-title">
-          <span>🚀</span> Guia Rápido — Comece em 4 passos
+          <Rocket size={18} strokeWidth={2.2} /> Guia Rápido — Comece em 4 passos
         </div>
 
         <div className="help-step">
@@ -61,7 +62,7 @@ export default function AjudaPage() {
       {/* Dicas */}
       <div className="help-guide-card">
         <div className="help-guide-title">
-          <span>💡</span> Dicas para aproveitar melhor
+          <Lightbulb size={18} strokeWidth={2.2} /> Dicas para aproveitar melhor
         </div>
         {[
           {
@@ -94,7 +95,9 @@ export default function AjudaPage() {
 
       {/* Suporte */}
       <div className="help-guide-card" style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 32, marginBottom: 8 }}>📧</div>
+        <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center', color: 'var(--primary)' }}>
+          <Mail size={32} strokeWidth={1.8} />
+        </div>
         <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>
           Precisa de ajuda?
         </div>

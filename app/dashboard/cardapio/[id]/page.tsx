@@ -74,7 +74,7 @@ export default async function ProductEditPage({ params }: { params: Promise<{ id
             name="images"
             label="Fotos do produto"
             defaultUrls={images}
-            hint="A 1ª foto é a capa. Toque em ★ capa numa foto pra promovê-la. Até 5 MB cada."
+            hint="A 1ª foto é a capa. Toque em “capa” numa foto pra promovê-la. Até 5 MB cada."
             max={6}
           />
           <SubmitButton className="save-btn" style={{ alignSelf: 'flex-start' }}>Salvar alterações</SubmitButton>

@@ -1,3 +1,4 @@
+import { CircleCheck } from 'lucide-react'
 import { getCurrentStore } from '@/lib/store'
 import { getConnectedMpAccount } from '@/lib/mercadopago/tokens'
 import { fmtCents } from '@/lib/format'
@@ -71,7 +72,9 @@ export default async function LojaPage({ searchParams }: { searchParams: Promise
             <div className="toggle-label">Conta Mercado Pago</div>
             {store.mp_connected ? (
               <div className="toggle-desc">
-                <span style={{ color: '#16a34a', fontWeight: 600 }}>✓ Conectada</span>
+                <span style={{ color: '#16a34a', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                  <CircleCheck size={14} strokeWidth={2.4} /> Conectada
+                </span>
                 {mpAccount ? (
                   <>
                     {mpAccountName && <> — {mpAccountName}</>}

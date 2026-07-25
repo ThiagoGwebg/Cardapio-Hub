@@ -1,6 +1,19 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Bell,
+  BellOff,
+  Bike,
+  CalendarClock,
+  MapPin,
+  MessageCircle,
+  ReceiptText,
+  ShoppingBag,
+  Utensils,
+  X,
+  type LucideIcon,
+} from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
@@ -56,10 +69,10 @@ type Order = {
   order_items: OrderItem[]
 }
 
-const TYPE_EMOJI: Record<string, string> = {
-  delivery: '🛵',
-  pickup: '🛍',
-  dine_in: '🍽',
+const TYPE_ICON: Record<string, LucideIcon> = {
+  delivery: Bike,
+  pickup: ShoppingBag,
+  dine_in: Utensils,
 }
 
 // Chips de filtro por status (a coluna virou filtro — mesma visão do kanban, em lista)
@@ -268,7 +281,8 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
           onChange={(e) => setSearch(e.target.value)}
         />
         <button className={`sound-toggle ${flash ? 'flash' : ''}`} onClick={toggleSound}>
-          {soundOn ? '🔔 Som ligado' : '🔕 Som desligado'}
+          {soundOn ? <Bell size={15} strokeWidth={2.2} /> : <BellOff size={15} strokeWidth={2.2} />}
+          {soundOn ? 'Som ligado' : 'Som desligado'}
         </button>
       </div>
 
@@ -306,7 +320,10 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
                 onClick={() => setExpandedId(expanded ? null : order.id)}
               >
                 <span className="ol-avatar" aria-hidden>
-                  {TYPE_EMOJI[order.order_type] ?? '🧾'}
+                  {(() => {
+                    const TypeIcon = TYPE_ICON[order.order_type] ?? ReceiptText
+                    return <TypeIcon size={18} strokeWidth={2} />
+                  })()}
                 </span>
                 <span className="ol-info">
                   <span className="ol-name-line">
@@ -315,7 +332,9 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
                   </span>
                   <span className="ol-sub">
                     {order.scheduled_for && (
-                      <span className="ol-sched-line">📅 {fmtScheduledFor(order.scheduled_for)} · </span>
+                      <span className="ol-sched-line">
+                        <CalendarClock size={12} strokeWidth={2.2} /> {fmtScheduledFor(order.scheduled_for)} ·{' '}
+                      </span>
                     )}
                     {fmtCents(order.total_cents)}
                     {order.order_type === 'dine_in' && order.table_number ? ` · Mesa ${order.table_number}` : ''}
@@ -338,7 +357,11 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
                 <div className="ol-detail">
                   <div className="ol-detail-tags">
                     <span className="order-tag">{ORDER_TYPE_LABEL[order.order_type]}</span>
-                    {order.scheduled_for && <span className="order-tag">📅 {fmtScheduledFor(order.scheduled_for)}</span>}
+                    {order.scheduled_for && (
+                      <span className="order-tag">
+                        <CalendarClock size={12} strokeWidth={2.2} /> {fmtScheduledFor(order.scheduled_for)}
+                      </span>
+                    )}
                     {order.payment_method && <span className="order-tag">{PAYMENT_LABEL[order.payment_method]}</span>}
                     <span className="order-tag">
                       {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
@@ -347,7 +370,8 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
 
                   {order.order_type === 'delivery' && order.address_street && (
                     <div className="ol-addr">
-                      📍 {order.address_street}, {order.address_number} — {order.address_neighborhood}
+                      <MapPin size={13} strokeWidth={2.2} /> {order.address_street}, {order.address_number} —{' '}
+                      {order.address_neighborhood}
                       {order.address_cep ? ` · CEP ${order.address_cep}` : ''}
                     </div>
                   )}
@@ -385,7 +409,8 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
                         }
                         title="Enviar atualização pelo WhatsApp"
                       >
-                        💬 Avisar
+                        <MessageCircle size={14} strokeWidth={2.2} />
+                        Avisar
                       </button>
                     )}
                     <Link href={`/dashboard/pedidos/${order.id}`} className="ol-detail-link" title="Ver ficha / imprimir">
@@ -393,7 +418,7 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
                     </Link>
                     {action && (
                       <button className="ol-cancel" onClick={() => cancel(order)} title="Cancelar pedido">
-                        ✕
+                        <X size={14} strokeWidth={2.6} />
                       </button>
                     )}
                   </div>

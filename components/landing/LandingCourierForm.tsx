@@ -41,7 +41,7 @@ export default function LandingCourierForm() {
           </div>
           <div className="l-lead-success-title">Cadastro realizado com sucesso!</div>
           <p className="l-lead-success-desc">
-            Obrigado pelo seu interesse! Guardamos os seus dados e <strong>entraremos em contato pelo WhatsApp</strong> assim que tivermos vagas de entrega na sua região. 💬
+            Obrigado pelo seu interesse! Guardamos os seus dados e <strong>entraremos em contato pelo WhatsApp</strong> assim que tivermos vagas de entrega na sua região.
           </p>
         </div>
       </div>

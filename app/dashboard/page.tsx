@@ -1,3 +1,4 @@
+import { ClipboardList, Lightbulb, Link2, Settings, Utensils } from 'lucide-react'
 import { getCurrentStore } from '@/lib/store'
 import { fmtCents, fmtSince, spDayStart } from '@/lib/format'
 import { getStoreUsage } from '@/lib/plan'
@@ -96,22 +97,22 @@ export default async function DashboardHomePage() {
         <div className="dash-section-title">Ações rápidas</div>
         <div className="quick-actions">
           <Link href="/dashboard/cardapio" className="quick-action-card">
-            <span className="qa-icon">🍽️</span>
+            <span className="qa-icon"><Utensils size={22} strokeWidth={2} /></span>
             <span className="qa-label">Adicionar produto</span>
             <span className="qa-desc">Cadastre itens no seu cardápio</span>
           </Link>
           <Link href="/dashboard/links" className="quick-action-card">
-            <span className="qa-icon">🔗</span>
+            <span className="qa-icon"><Link2 size={22} strokeWidth={2} /></span>
             <span className="qa-label">Compartilhar link</span>
             <span className="qa-desc">Divulgue seu cardápio online</span>
           </Link>
           <Link href="/dashboard/loja" className="quick-action-card">
-            <span className="qa-icon">⚙️</span>
+            <span className="qa-icon"><Settings size={22} strokeWidth={2} /></span>
             <span className="qa-label">Configurar loja</span>
             <span className="qa-desc">Horários, endereço e mais</span>
           </Link>
           <Link href="/dashboard/ajuda" className="quick-action-card">
-            <span className="qa-icon">💡</span>
+            <span className="qa-icon"><Lightbulb size={22} strokeWidth={2} /></span>
             <span className="qa-label">Central de Ajuda</span>
             <span className="qa-desc">Dicas e guia rápido</span>
           </Link>
@@ -154,7 +155,7 @@ export default async function DashboardHomePage() {
           </div>
         ) : (
           <div className="empty-state">
-            <span style={{ fontSize: 40, opacity: 0.2 }}>📋</span>
+            <span style={{ opacity: 0.28, display: 'inline-flex' }}><ClipboardList size={40} strokeWidth={1.5} /></span>
             <p>Nenhum pedido ainda. Compartilhe seu link e comece a vender!</p>
           </div>
         )}

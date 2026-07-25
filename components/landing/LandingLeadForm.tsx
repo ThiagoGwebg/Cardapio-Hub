@@ -53,7 +53,7 @@ export default function LandingLeadForm() {
           <div className="l-lead-success-title">Recebemos seus dados!</div>
           <p className="l-lead-success-desc">
             Em breve <strong>entraremos em contato pelo WhatsApp</strong> pra te ajudar a colocar
-            sua loja no ar. Fica de olho nas suas mensagens! 💬
+            sua loja no ar. Fica de olho nas suas mensagens!
           </p>
         </div>
       </div>

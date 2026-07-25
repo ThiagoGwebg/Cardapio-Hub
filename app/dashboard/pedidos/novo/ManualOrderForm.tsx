@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { CalendarClock } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { fmtCents } from '@/lib/format'
@@ -371,8 +372,11 @@ export default function ManualOrderForm({ menu, disabled = false }: { menu: Cate
                 if (e.target.checked) setMarkDone(false)
               }}
             />
-            <span>
-              📅 <b>Agendar</b> este pedido (encomenda para data/hora combinada)
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <CalendarClock size={15} strokeWidth={2.2} />
+              <span>
+                <b>Agendar</b> este pedido (encomenda para data/hora combinada)
+              </span>
             </span>
           </label>
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Bell, X } from 'lucide-react'
 import { activatePush, initOneSignal, type OneSignalScope } from '@/lib/onesignal'
 
 const SEEN_PREFIX = 'cardapio-push-prompt-seen:'
@@ -103,7 +104,7 @@ export default function PushNotificationPrompt({
 
   return (
     <div className="push-prompt" role="dialog" aria-live="polite">
-      <span className="push-prompt-icon">🔔</span>
+      <span className="push-prompt-icon"><Bell size={20} strokeWidth={2.1} /></span>
       <div className="push-prompt-body">
         <div className="push-prompt-title">{urgent && triggerTitle ? triggerTitle : title}</div>
         <div className="push-prompt-sub">{subtitle}</div>
@@ -113,7 +114,7 @@ export default function PushNotificationPrompt({
           {busy ? 'Ativando…' : 'Ativar'}
         </button>
         <button className="push-prompt-close" onClick={dismiss} aria-label="Fechar" disabled={busy}>
-          ✕
+          <X size={16} strokeWidth={2.4} />
         </button>
       </div>
     </div>

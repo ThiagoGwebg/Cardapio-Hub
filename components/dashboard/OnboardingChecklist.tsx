@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Check, PartyPopper, X } from 'lucide-react'
 import Link from 'next/link'
 
 type Props = {
@@ -64,7 +65,13 @@ export default function OnboardingChecklist({ hasProducts, hasOrders, hasLogo, h
       <div className="onboarding-header">
         <div>
           <div className="onboarding-title">
-            {allDone ? '🎉 Tudo pronto!' : `Bem-vindo(a), ${storeName}!`}
+            {allDone ? (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
+                <PartyPopper size={18} strokeWidth={2.2} /> Tudo pronto!
+              </span>
+            ) : (
+              `Bem-vindo(a), ${storeName}!`
+            )}
           </div>
           <div className="onboarding-sub">
             {allDone
@@ -74,7 +81,7 @@ export default function OnboardingChecklist({ hasProducts, hasOrders, hasLogo, h
         </div>
         {(dismissed || allDone) && (
           <button className="onboarding-dismiss" onClick={() => setDismissed(true)} aria-label="Fechar">
-            ✕
+            <X size={16} strokeWidth={2.4} />
           </button>
         )}
       </div>
@@ -96,7 +103,7 @@ export default function OnboardingChecklist({ hasProducts, hasOrders, hasLogo, h
                 className={`onboarding-step ${step.done ? 'done' : ''}`}
               >
                 <span className={`onboarding-step-check ${step.done ? 'checked' : ''}`}>
-                  {step.done ? '✓' : `${steps.indexOf(step) + 1}`}
+                  {step.done ? <Check size={14} strokeWidth={3} /> : `${steps.indexOf(step) + 1}`}
                 </span>
                 <div className="onboarding-step-info">
                   <div className="onboarding-step-label">{step.label}</div>

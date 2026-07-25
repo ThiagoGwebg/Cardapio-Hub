@@ -2405,9 +2405,12 @@ tr:hover td {
 /* ===== Kanban: tags e endereço no card ===== */
 .order-tags { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
 .order-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 10px;
   font-weight: 600;
-  padding: 2px 7px;
+  padding: 3px 8px;
   border-radius: 20px;
   background: var(--surface3);
   color: var(--text2);
@@ -2447,6 +2450,9 @@ tr:hover td {
 /* ===== Kanban: alerta sonoro ===== */
 .kanban-toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
 .sound-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   padding: 7px 14px;
   border-radius: 8px;
   border: 1px solid var(--border);
@@ -2586,7 +2592,7 @@ tr:hover td {
   justify-content: center;
   flex-shrink: 0;
 }
-.pwa-ios-glyph { display: inline-block; }
+.pwa-ios-glyph { display: inline-block; vertical-align: -2px; }
 
 .pwa-install-btn {
   width: 100%;
@@ -3857,10 +3863,20 @@ body:has(.storefront) {
   margin-bottom: 6px;
 }
 .receipt-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
   font-size: 14px;
   color: var(--text2);
   line-height: 1.5;
 }
+/* Ícone da linha da comanda: alinha com a primeira linha do texto que quebra. */
+.receipt-line > svg { flex-shrink: 0; margin-top: 3px; }
+
+/* Marcadores de incluído/não incluído na tabela de planos. */
+.plan-cell-icon { display: inline-block; vertical-align: -3px; }
+.plan-table-pro .plan-cell-icon { color: var(--green); }
+.plan-cell-off .plan-cell-icon { color: var(--muted); opacity: 0.7; }
 .receipt-muted {
   color: var(--muted);
   font-size: 13px;

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ClipboardList, HardDrive, Zap, type LucideIcon } from 'lucide-react'
+import { ClipboardList, HardDrive, Share, Zap, type LucideIcon } from 'lucide-react'
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>
@@ -171,8 +171,11 @@ export default function InstallPwaButton({
                   <div className="pwa-ios-step">
                     <span className="pwa-ios-step-num">1</span>
                     <span>
-                      Toque no ícone <span className="pwa-ios-glyph">⬆️</span> <b>Compartilhar</b> na barra do
-                      Safari
+                      Toque no ícone{' '}
+                      <span className="pwa-ios-glyph">
+                        <Share size={13} strokeWidth={2.2} />
+                      </span>{' '}
+                      <b>Compartilhar</b> na barra do Safari
                     </span>
                   </div>
                   <div className="pwa-ios-step">

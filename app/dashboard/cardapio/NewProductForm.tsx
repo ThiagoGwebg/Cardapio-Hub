@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { X } from 'lucide-react'
 import ProductImagesField from '@/components/ProductImagesField'
 
 export default function NewProductForm({
@@ -31,7 +32,7 @@ export default function NewProductForm({
       <div className="prod-form-head">
         <span className="prod-form-title">Novo produto</span>
         <button type="button" className="prod-form-close" onClick={() => setOpen(false)} aria-label="Fechar">
-          ✕
+          <X size={16} strokeWidth={2.4} />
         </button>
       </div>
 

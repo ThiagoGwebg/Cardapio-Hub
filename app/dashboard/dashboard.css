@@ -1219,6 +1219,11 @@ html[data-dash-theme="black"] .dashboard .ol-pill-sched {
   color: #b6a3f8;
 }
 .ol-sched-line { font-weight: 700; color: #8b5cf6; }
+
+/* Ícones lucide inline: alinham com a linha de texto sem empurrar o layout. */
+.ol-sched-line, .ol-addr { display: inline-flex; align-items: center; gap: 5px; }
+.ol-addr { flex-wrap: wrap; }
+.ol-cancel { display: inline-flex; align-items: center; justify-content: center; }
 html[data-dash-theme="dark"] .dashboard .ol-sched-line,
 html[data-dash-theme="black"] .dashboard .ol-sched-line { color: #b6a3f8; }
 

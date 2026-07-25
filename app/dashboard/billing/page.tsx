@@ -1,3 +1,4 @@
+import { Check, Minus, PartyPopper } from 'lucide-react'
 import Link from 'next/link'
 import { getCurrentStore } from '@/lib/store'
 import { getStoreUsage } from '@/lib/plan'
@@ -32,6 +33,16 @@ const FEATURES: { label: string; free: string; pro: string }[] = [
   { label: 'Comissão por venda', free: 'R$ 0', pro: 'R$ 0' },
 ]
 
+/**
+ * Célula da tabela de planos: os marcadores "✓" e "—" viram ícone; qualquer
+ * outro valor ("Até 30", "Ilimitados") continua sendo texto.
+ */
+function renderCell(value: string) {
+  if (value === '✓') return <Check size={16} strokeWidth={2.6} className="plan-cell-icon" aria-label="incluído" />
+  if (value === '—') return <Minus size={16} strokeWidth={2.4} className="plan-cell-icon" aria-label="não incluído" />
+  return value
+}
+
 export default async function BillingPage({
   searchParams,
 }: {
@@ -61,8 +72,9 @@ export default async function BillingPage({
         </p>
       )}
       {success && (
-        <p style={{ color: 'var(--green)', fontSize: 12, marginBottom: 12 }}>
-          Assinatura confirmada! Bem-vindo ao Pro 🎉
+        <p style={{ color: 'var(--green)', fontSize: 12, marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <PartyPopper size={14} strokeWidth={2.2} />
+          Assinatura confirmada! Bem-vindo ao Pro
         </p>
       )}
 
@@ -109,8 +121,8 @@ export default async function BillingPage({
             {FEATURES.map((f) => (
               <tr key={f.label}>
                 <td>{f.label}</td>
-                <td className={f.free === '—' ? 'plan-cell-off' : ''}>{f.free}</td>
-                <td className="plan-table-pro">{f.pro}</td>
+                <td className={f.free === '—' ? 'plan-cell-off' : ''}>{renderCell(f.free)}</td>
+                <td className="plan-table-pro">{renderCell(f.pro)}</td>
               </tr>
             ))}
           </tbody>

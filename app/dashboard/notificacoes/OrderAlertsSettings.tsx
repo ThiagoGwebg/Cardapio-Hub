@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { AlertTriangle, Bell, CircleCheck } from 'lucide-react'
 import { playNewOrderBeep } from '@/lib/sound'
 import { activatePush, type ActivateResult } from '@/lib/onesignal'
 
@@ -78,11 +79,21 @@ export default function OrderAlertsSettings({ storeId }: { storeId: string }) {
       )}
 
       {enabled && pushStatus && (
-        <p style={{ fontSize: 12, marginTop: 10, color: pushStatus === 'ok' ? 'var(--green)' : 'var(--muted)' }}>
+        <p
+          style={{
+            fontSize: 12, marginTop: 10, display: 'flex', alignItems: 'flex-start', gap: 6,
+            color: pushStatus === 'ok' ? 'var(--green)' : 'var(--muted)',
+          }}
+        >
+          {pushStatus === 'ok' ? (
+            <CircleCheck size={14} strokeWidth={2.3} style={{ flexShrink: 0, marginTop: 2 }} />
+          ) : pushStatus === 'no-app-id' ? (
+            <AlertTriangle size={14} strokeWidth={2.3} style={{ flexShrink: 0, marginTop: 2 }} />
+          ) : null}
           {pushStatus === 'ok'
-            ? '✅ Push ativo — você é avisado até com o app fechado.'
+            ? 'Push ativo — você é avisado até com o app fechado.'
             : pushStatus === 'no-app-id'
-              ? '⚠️ Push com app fechado ainda não configurado no servidor (falta o OneSignal). Com a aba aberta, o alerta já funciona.'
+              ? 'Push com app fechado ainda não configurado no servidor (falta o OneSignal). Com a aba aberta, o alerta já funciona.'
               : pushStatus === 'unsupported'
                 ? 'Este navegador não suporta push com app fechado. Com a aba aberta, o alerta funciona.'
                 : pushStatus === 'denied'
@@ -100,7 +111,10 @@ export default function OrderAlertsSettings({ storeId }: { storeId: string }) {
                 Ativando…
               </>
             ) : (
-              '🔔 Ativar alertas'
+              <>
+                <Bell size={15} strokeWidth={2.2} />
+                Ativar alertas
+              </>
             )}
           </button>
         ) : (

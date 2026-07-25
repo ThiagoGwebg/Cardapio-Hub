@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Circle, Moon, Sun, type LucideIcon } from 'lucide-react'
 
 type DashTheme = 'light' | 'dark' | 'black'
 
-const THEMES: { value: DashTheme; label: string; icon: string }[] = [
-  { value: 'light', label: 'Claro', icon: '☀️' },
-  { value: 'dark', label: 'Escuro', icon: '🌙' },
-  { value: 'black', label: 'Black', icon: '⚫' },
+const THEMES: { value: DashTheme; label: string; Icon: LucideIcon }[] = [
+  { value: 'light', label: 'Claro', Icon: Sun },
+  { value: 'dark', label: 'Escuro', Icon: Moon },
+  { value: 'black', label: 'Black', Icon: Circle },
 ]
 
 const STORAGE_KEY = 'cardapio-dash-theme'
@@ -37,7 +38,7 @@ export default function ThemeToggle() {
           aria-label={t.label}
           title={t.label}
         >
-          {t.icon}
+          <t.Icon size={15} strokeWidth={2.2} fill={t.value === 'black' ? 'currentColor' : 'none'} />
         </button>
       ))}
     </div>

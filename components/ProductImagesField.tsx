@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { Star } from 'lucide-react'
 import type { CSSProperties } from 'react'
 
 type Props = {
@@ -112,10 +113,11 @@ export default function ProductImagesField({ name, label, hint, defaultUrls = []
                 title="Tornar capa"
                 style={{
                   position: 'absolute', bottom: 4, left: 4, background: 'rgba(0,0,0,0.6)', color: '#fff',
-                  fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                  fontSize: 10, fontWeight: 700, padding: '3px 7px', borderRadius: 6, border: 'none', cursor: 'pointer',
+                  display: 'inline-flex', alignItems: 'center', gap: 4,
                 }}
               >
-                ★ capa
+                <Star size={11} strokeWidth={2.4} /> capa
               </button>
             )}
             <button

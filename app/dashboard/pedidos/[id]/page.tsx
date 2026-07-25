@@ -1,3 +1,4 @@
+import { CalendarClock, MapPin, StickyNote, Utensils } from 'lucide-react'
 import { getCurrentStore } from '@/lib/store'
 import { fmtCents, fmtOrderNumber, fmtSince, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL, SP_TZ } from '@/lib/format'
 import { notFound } from 'next/navigation'
@@ -97,7 +98,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <div className="order-tags" style={{ marginBottom: 12 }}>
           <span className={`status-dot ${STATUS_DOT[order.status] ?? ''}`} style={{ marginRight: 4 }} />
           <span className="order-tag">{STATUS_LABEL[order.status]}</span>
-          {order.scheduled_for && <span className="order-tag">📅 Agendado para {fmtDateTime(order.scheduled_for)}</span>}
+          {order.scheduled_for && (
+            <span className="order-tag">
+              <CalendarClock size={12} strokeWidth={2.2} /> Agendado para {fmtDateTime(order.scheduled_for)}
+            </span>
+          )}
           <span className="order-tag">{ORDER_TYPE_LABEL[order.order_type]}</span>
           {order.payment_method && <span className="order-tag">{PAYMENT_LABEL[order.payment_method]}</span>}
         </div>
@@ -110,14 +115,24 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <div className="receipt-line receipt-muted">
             {custCount > 1
               ? `Cliente há ${firstOrder ? fmtSince(firstOrder) : '—'} · ${custCount} pedidos`
-              : 'Primeiro pedido deste cliente 🎉'}
+              : 'Primeiro pedido deste cliente'}
           </div>
-          {address && <div className="receipt-line">📍 {address}</div>}
+          {address && (
+            <div className="receipt-line">
+              <MapPin size={13} strokeWidth={2.2} /> {address}
+            </div>
+          )}
           {order.order_type === 'dine_in' && order.table_number && (
-            <div className="receipt-line">🍽 Mesa {order.table_number}</div>
+            <div className="receipt-line">
+              <Utensils size={13} strokeWidth={2.2} /> Mesa {order.table_number}
+            </div>
           )}
           {order.address_reference && <div className="receipt-line receipt-muted">Ref.: {order.address_reference}</div>}
-          {order.customer_note && <div className="receipt-line">📝 {order.customer_note}</div>}
+          {order.customer_note && (
+            <div className="receipt-line">
+              <StickyNote size={13} strokeWidth={2.2} /> {order.customer_note}
+            </div>
+          )}
         </div>
 
         {/* Itens */}
