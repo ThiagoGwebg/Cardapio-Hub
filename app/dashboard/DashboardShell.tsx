@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { Bell, HardDrive, X, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -12,9 +13,9 @@ import ThemeToggle from './ThemeToggle'
 import './dashboard.css'
 
 const DASHBOARD_INSTALL_BENEFITS = [
-  { icon: '🔔', text: 'Alertas de pedido novo, mesmo com o app fechado' },
-  { icon: '⚡', text: 'Abre direto nos pedidos, sem precisar buscar o link' },
-  { icon: '💾', text: 'Leve — não ocupa espaço como um app de loja' },
+  { Icon: Bell, text: 'Alertas de pedido novo, mesmo com o app fechado' },
+  { Icon: Zap, text: 'Abre direto nos pedidos, sem precisar buscar o link' },
+  { Icon: HardDrive, text: 'Leve — não ocupa espaço como um app de loja' },
 ]
 
 const THEME_INIT_SCRIPT = `
@@ -205,7 +206,9 @@ export default function DashboardShell({ store, children }: { store: Store; chil
       {open && <div className="sidebar-overlay" onClick={() => setOpen(false)} />}
 
       <aside className={`sidebar ${open ? 'open' : ''}`}>
-        <button className="sidebar-close" onClick={() => setOpen(false)} aria-label="Fechar menu">✕</button>
+        <button className="sidebar-close" onClick={() => setOpen(false)} aria-label="Fechar menu">
+          <X size={18} strokeWidth={2.4} />
+        </button>
         <div className="sidebar-logo">
           cardápio<span>ágil</span>
         </div>

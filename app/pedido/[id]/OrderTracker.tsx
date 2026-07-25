@@ -1,7 +1,26 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { AlertTriangle, Check, Copy, Lock, QrCode, RefreshCw, ShieldCheck } from 'lucide-react'
+import {
+  AlertTriangle,
+  Bike,
+  CalendarClock,
+  Check,
+  ChefHat,
+  CircleCheck,
+  Copy,
+  Link2,
+  Lock,
+  Package,
+  PartyPopper,
+  QrCode,
+  ReceiptText,
+  RefreshCw,
+  SearchX,
+  ShieldCheck,
+  XCircle,
+  type LucideIcon,
+} from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents, fmtOrderNumber, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL, PIX_KEY_TYPE_LABEL } from '@/lib/format'
 import { saveOrderToHistory } from '@/lib/orderHistory'
@@ -42,12 +61,12 @@ type Order = {
 const FLOW_DELIVERY = ['novo', 'preparando', 'pronto', 'a_caminho', 'concluido']
 const FLOW_OTHER = ['novo', 'preparando', 'pronto', 'concluido']
 
-const STEP_ICON: Record<string, string> = {
-  novo: '🧾',
-  preparando: '👨‍🍳',
-  pronto: '📦',
-  a_caminho: '🛵',
-  concluido: '🎉',
+const STEP_ICON: Record<string, LucideIcon> = {
+  novo: ReceiptText,
+  preparando: ChefHat,
+  pronto: Package,
+  a_caminho: Bike,
+  concluido: PartyPopper,
 }
 
 function estimatedArrival(createdAt: string, etaMin: number) {
@@ -55,26 +74,26 @@ function estimatedArrival(createdAt: string, etaMin: number) {
   return arrival.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 }
 
-function heroFor(status: string, orderType: string): { icon: string; title: string; sub: string } {
+function heroFor(status: string, orderType: string): { Icon: LucideIcon; title: string; sub: string } {
   switch (status) {
     case 'agendado':
-      return { icon: '📅', title: 'Pedido agendado', sub: 'A loja vai preparar seu pedido na data e hora combinadas.' }
+      return { Icon: CalendarClock, title: 'Pedido agendado', sub: 'A loja vai preparar seu pedido na data e hora combinadas.' }
     case 'novo':
-      return { icon: '✅', title: 'Pedido recebido!', sub: 'A loja já foi avisada e vai começar o preparo.' }
+      return { Icon: CircleCheck, title: 'Pedido recebido!', sub: 'A loja já foi avisada e vai começar o preparo.' }
     case 'preparando':
-      return { icon: '👨‍🍳', title: 'Preparando seu pedido', sub: 'Tá rolando na cozinha agora mesmo.' }
+      return { Icon: ChefHat, title: 'Preparando seu pedido', sub: 'Tá rolando na cozinha agora mesmo.' }
     case 'pronto':
       return orderType === 'delivery'
-        ? { icon: '📦', title: 'Pedido pronto!', sub: 'Logo, logo sai para entrega.' }
+        ? { Icon: Package, title: 'Pedido pronto!', sub: 'Logo, logo sai para entrega.' }
         : orderType === 'dine_in'
-          ? { icon: '🎉', title: 'Pedido pronto!', sub: 'Já vai ser levado até você.' }
-          : { icon: '🎉', title: 'Pronto para retirada!', sub: 'Pode vir buscar quando quiser.' }
+          ? { Icon: PartyPopper, title: 'Pedido pronto!', sub: 'Já vai ser levado até você.' }
+          : { Icon: PartyPopper, title: 'Pronto para retirada!', sub: 'Pode vir buscar quando quiser.' }
     case 'a_caminho':
-      return { icon: '🛵', title: 'Saiu para entrega', sub: 'Seu pedido está a caminho. Fica de olho!' }
+      return { Icon: Bike, title: 'Saiu para entrega', sub: 'Seu pedido está a caminho. Fica de olho!' }
     case 'concluido':
-      return { icon: '🎉', title: 'Pedido concluído', sub: 'Bom apetite! Obrigado pela preferência.' }
+      return { Icon: PartyPopper, title: 'Pedido concluído', sub: 'Bom apetite! Obrigado pela preferência.' }
     default:
-      return { icon: '🧾', title: 'Acompanhe seu pedido', sub: '' }
+      return { Icon: ReceiptText, title: 'Acompanhe seu pedido', sub: '' }
   }
 }
 
@@ -190,7 +209,7 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
       <div className={`storefront storefront-${themeMode} track-page`}>
         <div className="track-shell">
           <div className="track-hero">
-            <span className="track-hero-icon">🔍</span>
+            <span className="track-hero-icon"><SearchX size={44} strokeWidth={1.6} /></span>
             <div className="track-hero-title">Pedido não encontrado</div>
             <div className="track-hero-sub">O link pode estar incompleto ou o pedido foi removido.</div>
           </div>
@@ -372,13 +391,13 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
         {/* Hero de status */}
         {canceled ? (
           <div className="track-hero track-hero--canceled">
-            <span className="track-hero-icon">✖️</span>
+            <span className="track-hero-icon"><XCircle size={44} strokeWidth={1.6} /></span>
             <div className="track-hero-title">Pedido cancelado</div>
             <div className="track-hero-sub">Se ficou alguma dúvida, fale direto com a loja.</div>
           </div>
         ) : (
           <div className="track-hero">
-            <span className="track-hero-icon">{hero.icon}</span>
+            <span className="track-hero-icon"><hero.Icon size={44} strokeWidth={1.6} /></span>
             <div className="track-hero-title">{hero.title}</div>
             {hero.sub && <div className="track-hero-sub">{hero.sub}</div>}
             {order.status !== 'concluido' && (
@@ -397,9 +416,12 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
             {flow.map((s, i) => {
               const done = i < currentIdx
               const current = i === currentIdx
+              const StepIcon = STEP_ICON[s]
               return (
                 <div key={s} className={`track-step ${done ? 'done' : ''} ${current ? 'current' : ''}`}>
-                  <div className="track-step-icon">{done ? '✓' : STEP_ICON[s]}</div>
+                  <div className="track-step-icon">
+                    {done ? <Check size={17} strokeWidth={3} /> : StepIcon && <StepIcon size={17} strokeWidth={2} />}
+                  </div>
                   <div className="track-step-body">
                     <span className="track-step-label">{STATUS_LABEL[s]}</span>
                     {current && <span className="track-step-now">Agora</span>}
@@ -426,7 +448,8 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
                   setTimeout(() => setPixCopied(false), 2000)
                 }}
               >
-                {pixCopied ? '✓' : 'Copiar'}
+                {pixCopied ? <Check size={14} strokeWidth={3} /> : <Copy size={14} strokeWidth={2.2} />}
+                {pixCopied ? 'Copiado' : 'Copiar'}
               </button>
             </div>
             <p className="pix-key-hint">Se ainda não pagou, envie o Pix pra essa chave e mostre o comprovante na retirada/entrega.</p>
@@ -469,7 +492,8 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
         {/* Ações */}
         <div className="track-actions">
           <button className="track-copy-btn" onClick={copyLink}>
-            {copied ? '✓ Link copiado' : '🔗 Salvar link do pedido'}
+            {copied ? <Check size={15} strokeWidth={3} /> : <Link2 size={15} strokeWidth={2.2} />}
+            {copied ? 'Link copiado' : 'Salvar link do pedido'}
           </button>
           <a className="track-back-btn" href={`/loja/${order.store_slug}`}>Voltar ao cardápio</a>
         </div>

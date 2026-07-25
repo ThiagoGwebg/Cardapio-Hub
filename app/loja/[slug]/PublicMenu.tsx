@@ -1,6 +1,22 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Bike,
+  CalendarClock,
+  Check,
+  ChefHat,
+  Copy,
+  Hourglass,
+  Megaphone,
+  Package,
+  PartyPopper,
+  ReceiptText,
+  ShoppingBag,
+  ShoppingCart,
+  XCircle,
+  type LucideIcon,
+} from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents, fmtOrderNumber, STATUS_LABEL, PIX_KEY_TYPE_LABEL, friendlyOrderError } from '@/lib/format'
@@ -78,14 +94,14 @@ function unitOf(item: CartItem) {
 
 type OrderSummary = { status: string; payment_status?: string | null; order_number: number | null; total_cents: number; item_count: number }
 
-const ORDER_STATUS_META: Record<string, { icon: string; cls: string }> = {
-  agendado: { icon: '📅', cls: 'is-pending' },
-  novo: { icon: '🧾', cls: 'is-pending' },
-  preparando: { icon: '👨‍🍳', cls: 'is-active' },
-  pronto: { icon: '📦', cls: 'is-active' },
-  a_caminho: { icon: '🛵', cls: 'is-active' },
-  concluido: { icon: '🎉', cls: 'is-done' },
-  cancelado: { icon: '✖️', cls: 'is-canceled' },
+const ORDER_STATUS_META: Record<string, { Icon: LucideIcon; cls: string }> = {
+  agendado: { Icon: CalendarClock, cls: 'is-pending' },
+  novo: { Icon: ReceiptText, cls: 'is-pending' },
+  preparando: { Icon: ChefHat, cls: 'is-active' },
+  pronto: { Icon: Package, cls: 'is-active' },
+  a_caminho: { Icon: Bike, cls: 'is-active' },
+  concluido: { Icon: PartyPopper, cls: 'is-done' },
+  cancelado: { Icon: XCircle, cls: 'is-canceled' },
 }
 
 export default function PublicMenu({
@@ -495,7 +511,7 @@ export default function PublicMenu({
                 const summary = orderSummaries[o.id]
                 const isAwaitingPayment = summary?.payment_status === 'pending'
                 const meta = summary ? ORDER_STATUS_META[summary.status] ?? ORDER_STATUS_META.novo : null
-                const icon = isAwaitingPayment ? '⏳' : meta?.icon ?? '🧾'
+                const StatusIcon = isAwaitingPayment ? Hourglass : meta?.Icon ?? ReceiptText
                 const statusLabel = isAwaitingPayment
                   ? 'Aguardando pagamento'
                   : summary
@@ -503,7 +519,9 @@ export default function PublicMenu({
                     : 'Carregando…'
                 return (
                   <a key={o.id} href={`/pedido/${o.id}`} className="my-order-card">
-                    <span className={`my-order-icon ${isAwaitingPayment ? 'is-pending' : meta?.cls ?? ''}`}>{icon}</span>
+                    <span className={`my-order-icon ${isAwaitingPayment ? 'is-pending' : meta?.cls ?? ''}`}>
+                      <StatusIcon size={18} strokeWidth={2} />
+                    </span>
                     <span className="my-order-main">
                       <span className="my-order-title">
                         Pedido {summary ? fmtOrderNumber(summary.order_number, o.id) : `#${o.id.slice(0, 8)}`}
@@ -575,12 +593,18 @@ export default function PublicMenu({
       </header>
 
       {theme.announcement && (
-        <div className="storefront-announce">📣 {theme.announcement}</div>
+        <div className="storefront-announce">
+          <Megaphone size={15} strokeWidth={2.2} />
+          <span>{theme.announcement}</span>
+        </div>
       )}
 
       {!store.delivery_enabled && (store.pickup_enabled || store.dine_in_enabled) && (
         <div className="storefront-fulfillment">
-          🛍️ Esta loja trabalha {store.pickup_enabled ? 'com retirada no local' : 'para consumo no local'} — <b>sem entrega</b>
+          <ShoppingBag size={15} strokeWidth={2.2} />
+          <span>
+            Esta loja trabalha {store.pickup_enabled ? 'com retirada no local' : 'para consumo no local'} — <b>sem entrega</b>
+          </span>
         </div>
       )}
 
@@ -655,7 +679,7 @@ export default function PublicMenu({
 
           {cart.length === 0 ? (
             <div className="cart-empty" style={{ display: 'flex' }}>
-              <span className="cart-empty-emoji" aria-hidden>🛒</span>
+              <span className="cart-empty-emoji" aria-hidden><ShoppingCart size={40} strokeWidth={1.5} /></span>
               <p>Seu carrinho está vazio</p>
             </div>
           ) : (
@@ -824,7 +848,8 @@ export default function PublicMenu({
                           setTimeout(() => setPixCopied(false), 2000)
                         }}
                       >
-                        {pixCopied ? '✓' : 'Copiar'}
+                        {pixCopied ? <Check size={14} strokeWidth={3} /> : <Copy size={14} strokeWidth={2.2} />}
+                        {pixCopied ? 'Copiado' : 'Copiar'}
                       </button>
                     </div>
                     <p className="pix-key-hint">Pague com essa chave e confirme o pedido. O comprovante pode ser confirmado direto com a loja.</p>

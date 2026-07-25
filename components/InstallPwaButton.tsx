@@ -1,18 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { ClipboardList, HardDrive, Zap, type LucideIcon } from 'lucide-react'
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
-type Benefit = { icon: string; text: string }
+type Benefit = { Icon: LucideIcon; text: string }
 
 const DEFAULT_BENEFITS: Benefit[] = [
-  { icon: '⚡', text: 'Abre na hora, sem precisar buscar o site' },
-  { icon: '📋', text: 'Seus pedidos ficam salvos e fáceis de acompanhar' },
-  { icon: '💾', text: 'Leve — não ocupa espaço como um app de loja' },
+  { Icon: Zap, text: 'Abre na hora, sem precisar buscar o site' },
+  { Icon: ClipboardList, text: 'Seus pedidos ficam salvos e fáceis de acompanhar' },
+  { Icon: HardDrive, text: 'Leve — não ocupa espaço como um app de loja' },
 ]
 
 function isIos() {
@@ -158,7 +159,7 @@ export default function InstallPwaButton({
             <div className="pwa-benefits">
               {benefits.map((b) => (
                 <div className="pwa-benefit" key={b.text}>
-                  <span className="pwa-benefit-icon">{b.icon}</span>
+                  <span className="pwa-benefit-icon"><b.Icon size={17} strokeWidth={2.1} /></span>
                   <span>{b.text}</span>
                 </div>
               ))}
