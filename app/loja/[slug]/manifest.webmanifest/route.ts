@@ -17,22 +17,18 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
 
   const theme = (store.theme ?? {}) as { primaryColor?: string; logoUrl?: string }
   const primaryColor = theme.primaryColor || '#FF5722'
-  const logoUrl = theme.logoUrl
 
-  const generatedIcon = `/loja/${slug}/app-icon.svg`
-  // O ícone gerado é "full-bleed" (fundo colorido preenche o quadrado), então serve de maskable
-  // no Android e evita a borda branca em volta do logo do cliente.
-  const icons = logoUrl
-    ? [
-        { src: logoUrl, sizes: '192x192', type: 'image/png', purpose: 'any' },
-        { src: logoUrl, sizes: '512x512', type: 'image/png', purpose: 'any' },
-        { src: generatedIcon, sizes: '512x512', type: 'image/svg+xml', purpose: 'maskable' },
-      ]
-    : [
-        { src: generatedIcon, sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
-        { src: generatedIcon, sizes: '512x512', type: 'image/svg+xml', purpose: 'any' },
-        { src: generatedIcon, sizes: '512x512', type: 'image/svg+xml', purpose: 'maskable' },
-      ]
+  // Todos os ícones saem da rota PNG, que já desenha a logo da loja (ou a inicial, se não
+  // houver logo) num quadrado 512×512. Antes o manifest apontava a logo crua: como o upload
+  // pode ser JPG/WEBP/SVG e de qualquer proporção, o `type`/`sizes` declarado ficava errado
+  // e o Chrome descartava o ícone na hora de instalar a PWA.
+  const icon = `/loja/${slug}/app-icon.png`
+  const icons = [
+    { src: icon, sizes: '192x192', type: 'image/png', purpose: 'any' },
+    { src: icon, sizes: '512x512', type: 'image/png', purpose: 'any' },
+    // Full-bleed (o desenho preenche o quadrado), então serve de maskable sem borda branca.
+    { src: icon, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+  ]
 
   const manifest = {
     id: `/loja/${store.slug}`,

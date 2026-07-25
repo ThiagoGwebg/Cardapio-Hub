@@ -2,18 +2,22 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
+  Banknote,
   Bike,
   CalendarClock,
   Check,
   ChefHat,
   Copy,
+  CreditCard,
   Hourglass,
   Megaphone,
   Package,
   PartyPopper,
+  QrCode,
   ReceiptText,
   ShoppingBag,
   ShoppingCart,
+  Wallet,
   XCircle,
   type LucideIcon,
 } from 'lucide-react'
@@ -87,6 +91,32 @@ type CartItem = {
 
 type OrderType = 'delivery' | 'pickup' | 'dine_in'
 type Payment = 'cash' | 'card' | 'card_online' | 'pix'
+
+// Rótulo curto + linha de apoio: o nome sozinho não distingue "cartão agora" de
+// "cartão na entrega", e frases longas quebravam feio dentro do botão.
+const PAYMENT_ICON: Record<Payment, LucideIcon> = {
+  pix: QrCode,
+  card_online: CreditCard,
+  cash: Banknote,
+  card: Wallet,
+}
+
+const PAYMENT_NAME: Record<Payment, string> = {
+  pix: 'Pix',
+  card_online: 'Cartão',
+  cash: 'Dinheiro',
+  card: 'Cartão',
+}
+
+// Onde o pagamento offline acontece muda com o tipo de pedido — "na entrega" seria
+// mentira em retirada ou pedido na mesa.
+function paymentHint(p: Payment, orderType: string, onlinePix: boolean): string {
+  if (p === 'card_online') return 'Pagar agora'
+  if (p === 'pix') return onlinePix ? 'Pagar agora' : 'Chave da loja'
+  if (orderType === 'pickup') return 'Na retirada'
+  if (orderType === 'dine_in') return 'No local'
+  return 'Na entrega'
+}
 
 function unitOf(item: CartItem) {
   return item.base_cents + item.options.reduce((s, o) => s + o.price_delta_cents, 0)
@@ -806,20 +836,25 @@ export default function PublicMenu({
 
                 {/* Pagamento */}
                 {payments.length > 0 && (
-                  <div className="ordertype-row">
-                    {payments.map((p) => (
-                      <button key={p} type="button" className={`ordertype-btn ${payment === p ? 'active' : ''}`} onClick={() => setPayment(p)}>
-                        {p === 'cash'
-                          ? 'Dinheiro'
-                          : p === 'card'
-                            ? 'Cartão na entrega'
-                            : p === 'card_online'
-                              ? 'Cartão — pagar agora'
-                              : onlinePix
-                                ? 'Pix — pagar agora'
-                                : 'Pix'}
-                      </button>
-                    ))}
+                  <div className="payment-grid">
+                    {payments.map((p) => {
+                      const Icon = PAYMENT_ICON[p]
+                      return (
+                        <button
+                          key={p}
+                          type="button"
+                          className={`payment-btn ${payment === p ? 'active' : ''}`}
+                          aria-pressed={payment === p}
+                          onClick={() => setPayment(p)}
+                        >
+                          <Icon size={18} strokeWidth={2} className="payment-btn-icon" />
+                          <span className="payment-btn-text">
+                            <span className="payment-btn-label">{PAYMENT_NAME[p]}</span>
+                            <span className="payment-btn-hint">{paymentHint(p, orderType, onlinePix)}</span>
+                          </span>
+                        </button>
+                      )
+                    })}
                   </div>
                 )}
                 {payment === 'cash' && (

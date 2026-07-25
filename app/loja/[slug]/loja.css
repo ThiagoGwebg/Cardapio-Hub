@@ -363,6 +363,57 @@
   color: var(--primary);
 }
 
+/* Formas de pagamento: até 4 opções não cabem numa linha só (o texto quebrava em
+   3 linhas dentro do botão), então vão em grade de 2 colunas. */
+.storefront .payment-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.storefront .payment-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  text-align: left;
+  transition: 0.2s;
+}
+.storefront .payment-btn-icon {
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+.storefront .payment-btn-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+.storefront .payment-btn-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.storefront .payment-btn-hint {
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.storefront .payment-btn.active {
+  background: rgba(var(--primary-rgb, 255, 87, 34), 0.1);
+  border-color: var(--primary);
+}
+.storefront .payment-btn.active .payment-btn-icon,
+.storefront .payment-btn.active .payment-btn-label,
+.storefront .payment-btn.active .payment-btn-hint {
+  color: var(--primary);
+}
+
 /* Cart item text colors */
 .storefront .cart-item-name { color: var(--text); font-weight: 600; }
 .storefront .cart-item-unit { color: var(--muted); }

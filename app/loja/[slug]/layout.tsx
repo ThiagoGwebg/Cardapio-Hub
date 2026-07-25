@@ -22,7 +22,10 @@ export async function generateMetadata({
   const { slug } = await params
   const store = await getStoreHead(slug)
   const name = store?.name || 'Cardápio'
-  const icon = store?.theme?.logoUrl || `/loja/${slug}/app-icon.svg`
+  // Mesma rota do ícone da PWA: entrega a logo da loja já quadrada em PNG 512×512.
+  // Usar `theme.logoUrl` direto deixava o favicon torto quando a logo não era quadrada,
+  // e o apple-touch-icon do iPhone exige PNG quadrado.
+  const icon = `/loja/${slug}/app-icon.png`
 
   return {
     title: name,
@@ -35,10 +38,13 @@ export async function generateMetadata({
       title: name,
       statusBarStyle: 'black-translucent',
     },
+    // `sizes`/`type` explícitos são necessários: o Next injeta o favicon.ico global do
+    // Cardápio Hub em toda rota, declarado como 256×256. Sem tamanho declarado aqui, o
+    // navegador podia preferir o ícone global e ignorar a logo da loja na aba.
     icons: {
-      icon,
-      shortcut: icon,
-      apple: icon,
+      icon: [{ url: icon, sizes: '512x512', type: 'image/png' }],
+      shortcut: [{ url: icon, sizes: '512x512', type: 'image/png' }],
+      apple: [{ url: icon, sizes: '180x180', type: 'image/png' }],
     },
     other: {
       // O Next já emite `mobile-web-app-capable` (moderno) via appleWebApp.capable.

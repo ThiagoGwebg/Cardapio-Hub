@@ -15,6 +15,11 @@ function darken(hex: string, amount: number) {
 // Ícone PNG "de verdade" por loja. O Chrome no Android só aceita ícones raster (PNG) pra
 // instalação da PWA — ícone SVG faz o convite aparecer mas a instalação falhar. Renderizamos
 // full-bleed (fundo preenche o quadrado) pra também servir de maskable, sem borda branca.
+//
+// Quando a loja tem logo, é ELA que vira o ícone do app e o favicon do cardápio. Passar a
+// logo direto no manifest não funcionava: o arquivo enviado pode ser JPG/WEBP/SVG e de
+// qualquer proporção, enquanto o manifest precisa declarar tipo e tamanho corretos. Ao
+// redesenhar aqui, qualquer upload vira um PNG 512×512 quadrado e válido.
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const supabase = await createClient()
@@ -26,10 +31,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
     .maybeSingle()
 
   const name = store?.name || 'Cardápio'
-  const theme = (store?.theme ?? {}) as { primaryColor?: string }
+  const theme = (store?.theme ?? {}) as { primaryColor?: string; logoUrl?: string }
   const color = theme.primaryColor || '#FF5722'
   const dark = darken(color, 45)
   const letter = name.trim().charAt(0).toUpperCase() || 'C'
+  const logoUrl = theme.logoUrl?.trim()
+
+  // Cache longo no CDN: o ícone só muda quando a loja troca a logo, e aí a URL do
+  // arquivo no Storage também muda — então não há risco de servir ícone velho.
+  const headers = { 'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800' }
 
   return new ImageResponse(
     (
@@ -47,9 +57,16 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
           fontFamily: 'sans-serif',
         }}
       >
-        {letter}
+        {logoUrl ? (
+          // `cover` preenche o quadrado mesmo com logo retangular, mantendo o full-bleed
+          // que o ícone maskable do Android exige (sem borda branca em volta).
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={logoUrl} alt="" width={512} height={512} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          letter
+        )}
       </div>
     ),
-    { width: 512, height: 512 }
+    { width: 512, height: 512, headers }
   )
 }
