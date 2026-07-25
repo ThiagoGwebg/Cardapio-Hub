@@ -44,7 +44,9 @@ export async function generateMetadata({
     icons: {
       icon: [{ url: icon, sizes: '512x512', type: 'image/png' }],
       shortcut: [{ url: icon, sizes: '512x512', type: 'image/png' }],
-      apple: [{ url: icon, sizes: '180x180', type: 'image/png' }],
+      // A rota entrega 512×512; declarar o tamanho real evita mentir pro iOS, que
+      // reduz sozinho para o tamanho da tela de início.
+      apple: [{ url: icon, sizes: '512x512', type: 'image/png' }],
     },
     other: {
       // O Next já emite `mobile-web-app-capable` (moderno) via appleWebApp.capable.
