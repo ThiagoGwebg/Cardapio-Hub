@@ -4069,3 +4069,46 @@ button:disabled:hover,
   animation: btnSpin 0.7s linear infinite;
 }
 @keyframes btnSpin { to { transform: rotate(360deg); } }
+
+/* ══════════════════════════════════════════════════════════
+   ACESSIBILIDADE — baseline global
+   Auditoria de jul/2026: havia 100 regras :hover para 2 :focus-visible,
+   e 7 `outline: none`. Quem navega por teclado não enxergava o foco em
+   nenhum botão. As regras abaixo são o piso para toda a aplicação.
+   ══════════════════════════════════════════════════════════ */
+
+/* Anel de foco consistente. Usa :focus-visible (e não :focus) para o anel
+   aparecer só na navegação por teclado — clique de mouse segue sem contorno.
+   Seletor de elemento + pseudo-classe vence os `outline: none` por classe.
+   O offset joga o anel para fora do botão, garantindo contraste mesmo em
+   botões preenchidos com a cor primária. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Respeita quem pediu menos movimento no sistema (enjoo/vertigem). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Exceção: spinners são feedback de carregamento, não enfeite — se
+     parassem, a tela pareceria travada. */
+  .track-spinner,
+  .btn-spinner,
+  .pay-btn-spinner {
+    animation-duration: 0.8s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
