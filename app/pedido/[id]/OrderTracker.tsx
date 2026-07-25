@@ -70,6 +70,23 @@ const STEP_ICON: Record<string, LucideIcon> = {
   concluido: PartyPopper,
 }
 
+/**
+ * Avatar da loja no topo. Usa a mesma rota do ícone do app, que já entrega a logo
+ * quadrada (ou a inicial num gradiente, quando a loja não tem logo) — assim o
+ * cabeçalho do pedido mostra a marca sem precisar de um campo novo no get_order.
+ * Se a imagem falhar, cai para a letra em vez de deixar um quadrado quebrado.
+ */
+function StoreBadge({ slug, letter }: { slug: string; letter: string }) {
+  const [failed, setFailed] = useState(false)
+  if (failed || !slug) return <div className="track-store-badge">{letter}</div>
+  return (
+    <div className="track-store-badge track-store-badge--logo">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={`/loja/${slug}/app-icon.png`} alt="" onError={() => setFailed(true)} />
+    </div>
+  )
+}
+
 function estimatedArrival(createdAt: string, etaMin: number) {
   const arrival = new Date(new Date(createdAt).getTime() + etaMin * 60000)
   return arrival.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
@@ -236,7 +253,7 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
       <div className={`storefront storefront-${themeMode} track-page`}>
         <div className="track-shell">
           <div className="track-top">
-            <div className="track-store-badge">{initialLetter}</div>
+            <StoreBadge slug={order.store_slug} letter={initialLetter} />
             <div className="track-top-info">
               <div className="track-store">{order.store_name}</div>
               <div className="track-order-num">Pedido {fmtOrderNumber(order.order_number, order.id)}</div>
@@ -387,7 +404,7 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
       <div className="track-shell">
         {/* Cabeçalho da loja */}
         <div className="track-top">
-          <div className="track-store-badge">{initial}</div>
+          <StoreBadge slug={order.store_slug} letter={initial} />
           <div className="track-top-info">
             <div className="track-store">{order.store_name}</div>
             <div className="track-order-num">

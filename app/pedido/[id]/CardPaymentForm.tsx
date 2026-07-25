@@ -179,12 +179,18 @@ export default function CardPaymentForm({
         </div>
       )}
       {rejectMsg && (
-        <div className="pix-key-box" role="alert" style={{ marginBottom: 12 }}>
-          <span className="pix-key-label">Pagamento recusado</span>
-          <p className="pix-key-hint">{rejectMsg}</p>
+        <div className="pay-reject" role="alert">
+          <AlertTriangle size={16} strokeWidth={2.3} />
+          <div>
+            <strong>Pagamento recusado</strong>
+            <p>{rejectMsg}</p>
+          </div>
         </div>
       )}
-      <div id="mp-card-brick" />
+      {/* O container precisa existir no DOM pro Brick montar, mas fica oculto até ficar
+          pronto: o Mercado Pago desenha o próprio esqueleto cinza e ele aparecia embaixo
+          do nosso spinner, deixando a tela com dois carregamentos ao mesmo tempo. */}
+      <div id="mp-card-brick" style={{ display: ready ? 'block' : 'none' }} />
     </div>
   )
 }

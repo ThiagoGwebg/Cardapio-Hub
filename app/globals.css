@@ -2220,6 +2220,21 @@ tr:hover td {
   box-shadow: 0 6px 16px rgba(255, 87, 34, 0.28);
   flex-shrink: 0;
 }
+/* Quando há logo, o quadrado vira moldura da imagem: sem gradiente por baixo
+   (apareceria nas bordas de logos com fundo claro) e sem sombra colorida. */
+.track-store-badge--logo {
+  background: var(--surface2);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  padding: 0;
+}
+.track-store-badge--logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .track-top-info { min-width: 0; }
 .track-store { font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
 .track-order-num { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
@@ -2886,6 +2901,22 @@ tr:hover td {
   border-top-color: var(--primary);
   animation: trackSpin 0.8s linear infinite;
 }
+
+/* Recusa do cartão: alerta legível, no lugar da caixa de "chave Pix" reaproveitada. */
+.pay-reject {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--red-l);
+  border: 1px solid var(--red);
+  color: var(--red);
+}
+.pay-reject > svg { flex-shrink: 0; margin-top: 1px; }
+.pay-reject strong { display: block; font-size: 13.5px; font-weight: 800; }
+.pay-reject p { margin: 3px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--text2); }
 
 .pay-trust {
   display: flex;
