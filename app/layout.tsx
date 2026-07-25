@@ -7,6 +7,19 @@ import Analytics from '@/components/analytics/Analytics'
 export const metadata: Metadata = {
   title: 'Cardápio Hub',
   description: 'Cardápio digital e painel de gestão para pequenos negócios',
+  // Declarados aqui, e não como `app/favicon.ico`/`app/icon.svg`: os arquivos de
+  // convenção são injetados em TODA rota e não podem ser sobrescritos por um layout
+  // aninhado. O favicon global vencia o da loja na aba do cardápio, porque o Next o
+  // publica como 16×16 — casando exatamente com o tamanho que o navegador procura.
+  // Como metadata, o layout de /loja/[slug] substitui por completo pela logo da loja.
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '16x16', type: 'image/x-icon' },
+    ],
+    shortcut: [{ url: '/favicon.ico' }],
+    apple: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+  },
 }
 
 // Captura o beforeinstallprompt o quanto antes, antes até do bundle do Next carregar.
