@@ -1,5 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin'
-import { refreshOAuthToken } from '@/lib/mercadopago/client'
+import { refreshOAuthToken, mpFetch } from '@/lib/mercadopago/client'
 
 export type SellerCredential = {
   store_id: string
@@ -49,4 +49,24 @@ export async function getFreshSellerToken(
   }
 
   return { accessToken: cred.access_token, mpUserId: cred.mp_user_id }
+}
+
+export type MpAccountInfo = {
+  id: number
+  nickname?: string
+  email?: string
+  first_name?: string
+  last_name?: string
+}
+
+// Dados públicos da conta MP conectada do lojista (nome, e-mail, nickname), pra exibir no painel.
+// Se o MP recusar a leitura mas houver conta conectada, devolve ao menos o ID; null se não há conta.
+export async function getConnectedMpAccount(storeId: string): Promise<MpAccountInfo | null> {
+  const seller = await getFreshSellerToken(storeId)
+  if (!seller) return null
+  try {
+    return await mpFetch<MpAccountInfo>('/users/me', { accessToken: seller.accessToken, method: 'GET' })
+  } catch {
+    return seller.mpUserId ? { id: Number(seller.mpUserId) } : null
+  }
 }

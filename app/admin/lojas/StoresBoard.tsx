@@ -15,6 +15,8 @@ export type AdminStore = {
   orders: number
   gmvCents: number
   createdAt: string
+  mpConnected: boolean
+  mpUserId?: string
 }
 
 type SortKey = 'recent' | 'orders' | 'gmv' | 'name'
@@ -126,6 +128,11 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
                   {store.name}
                   <span className={`adm-badge ${store.isPro ? 'pro' : ''}`}>{store.isPro ? '★ Pro' : 'Lite'}</span>
                   {!store.isOpen && <span className="adm-badge closed">Fechada</span>}
+                  {store.mpConnected && (
+                    <span className="adm-badge" title={store.mpUserId ? `Conta MP ${store.mpUserId}` : 'Mercado Pago conectado'}>
+                      💳 MP{store.mpUserId ? ` ${store.mpUserId}` : ''}
+                    </span>
+                  )}
                 </div>
                 <div className="adm-store-meta">
                   {store.email && <span title="Dono da loja">👤 {store.email}</span>}

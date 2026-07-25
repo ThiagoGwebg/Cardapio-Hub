@@ -34,6 +34,8 @@ export default function DisconnectMpButton({ action }: { action: () => Promise<v
             'Desvincular a conta do Mercado Pago?\n\n' +
               '• O Pix pelo app será desligado e o cardápio volta a aceitar só as formas offline.\n' +
               '• Pedidos que já estavam aguardando pagamento não serão mais confirmados automaticamente.\n\n' +
+              'Isto remove a conexão apenas aqui no app. Para revogar por completo, entre na sua ' +
+              'conta do Mercado Pago (Seu negócio › Aplicativos conectados) e remova o acesso do app.\n\n' +
               'Você pode conectar de novo quando quiser.'
           )
         ) {

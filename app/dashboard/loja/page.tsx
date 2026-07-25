@@ -1,4 +1,5 @@
 import { getCurrentStore } from '@/lib/store'
+import { getConnectedMpAccount } from '@/lib/mercadopago/tokens'
 import { fmtCents } from '@/lib/format'
 import { isStorePro } from '@/lib/plan'
 import type { StoreTheme } from '@/lib/storeTheme'
@@ -15,6 +16,12 @@ export default async function LojaPage({ searchParams }: { searchParams: Promise
   const theme = (store.theme ?? {}) as StoreTheme
   const isPro = await isStorePro(supabase, store.id)
   const { mp } = await searchParams
+
+  // Dados da conta MP conectada (nome/e-mail/ID) pra mostrar no card de pagamento online.
+  const mpAccount = store.mp_connected ? await getConnectedMpAccount(store.id) : null
+  const mpAccountName =
+    mpAccount &&
+    ([mpAccount.first_name, mpAccount.last_name].filter(Boolean).join(' ') || mpAccount.nickname)
 
   const mpBanner =
     mp === 'connected'
@@ -62,7 +69,26 @@ export default async function LojaPage({ searchParams }: { searchParams: Promise
         <div className="toggle-row">
           <div>
             <div className="toggle-label">Conta Mercado Pago</div>
-            <div className="toggle-desc">{store.mp_connected ? '✓ Conectada' : 'Nenhuma conta conectada ainda.'}</div>
+            {store.mp_connected ? (
+              <div className="toggle-desc">
+                <span style={{ color: '#16a34a', fontWeight: 600 }}>✓ Conectada</span>
+                {mpAccount ? (
+                  <>
+                    {mpAccountName && <> — {mpAccountName}</>}
+                    {mpAccount.email && (
+                      <>
+                        <br />
+                        {mpAccount.email}
+                      </>
+                    )}
+                    <br />
+                    <span style={{ opacity: 0.7 }}>ID {mpAccount.id}</span>
+                  </>
+                ) : null}
+              </div>
+            ) : (
+              <div className="toggle-desc">Nenhuma conta conectada ainda.</div>
+            )}
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
             <a className="save-btn" href="/api/mp/oauth/start" style={{ textDecoration: 'none' }}>
