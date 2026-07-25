@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { Star } from 'lucide-react'
 import { setStorePlan } from './actions'
 
 export default function PlanToggle({ storeId, isPro }: { storeId: string; isPro: boolean }) {
@@ -25,7 +26,15 @@ export default function PlanToggle({ storeId, isPro }: { storeId: string; isPro:
         onClick={toggle}
         disabled={pending}
       >
-        {pending ? '…' : isPro ? 'Rebaixar p/ Lite' : '★ Ativar Pro'}
+        {pending ? (
+          '…'
+        ) : isPro ? (
+          'Rebaixar p/ Lite'
+        ) : (
+          <>
+            <Star size={13} strokeWidth={2.6} /> Ativar Pro
+          </>
+        )}
       </button>
       {error && <span className="adm-toggle-error">{error}</span>}
     </span>

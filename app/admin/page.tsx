@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { CircleCheck, ClipboardList, Flame, Plus, Store } from 'lucide-react'
 import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -238,7 +239,7 @@ export default async function AdminHomePage() {
       <div className="adm-panels">
         <section className="adm-panel">
           <div className="adm-panel-head">
-            <h2>🔥 Radar de upgrade</h2>
+            <h2><Flame size={17} strokeWidth={2.2} /> Radar de upgrade</h2>
             <Link href="/admin/lojas" className="adm-panel-link">gerenciar planos →</Link>
           </div>
           <p className="adm-panel-hint">
@@ -255,7 +256,11 @@ export default async function AdminHomePage() {
                     <div className="adm-radar-top">
                       <span className="adm-radar-name">
                         {s.name}
-                        {s.pct >= 80 && <span className="adm-radar-flame" title="Pronta pra virar Pro">🔥</span>}
+                        {s.pct >= 80 && (
+                          <span className="adm-radar-flame" title="Pronta pra virar Pro">
+                            <Flame size={13} strokeWidth={2.4} />
+                          </span>
+                        )}
                       </span>
                       <span className={`adm-radar-count ${heat}`}>
                         {s.orders}/{freeLimit}
@@ -309,7 +314,9 @@ export default async function AdminHomePage() {
             <Link href="/admin/leads" className="adm-panel-link">ver todos →</Link>
           </div>
           {recentLeads.length === 0 ? (
-            <p className="adm-panel-empty">✅ Nenhum lead pendente — tudo em dia!</p>
+            <p className="adm-panel-empty">
+              <CircleCheck size={15} strokeWidth={2.2} /> Nenhum lead pendente — tudo em dia!
+            </p>
           ) : (
             <ul className="adm-mini-list">
               {recentLeads.map((l) => (
@@ -331,13 +338,16 @@ export default async function AdminHomePage() {
           </div>
           <div className="adm-shortcuts">
             <Link href="/admin/leads" className="adm-shortcut">
-              📋 <span>Painel de leads<br /><small>aprovar contas, WhatsApp, anotações</small></span>
+              <ClipboardList size={20} strokeWidth={2} />
+              <span>Painel de leads<br /><small>aprovar contas, WhatsApp, anotações</small></span>
             </Link>
             <Link href="/admin/lojas" className="adm-shortcut">
-              🏪 <span>Todas as lojas<br /><small>planos, pedidos, donos</small></span>
+              <Store size={20} strokeWidth={2} />
+              <span>Todas as lojas<br /><small>planos, pedidos, donos</small></span>
             </Link>
             <Link href="/signup" className="adm-shortcut">
-              ➕ <span>Criar loja manual<br /><small>sem passar por lead</small></span>
+              <Plus size={20} strokeWidth={2} />
+              <span>Criar loja manual<br /><small>sem passar por lead</small></span>
             </Link>
           </div>
         </section>

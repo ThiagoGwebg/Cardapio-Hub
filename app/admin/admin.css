@@ -499,8 +499,31 @@ a.adm-stat:hover {
   white-space: nowrap;
 }
 .adm-radar-flame {
+  display: inline-flex;
+  vertical-align: -2px;
   margin-left: 6px;
+  color: #f97316;
 }
+
+/* Alinhamento dos ícones lucide nos containers que antes seguravam emoji. */
+.lead-chip,
+.leads-cred-warn,
+.adm-panel-empty,
+.leads-modal-title,
+.adm-usage-label,
+.lead-notes-toggle,
+.leads-alert-cta,
+.lead-client-check,
+.adm-panel-head h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.leads-cred-warn { align-items: flex-start; }
+.leads-cred-warn > svg { flex-shrink: 0; margin-top: 2px; }
+.adm-store-meta span { display: inline-flex; align-items: center; gap: 5px; }
+/* A rotação do caret já está em .lead-caret/.lead-caret.open, mais abaixo. */
+.lead-notes-toggle .lead-caret { margin-left: auto; }
 .adm-radar-count {
   font-size: 12px;
   font-weight: 800;
@@ -1669,9 +1692,11 @@ a.adm-stat:hover {
   color: var(--muted);
 }
 .leads-empty-emoji {
-  font-size: 42px;
+  display: flex;
+  justify-content: center;
   margin-bottom: 12px;
-  filter: grayscale(0.2);
+  color: var(--muted);
+  opacity: 0.55;
 }
 .leads-empty-title {
   font-family: 'Nunito', sans-serif;

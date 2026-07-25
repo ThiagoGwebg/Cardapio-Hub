@@ -4,6 +4,8 @@
 // Sem 'use client': o link de "tentar de novo" é uma navegação normal (<a href>),
 // então a página continua um Server Component simples e pode exportar metadata.
 
+import { WifiOff } from 'lucide-react'
+
 export const metadata = {
   title: 'Sem conexão · Cardápio Hub',
   robots: { index: false, follow: false },
@@ -34,10 +36,10 @@ export default function OfflinePage() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 34,
+            color: '#FF5722',
           }}
         >
-          📡
+          <WifiOff size={34} strokeWidth={1.8} />
         </div>
         <h1 style={{ fontSize: 20, fontWeight: 800, margin: '0 0 8px' }}>Você está offline</h1>
         <p style={{ fontSize: 14, lineHeight: 1.5, color: '#A1A1AA', margin: '0 0 24px' }}>

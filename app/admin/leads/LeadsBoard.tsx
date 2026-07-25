@@ -2,6 +2,26 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
+  AlertTriangle,
+  Bell,
+  Bike,
+  Car,
+  Check,
+  ChevronDown,
+  CircleCheck,
+  Inbox,
+  KeyRound,
+  Mail,
+  Package,
+  PartyPopper,
+  Plus,
+  SearchX,
+  StickyNote,
+  Utensils,
+  Wallet,
+  X,
+} from 'lucide-react'
+import {
   fetchLeads,
   setLeadStatus,
   setLeadNotes,
@@ -37,6 +57,19 @@ function telLink(raw: string | null): string | null {
 }
 function initial(name: string | null): string {
   return (name?.trim()?.charAt(0) || '?').toUpperCase()
+}
+
+/**
+ * Ícone do chip de "faturamento/veículo": para entregadores, deduz o veículo a
+ * partir do texto livre que a pessoa preencheu; para lojas, é faturamento.
+ */
+function VehicleIcon({ segment, revenue }: { segment: string | null; revenue: string }) {
+  if (segment !== 'Entregador') return <Wallet size={12} strokeWidth={2.2} />
+  const r = revenue.toLowerCase()
+  if (['moto', 'motocicleta'].some((x) => r.includes(x))) return <Bike size={12} strokeWidth={2.2} />
+  if (['bike', 'bicicleta'].some((x) => r.includes(x))) return <Bike size={12} strokeWidth={2.2} />
+  if (['carro', 'automóvel', 'auto'].some((x) => r.includes(x))) return <Car size={12} strokeWidth={2.2} />
+  return <Package size={12} strokeWidth={2.2} />
 }
 function timeAgo(iso: string, now: number): string {
   const diff = Math.max(0, now - new Date(iso).getTime())
@@ -275,7 +308,7 @@ export default function LeadsBoard({ initialLeads }: { initialLeads: LeadRow[] }
 
           {!alertsOn && (
             <button className="leads-alert-cta" onClick={enableAlerts}>
-              🔔 Tocar um som e me avisar a cada lead novo
+              <Bell size={15} strokeWidth={2.2} /> Tocar um som e me avisar a cada lead novo
             </button>
           )}
 
@@ -309,7 +342,9 @@ export default function LeadsBoard({ initialLeads }: { initialLeads: LeadRow[] }
               placeholder="Buscar por nome, empresa, e-mail ou WhatsApp…"
             />
             {query && (
-              <button className="leads-search-clear" onClick={() => setQuery('')} aria-label="Limpar busca">✕</button>
+              <button className="leads-search-clear" onClick={() => setQuery('')} aria-label="Limpar busca">
+                <X size={14} strokeWidth={2.4} />
+              </button>
             )}
           </div>
 
@@ -335,19 +370,19 @@ export default function LeadsBoard({ initialLeads }: { initialLeads: LeadRow[] }
           <div className="leads-empty">
             {query ? (
               <>
-                <div className="leads-empty-emoji">🔍</div>
+                <div className="leads-empty-emoji"><SearchX size={38} strokeWidth={1.6} /></div>
                 <div className="leads-empty-title">Nada encontrado</div>
                 <div className="leads-empty-sub">Nenhum lead bate com “{query}” nesse filtro.</div>
               </>
             ) : filter === 'novo' ? (
               <>
-                <div className="leads-empty-emoji">✅</div>
+                <div className="leads-empty-emoji"><CircleCheck size={38} strokeWidth={1.6} /></div>
                 <div className="leads-empty-title">Nenhum lead pendente</div>
                 <div className="leads-empty-sub">Tudo em dia! Quando alguém preencher o formulário, aparece aqui na hora.</div>
               </>
             ) : (
               <>
-                <div className="leads-empty-emoji">📭</div>
+                <div className="leads-empty-emoji"><Inbox size={38} strokeWidth={1.6} /></div>
                 <div className="leads-empty-title">Nada por aqui ainda</div>
               </>
             )}
@@ -489,7 +524,7 @@ function LeadCard({
           </div>
         </div>
         <span className="lead-status-pill" style={{ background: meta.bg, color: meta.color }}>
-          {converted ? '✓ Cliente' : meta.label}
+          {converted ? <><Check size={12} strokeWidth={3} /> Cliente</> : meta.label}
         </span>
       </div>
 
@@ -497,16 +532,13 @@ function LeadCard({
         <div className="lead-chips">
           {lead.segment && (
             <span className="lead-chip">
-              {lead.segment === 'Entregador' ? '🛵' : '🍽️'} {lead.segment}
+              {lead.segment === 'Entregador' ? <Bike size={12} strokeWidth={2.2} /> : <Utensils size={12} strokeWidth={2.2} />}{' '}
+              {lead.segment}
             </span>
           )}
           {lead.monthly_revenue && (
             <span className="lead-chip">
-              {lead.segment === 'Entregador' ? (
-                ['moto', 'motocicleta'].some(x => lead.monthly_revenue!.toLowerCase().includes(x)) ? '🛵' :
-                ['bike', 'bicicleta'].some(x => lead.monthly_revenue!.toLowerCase().includes(x)) ? '🚲' :
-                ['carro', 'automóvel', 'auto'].some(x => lead.monthly_revenue!.toLowerCase().includes(x)) ? '🚗' : '📦'
-              ) : '💰'} {lead.monthly_revenue}
+              <VehicleIcon segment={lead.segment} revenue={lead.monthly_revenue} /> {lead.monthly_revenue}
             </span>
           )}
         </div>
@@ -528,14 +560,18 @@ function LeadCard({
           </a>
         )}
         {lead.email && (
-          <a className="lead-btn ghost" href={`mailto:${lead.email}`}>✉️ E-mail</a>
+          <a className="lead-btn ghost" href={`mailto:${lead.email}`}>
+            <Mail size={14} strokeWidth={2.2} /> E-mail
+          </a>
         )}
       </div>
 
       {lead.segment === 'Entregador' ? (
         <div className="lead-client-box" style={{ background: 'rgba(38, 198, 218, 0.08)', borderColor: 'var(--teal)', borderStyle: 'solid', borderWidth: '1px' }}>
           <div className="lead-client-info">
-            <span className="lead-client-check" style={{ color: 'var(--teal)', borderColor: 'var(--teal)' }}>🛵</span>
+            <span className="lead-client-check" style={{ color: 'var(--teal)', borderColor: 'var(--teal)' }}>
+              <Bike size={14} strokeWidth={2.4} />
+            </span>
             <div>
               <div className="lead-client-title" style={{ color: 'var(--teal)' }}>Cadastro de Entregador</div>
               <span style={{ fontSize: '11px', color: 'var(--muted)' }}>Candidato aguardando contato</span>
@@ -545,7 +581,7 @@ function LeadCard({
       ) : converted ? (
         <div className="lead-client-box">
           <div className="lead-client-info">
-            <span className="lead-client-check">✓</span>
+            <span className="lead-client-check"><Check size={14} strokeWidth={3} /></span>
             <div>
               <div className="lead-client-title">Conta ativa</div>
               {lead.store_slug && (
@@ -556,12 +592,12 @@ function LeadCard({
             </div>
           </div>
           <button className="lead-btn ghost sm" onClick={newPassword} disabled={resetting}>
-            {resetting ? 'Gerando…' : '🔑 Nova senha'}
+            {resetting ? 'Gerando…' : <><KeyRound size={13} strokeWidth={2.2} /> Nova senha</>}
           </button>
         </div>
       ) : (
         <button className="lead-approve-btn" onClick={onApprove}>
-          ✓ Aprovar e criar conta
+          <Check size={15} strokeWidth={2.8} /> Aprovar e criar conta
         </button>
       )}
 
@@ -584,9 +620,9 @@ function LeadCard({
       </div>
 
       <button className="lead-notes-toggle" onClick={() => setOpenNotes((o) => !o)}>
-        {lead.notes ? '📝 ' : '➕ '}
+        {lead.notes ? <StickyNote size={14} strokeWidth={2.2} /> : <Plus size={14} strokeWidth={2.4} />}
         {lead.notes ? 'Ver anotação' : 'Adicionar anotação'}
-        <span className={`lead-caret ${openNotes ? 'open' : ''}`}>▾</span>
+        <ChevronDown size={14} strokeWidth={2.4} className={`lead-caret ${openNotes ? 'open' : ''}`} />
       </button>
 
       {openNotes && (
@@ -599,7 +635,7 @@ function LeadCard({
           />
           <div className="lead-notes-foot">
             <button className="lead-save-note" onClick={saveNotes} disabled={savingNote}>
-              {savingNote ? 'Salvando…' : savedNote ? 'Salvo ✓' : 'Salvar anotação'}
+              {savingNote ? 'Salvando…' : savedNote ? <><Check size={13} strokeWidth={3} /> Salvo</> : 'Salvar anotação'}
             </button>
           </div>
         </div>
@@ -643,7 +679,9 @@ function ApproveModal({
       <form className="leads-modal" onClick={(e) => e.stopPropagation()} onSubmit={submit}>
         <div className="leads-modal-head">
           <div className="leads-modal-title">Aprovar {lead.name || 'lead'}</div>
-          <button type="button" className="leads-modal-close" onClick={onClose} aria-label="Fechar">✕</button>
+          <button type="button" className="leads-modal-close" onClick={onClose} aria-label="Fechar">
+            <X size={16} strokeWidth={2.4} />
+          </button>
         </div>
         <p className="leads-modal-sub">
           Cria a conta e a loja na hora. Você recebe a senha temporária pra mandar no WhatsApp — o cliente já entra direto.
@@ -665,7 +703,7 @@ function ApproveModal({
         {error && <p className="leads-modal-error">{error}</p>}
 
         <button className="leads-modal-submit" type="submit" disabled={busy}>
-          {busy ? 'Criando conta…' : '✓ Criar conta e liberar acesso'}
+          {busy ? 'Criando conta…' : <><Check size={15} strokeWidth={2.8} /> Criar conta e liberar acesso</>}
         </button>
       </form>
     </div>
@@ -712,8 +750,12 @@ function CredentialsModal({ credentials, onClose }: { credentials: Credentials; 
     <div className="leads-modal-overlay" onClick={onClose}>
       <div className="leads-modal" onClick={(e) => e.stopPropagation()}>
         <div className="leads-modal-head">
-          <div className="leads-modal-title">🎉 Conta criada!</div>
-          <button type="button" className="leads-modal-close" onClick={onClose} aria-label="Fechar">✕</button>
+          <div className="leads-modal-title">
+            <PartyPopper size={17} strokeWidth={2.2} /> Conta criada!
+          </div>
+          <button type="button" className="leads-modal-close" onClick={onClose} aria-label="Fechar">
+            <X size={16} strokeWidth={2.4} />
+          </button>
         </div>
 
         <div className="leads-cred-box">
@@ -721,14 +763,14 @@ function CredentialsModal({ credentials, onClose }: { credentials: Credentials; 
             <span className="leads-cred-label">E-mail</span>
             <code>{credentials.email}</code>
             <button className="leads-cred-copy" onClick={() => copyField('email', credentials.email)}>
-              {copiedField === 'email' ? '✓' : 'copiar'}
+              {copiedField === 'email' ? <Check size={13} strokeWidth={3} /> : 'copiar'}
             </button>
           </div>
           <div className="leads-cred-row">
             <span className="leads-cred-label">Senha</span>
             <code className="leads-cred-pass">{credentials.password}</code>
             <button className="leads-cred-copy" onClick={() => copyField('pass', credentials.password)}>
-              {copiedField === 'pass' ? '✓' : 'copiar'}
+              {copiedField === 'pass' ? <Check size={13} strokeWidth={3} /> : 'copiar'}
             </button>
           </div>
           {credentials.slug && (
@@ -740,7 +782,8 @@ function CredentialsModal({ credentials, onClose }: { credentials: Credentials; 
         </div>
 
         <p className="leads-cred-warn">
-          ⚠️ A senha só aparece agora — envie ou copie antes de fechar. Se perder, é só gerar outra no card do cliente.
+          <AlertTriangle size={14} strokeWidth={2.3} />
+          <span>A senha só aparece agora — envie ou copie antes de fechar. Se perder, é só gerar outra no card do cliente.</span>
         </p>
 
         <div className="leads-cred-actions">
@@ -750,7 +793,7 @@ function CredentialsModal({ credentials, onClose }: { credentials: Credentials; 
             </a>
           )}
           <button className="lead-btn ghost" onClick={copy}>
-            {copied ? 'Copiado ✓' : 'Copiar mensagem'}
+            {copied ? <><Check size={14} strokeWidth={3} /> Copiado</> : 'Copiar mensagem'}
           </button>
         </div>
       </div>

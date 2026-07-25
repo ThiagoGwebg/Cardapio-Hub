@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Smartphone, X } from 'lucide-react'
 
 // Evento não-padrão do Chrome/Edge/Android que permite disparar a instalação da PWA.
 type BeforeInstallPromptEvent = Event & {
@@ -92,8 +93,12 @@ export default function InstallAppButton() {
         <div className="leads-modal-overlay" onClick={() => setShowIosHelp(false)}>
           <div className="leads-modal" onClick={(e) => e.stopPropagation()}>
             <div className="leads-modal-head">
-              <div className="leads-modal-title">📲 Instalar no iPhone</div>
-              <button className="leads-modal-close" onClick={() => setShowIosHelp(false)} aria-label="Fechar">✕</button>
+              <div className="leads-modal-title">
+                <Smartphone size={17} strokeWidth={2.2} /> Instalar no iPhone
+              </div>
+              <button className="leads-modal-close" onClick={() => setShowIosHelp(false)} aria-label="Fechar">
+                <X size={16} strokeWidth={2.4} />
+              </button>
             </div>
             <p className="leads-modal-sub">
               No <strong>Safari</strong>, toque no botão <strong>Compartilhar</strong> (o quadrado com a seta pra cima,

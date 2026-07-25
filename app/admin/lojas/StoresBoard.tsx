@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { CalendarDays, CreditCard, Flame, Package, Star, User, Wallet, X } from 'lucide-react'
 import { PLAN_LIMITS } from '@/lib/stripe/plans'
 import { fmtCents } from '@/lib/format'
 import PlanToggle from './PlanToggle'
@@ -94,7 +95,7 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
           />
           {q && (
             <button className="adm-store-search-clear" onClick={() => setQ('')} aria-label="Limpar busca">
-              ✕
+              <X size={14} strokeWidth={2.4} />
             </button>
           )}
         </div>
@@ -126,20 +127,30 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
               <div className="adm-store-main">
                 <div className="adm-store-name">
                   {store.name}
-                  <span className={`adm-badge ${store.isPro ? 'pro' : ''}`}>{store.isPro ? '★ Pro' : 'Lite'}</span>
+                  <span className={`adm-badge ${store.isPro ? 'pro' : ''}`}>
+                    {store.isPro ? <><Star size={11} strokeWidth={2.6} /> Pro</> : 'Lite'}
+                  </span>
                   {!store.isOpen && <span className="adm-badge closed">Fechada</span>}
                   {store.mpConnected && (
                     <span className="adm-badge" title={store.mpUserId ? `Conta MP ${store.mpUserId}` : 'Mercado Pago conectado'}>
-                      💳 MP{store.mpUserId ? ` ${store.mpUserId}` : ''}
+                      <CreditCard size={11} strokeWidth={2.4} /> MP{store.mpUserId ? ` ${store.mpUserId}` : ''}
                     </span>
                   )}
                 </div>
                 <div className="adm-store-meta">
-                  {store.email && <span title="Dono da loja">👤 {store.email}</span>}
-                  <span>📦 {orders} pedido{orders === 1 ? '' : 's'}</span>
-                  <span title="Faturamento no mês">💰 {fmtCents(store.gmvCents)}</span>
+                  {store.email && (
+                    <span title="Dono da loja">
+                      <User size={12} strokeWidth={2.2} /> {store.email}
+                    </span>
+                  )}
                   <span>
-                    📅 desde{' '}
+                    <Package size={12} strokeWidth={2.2} /> {orders} pedido{orders === 1 ? '' : 's'}
+                  </span>
+                  <span title="Faturamento no mês">
+                    <Wallet size={12} strokeWidth={2.2} /> {fmtCents(store.gmvCents)}
+                  </span>
+                  <span>
+                    <CalendarDays size={12} strokeWidth={2.2} /> desde{' '}
                     {new Date(store.createdAt).toLocaleDateString('pt-BR', {
                       day: '2-digit',
                       month: 'short',
@@ -153,7 +164,13 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
                       <div className={`adm-usage-fill ${heat}`} style={{ width: `${pct}%` }} />
                     </div>
                     <span className={`adm-usage-label ${heat}`}>
-                      {orders}/{limit} do limite Lite{pct >= 80 ? ' · 🔥 hora do Pro' : ''}
+                      {orders}/{limit} do limite Lite
+                      {pct >= 80 && (
+                        <>
+                          {' · '}
+                          <Flame size={11} strokeWidth={2.4} /> hora do Pro
+                        </>
+                      )}
                     </span>
                   </div>
                 )}

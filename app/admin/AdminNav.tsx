@@ -1,5 +1,6 @@
 'use client'
 
+import { Zap } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -60,7 +61,7 @@ export default function AdminNav({ email }: { email: string }) {
   return (
     <nav className="adm-nav">
       <Link href="/admin" className="adm-brand">
-        <span className="adm-brand-mark">⚡</span>
+        <span className="adm-brand-mark"><Zap size={16} strokeWidth={2.4} /></span>
         <span className="adm-brand-text">
           Cardápio Hub
           <small>Painel do time</small>
