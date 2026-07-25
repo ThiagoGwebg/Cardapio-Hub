@@ -86,7 +86,7 @@ type CartItem = {
 }
 
 type OrderType = 'delivery' | 'pickup' | 'dine_in'
-type Payment = 'cash' | 'card' | 'pix'
+type Payment = 'cash' | 'card' | 'card_online' | 'pix'
 
 function unitOf(item: CartItem) {
   return item.base_cents + item.options.reduce((s, o) => s + o.price_delta_cents, 0)
@@ -270,13 +270,15 @@ export default function PublicMenu({
   }
   const [coupon, setCoupon] = useState('')
 
-  // Pix pago dentro do app (Mercado Pago): loja com pagamento online ligado e conta
-  // conectada. Nesse caso o Pix vira online (QR na tela do pedido).
+  // Pagamento dentro do app (Mercado Pago): loja com pagamento online ligado e conta
+  // conectada. Nesse caso o Pix vira online (QR na tela do pedido) e o cartão
+  // crédito/débito também pode ser pago na hora.
   const onlinePix = !!store.online_payment_enabled && !!store.mp_connected
 
   const payments = useMemo(() => {
     const p: Payment[] = []
     if (store.accepts_pix || onlinePix) p.push('pix')
+    if (onlinePix) p.push('card_online')
     if (store.accepts_cash) p.push('cash')
     if (store.accepts_card) p.push('card')
     return p
@@ -811,9 +813,11 @@ export default function PublicMenu({
                           ? 'Dinheiro'
                           : p === 'card'
                             ? 'Cartão na entrega'
-                            : onlinePix
-                              ? 'Pix — pagar agora'
-                              : 'Pix'}
+                            : p === 'card_online'
+                              ? 'Cartão — pagar agora'
+                              : onlinePix
+                                ? 'Pix — pagar agora'
+                                : 'Pix'}
                       </button>
                     ))}
                   </div>
@@ -821,6 +825,15 @@ export default function PublicMenu({
                 {payment === 'cash' && (
                   <div className="form-group">
                     <input className="form-input" type="number" step="0.01" placeholder="Troco para quanto? (opcional)" value={changeFor} onChange={(e) => setChangeFor(e.target.value)} />
+                  </div>
+                )}
+                {payment === 'card_online' && (
+                  <div className="pix-key-box">
+                    <span className="pix-key-label">Cartão de crédito ou débito pelo app</span>
+                    <p className="pix-key-hint">
+                      Ao finalizar, você informa os dados do cartão na próxima tela. O pedido só é
+                      enviado para a loja depois que o pagamento é aprovado.
+                    </p>
                   </div>
                 )}
                 {payment === 'pix' && onlinePix && (

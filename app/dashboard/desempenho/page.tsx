@@ -18,6 +18,7 @@ const PAYMENT_LABELS: Record<string, string> = {
   cash: 'Dinheiro',
   cartao: 'Cartão',
   card: 'Cartão',
+  card_online: 'Cartão (online)',
 }
 
 type OrderRow = {

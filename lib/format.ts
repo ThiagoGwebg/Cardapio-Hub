@@ -124,6 +124,7 @@ export const ORDER_TYPE_LABEL: Record<string, string> = {
 export const PAYMENT_LABEL: Record<string, string> = {
   cash: 'Dinheiro',
   card: 'Cartão',
+  card_online: 'Cartão (online)',
   pix: 'Pix',
 }
 

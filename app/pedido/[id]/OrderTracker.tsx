@@ -25,6 +25,7 @@ import { createClient } from '@/lib/supabase/client'
 import { fmtCents, fmtOrderNumber, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL, PIX_KEY_TYPE_LABEL } from '@/lib/format'
 import { saveOrderToHistory } from '@/lib/orderHistory'
 import PushNotificationPrompt from '@/components/PushNotificationPrompt'
+import CardPaymentForm from './CardPaymentForm'
 import '@/app/loja/[slug]/loja.css'
 
 type OrderItem = { name: string; quantity: number; unit_price_cents: number; options: string[] }
@@ -164,10 +165,13 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
     return () => clearInterval(t)
   }, [awaitingPayment])
 
+  // Cartão online: quem cria a cobrança é o formulário do cartão, não o auto-gerador de Pix.
+  const isCardOnline = order?.payment_method === 'card_online'
+
   // Gera a cobrança Pix quando falta QR OU quando o QR atual já expirou (aí o servidor cria um novo).
   const pay = order?.payment
   const chargeExpired = !!pay?.expires_at && now > 0 && new Date(pay.expires_at).getTime() < now
-  const needsCharge = awaitingPayment && (!pay?.qr_code || chargeExpired)
+  const needsCharge = awaitingPayment && !isCardOnline && (!pay?.qr_code || chargeExpired)
 
   const payInFlightRef = useRef(false)
   const generatePix = useCallback(async () => {
@@ -244,7 +248,9 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
             <span className="pay-hero-label">Total a pagar</span>
             <div className="pay-hero-value">{fmtCents(order.total_cents)}</div>
             <div className="pay-hero-sub">
-              O pedido é enviado à loja assim que o pagamento cair — a confirmação é automática.
+              {isCardOnline
+                ? 'Pague com cartão de crédito ou débito — o pedido é enviado à loja assim que o pagamento for aprovado.'
+                : 'O pedido é enviado à loja assim que o pagamento cair — a confirmação é automática.'}
             </div>
             {showQr && secondsLeft > 0 && (
               <div className={`pay-timer ${secondsLeft <= 300 ? 'pay-timer--urgent' : ''}`}>
@@ -255,7 +261,9 @@ export default function OrderTracker({ orderId }: { orderId: string }) {
           </div>
 
           <div className="track-card">
-            {payError ? (
+            {isCardOnline ? (
+              <CardPaymentForm orderId={order.id} onPaid={load} onProcessing={load} />
+            ) : payError ? (
               <div className="pay-state">
                 <span className="pay-state-icon pay-state-icon--error" aria-hidden>
                   <AlertTriangle size={26} strokeWidth={2} />
