@@ -11,6 +11,7 @@ import {
   DEFAULT_SECONDARY_COLOR,
   DEFAULT_ACCENT_COLOR,
 } from '@/lib/storeTheme'
+import { sanitizeOpeningHours } from '@/lib/openingHours'
 import { revalidatePath } from 'next/cache'
 
 /**
@@ -39,6 +40,16 @@ export async function updateStore(formData: FormData) {
   const whatsapp_number = String(formData.get('whatsapp') || '')
   const is_open = formData.get('isOpen') === 'on'
   const min_order = Number(formData.get('minOrder') || 0)
+
+  // Grade semanal: chega como JSON num input hidden (OpeningHoursField). JSON quebrado
+  // vira grade vazia em vez de derrubar o salvamento inteiro das outras configurações.
+  const auto_hours = formData.get('autoHours') === 'on'
+  let opening_hours
+  try {
+    opening_hours = sanitizeOpeningHours(JSON.parse(String(formData.get('openingHours') || '{}')))
+  } catch {
+    opening_hours = sanitizeOpeningHours(store.opening_hours)
+  }
 
   // Regra de planos para os metadados visuais salvos no JSONB `stores.theme`:
   //  • Logo e banner: liberados em TODOS os planos.
@@ -87,6 +98,8 @@ export async function updateStore(formData: FormData) {
       address,
       whatsapp_number,
       is_open,
+      auto_hours,
+      opening_hours,
       min_order_cents: Math.round(min_order * 100),
       theme,
       delivery_enabled: formData.get('deliveryEnabled') === 'on',

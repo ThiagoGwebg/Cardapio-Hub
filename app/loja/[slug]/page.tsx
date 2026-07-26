@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { isStorePro } from '@/lib/plan'
+import { resolveStoreOpen } from '@/lib/openingHours'
 import { notFound } from 'next/navigation'
 import PublicMenu from './PublicMenu'
 
@@ -100,5 +101,13 @@ export default async function LojaPage({ params }: { params: Promise<{ slug: str
     }))
     .filter((c) => c.products.length > 0)
 
-  return <PublicMenu store={store} menu={menu} zones={zones ?? []} showBranding={!isPro} />
+  return (
+    <PublicMenu
+      store={store}
+      menu={menu}
+      zones={zones ?? []}
+      initialOpen={resolveStoreOpen(store, new Date())}
+      showBranding={!isPro}
+    />
+  )
 }

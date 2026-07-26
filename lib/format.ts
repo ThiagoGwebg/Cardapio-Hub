@@ -142,6 +142,9 @@ const SAFE_ORDER_ERROR = /^(Loja |Entrega indispon|Retirada indispon|Pedido |Car
 
 export function friendlyOrderError(message?: string | null): string {
   const msg = (message ?? '').trim()
+  // A RPC recusa pedido fora da grade de horário com um código, não com texto:
+  // a mensagem pro cliente é montada aqui (o horário em si já aparece no banner).
+  if (msg.includes('fora_horario')) return 'A loja está fechada neste horário. Tente novamente quando ela abrir.'
   if (msg && SAFE_ORDER_ERROR.test(msg)) return msg
   return 'Não foi possível registrar o pedido. Revise os itens e tente novamente.'
 }

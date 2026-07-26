@@ -1515,6 +1515,101 @@ tr:hover td {
   color: var(--muted);
 }
 
+/* ── Grade de horário de funcionamento (OpeningHoursField) ── */
+.hours-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 12px;
+  transition: opacity 0.15s;
+}
+
+/* Com "seguir horário" desligado a grade continua editável (o lojista pode
+   preparar tudo antes de ligar), só perde o destaque visual. */
+.hours-grid.is-muted {
+  opacity: 0.55;
+}
+
+.hours-day {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border2);
+}
+
+.hours-day:last-child {
+  border-bottom: none;
+}
+
+.hours-day-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  min-width: 130px;
+  padding-top: 7px;
+}
+
+.hours-day-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.hours-day-closed {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.hours-ranges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.hours-range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hours-time {
+  width: auto;
+  padding: 6px 8px;
+  font-size: 12.5px;
+}
+
+.hours-range-sep {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.hours-range-remove,
+.hours-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.hours-range-remove:hover,
+.hours-add:hover {
+  color: var(--primary);
+  background: var(--surface2);
+}
+
 .save-btn {
   background: var(--primary);
   color: #fff;
@@ -3770,6 +3865,34 @@ body:has(.storefront) {
   font-weight: 600;
   text-align: center;
   line-height: 1.5;
+}
+
+/* Aviso de loja fechada (manual ou fora do horário). Âmbar, não vermelho: é um
+   estado temporário e esperado, não um erro — o cardápio continua navegável. */
+.storefront-closed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin: 12px 16px 0;
+  padding: 11px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.storefront-closed svg {
+  flex-shrink: 0;
+  color: #b45309;
+}
+
+.storefront-dark .storefront-closed svg {
+  color: #fbbf24;
 }
 
 /* Selo "Feito com Cardápio Hub" (some no Pro) */

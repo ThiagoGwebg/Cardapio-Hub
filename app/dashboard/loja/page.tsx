@@ -9,6 +9,8 @@ import DisconnectMpButton from './DisconnectMpButton'
 import PixKeyField from '@/components/PixKeyField'
 import ImageUploadField from '@/components/ImageUploadField'
 import ProCustomizationPanel from './ProCustomizationPanel'
+import OpeningHoursField from './OpeningHoursField'
+import { sanitizeOpeningHours } from '@/lib/openingHours'
 import { ProLockedSection } from '@/components/dashboard/ProUpsell'
 import SubmitButton from '@/components/ui/SubmitButton'
 
@@ -233,11 +235,17 @@ export default async function LojaPage({ searchParams }: { searchParams: Promise
         )}
 
         <div className="settings-card">
-          <div className="settings-section-title">Status</div>
+          <div className="settings-section-title">Status e horário</div>
           <div className="toggle-row">
-            <div><div className="toggle-label">Loja aberta</div><div className="toggle-desc">Clientes podem fazer pedidos agora</div></div>
+            <div><div className="toggle-label">Loja aberta</div><div className="toggle-desc">Desligar aqui fecha a loja na hora, mesmo dentro do horário</div></div>
             <label className="toggle-switch"><input type="checkbox" name="isOpen" defaultChecked={store.is_open} /><span className="toggle-slider"></span></label>
           </div>
+          <OpeningHoursField
+            name="openingHours"
+            value={sanitizeOpeningHours(store.opening_hours)}
+            autoHoursName="autoHours"
+            autoHours={!!store.auto_hours}
+          />
         </div>
 
         <SubmitButton className="save-btn">Salvar alterações</SubmitButton>

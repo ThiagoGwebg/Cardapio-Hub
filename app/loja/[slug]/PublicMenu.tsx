@@ -7,6 +7,7 @@ import {
   CalendarClock,
   Check,
   ChefHat,
+  Clock,
   Copy,
   CreditCard,
   Hourglass,
@@ -26,6 +27,7 @@ import { createClient } from '@/lib/supabase/client'
 import { fmtCents, fmtOrderNumber, STATUS_LABEL, PIX_KEY_TYPE_LABEL, friendlyOrderError } from '@/lib/format'
 import { googleFontHref } from '@/lib/plan'
 import { buildStorefrontVars, sanitizeMenuLayout, type StoreTheme } from '@/lib/storeTheme'
+import { resolveStoreOpen, type StoreOpenState } from '@/lib/openingHours'
 import { IconPin, IconUtensils, IconClose, IconSun, IconMoon } from '@/components/icons'
 import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } from '@/lib/orderHistory'
 import { loadCart, saveCart, clearCart } from '@/lib/cartStorage'
@@ -61,6 +63,9 @@ type Store = {
   address: string | null
   min_order_cents: number
   is_open: boolean
+  /** Grade semanal (JSONB cru do banco) — parseada por resolveStoreOpen. */
+  opening_hours?: unknown
+  auto_hours?: boolean | null
   theme: StoreTheme | null
   delivery_enabled: boolean
   pickup_enabled: boolean
@@ -138,11 +143,15 @@ export default function PublicMenu({
   store,
   menu,
   zones,
+  initialOpen,
   showBranding = true,
 }: {
   store: Store
   menu: Category[]
   zones: Zone[]
+  /** Estado aberta/fechada calculado no servidor — evita o cardápio piscar
+   *  "Aberto agora" antes da hidratação numa loja que está fechada. */
+  initialOpen: StoreOpenState
   showBranding?: boolean
 }) {
   const router = useRouter()
@@ -184,6 +193,26 @@ export default function PublicMenu({
   const [myOrders, setMyOrders] = useState<OrderHistoryEntry[]>([])
   const [myOrdersOpen, setMyOrdersOpen] = useState(false)
   const [orderSummaries, setOrderSummaries] = useState<Record<string, OrderSummary>>({})
+
+  // Relógio do cliente. Fica null no 1º render (servidor e cliente usam o mesmo
+  // `initialOpen`, então não há mismatch de hidratação) e depois passa a bater a
+  // cada minuto: a aba pode ficar aberta atravessando o horário de fechamento, e
+  // aí a loja precisa "fechar sozinha" na tela de quem está olhando.
+  const [nowTs, setNowTs] = useState<number | null>(null)
+  useEffect(() => {
+    const init = setTimeout(() => setNowTs(Date.now()), 0)
+    const tick = setInterval(() => setNowTs(Date.now()), 60_000)
+    return () => {
+      clearTimeout(init)
+      clearInterval(tick)
+    }
+  }, [])
+
+  // Estado real da loja: interruptor manual do lojista + grade de horário.
+  const storeOpen = useMemo(
+    () => (nowTs === null ? initialOpen : resolveStoreOpen(store, new Date(nowTs))),
+    [store, nowTs, initialOpen]
+  )
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => setMyOrders(getOrderHistoryForStore(store.slug)))
@@ -448,6 +477,13 @@ export default function PublicMenu({
 
   async function checkout() {
     setError(null)
+    if (!storeOpen.open) {
+      return setError(
+        storeOpen.nextLabel
+          ? `A loja está fechada agora. Abrimos ${storeOpen.nextLabel}.`
+          : 'A loja está fechada no momento.'
+      )
+    }
     if (!customerName.trim()) return setError('Informe seu nome pra continuar.')
     if (orderType === 'delivery' && !addr.neighborhood.trim()) return setError('Informe o bairro de entrega.')
     if (orderType === 'delivery' && !addr.street.trim()) return setError('Informe a rua de entrega.')
@@ -602,9 +638,9 @@ export default function PublicMenu({
         <div className="storefront-info">
           <h1 className="storefront-name">{store.name}</h1>
           <div className="storefront-meta-row">
-            <span className={`storefront-status ${store.is_open ? 'is-open' : 'is-closed'}`}>
+            <span className={`storefront-status ${storeOpen.open ? 'is-open' : 'is-closed'}`}>
               <span className="storefront-status-dot" />
-              {store.is_open ? 'Aberto agora' : 'Fechado no momento'}
+              {storeOpen.open ? 'Aberto agora' : 'Fechado no momento'}
             </span>
             {store.address && (
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -628,6 +664,17 @@ export default function PublicMenu({
         <div className="storefront-announce">
           <Megaphone size={15} strokeWidth={2.2} />
           <span>{theme.announcement}</span>
+        </div>
+      )}
+
+      {!storeOpen.open && (
+        <div className="storefront-closed" role="status">
+          <Clock size={15} strokeWidth={2.2} />
+          <span>
+            <b>Estamos fechados no momento</b> — não é possível fazer pedidos agora
+            {storeOpen.nextLabel ? `. Abrimos ${storeOpen.nextLabel}` : ''}. Fique à vontade para ver
+            o cardápio.
+          </span>
         </div>
       )}
 
@@ -665,7 +712,7 @@ export default function PublicMenu({
                 <div className="section-label">{cat.name}</div>
                 <div className="products-grid">
                   {cat.products.map((p) => (
-                    <div className="product-card" key={p.id} onClick={() => store.is_open && openProduct(p)} style={{ cursor: store.is_open ? 'pointer' : 'default' }}>
+                    <div className="product-card" key={p.id} onClick={() => storeOpen.open && openProduct(p)} style={{ cursor: storeOpen.open ? 'pointer' : 'default' }}>
                       <div className="product-img">
                         {p.image_url ? (
                           // eslint-disable-next-line @next/next/no-img-element
@@ -684,7 +731,12 @@ export default function PublicMenu({
                             {p.groups.length > 0 ? 'a partir de ' : ''}
                             {fmtCents(p.price_cents)}
                           </div>
-                          <button className="add-btn" disabled={!store.is_open} onClick={(e) => { e.stopPropagation(); openProduct(p) }}>
+                          <button
+                            className="add-btn"
+                            disabled={!storeOpen.open}
+                            title={storeOpen.open ? undefined : 'Loja fechada no momento'}
+                            onClick={(e) => { e.stopPropagation(); openProduct(p) }}
+                          >
                             +
                           </button>
                         </div>
@@ -929,7 +981,14 @@ export default function PublicMenu({
               </div>{/* /cart-scroll */}
 
               <div className="cart-action-bar">
-                {minToReach > 0 && (
+                {/* A loja pode fechar com o carrinho já montado (relógio corre com a aba
+                    aberta) — por isso o aviso aparece aqui também, não só no topo. */}
+                {!storeOpen.open && (
+                  <div className="cart-minimum">
+                    Loja fechada no momento{storeOpen.nextLabel ? ` — abrimos ${storeOpen.nextLabel}` : ''}
+                  </div>
+                )}
+                {storeOpen.open && minToReach > 0 && (
                   <div className="cart-minimum">Faltam {fmtCents(minToReach)} para o pedido mínimo</div>
                 )}
                 <div className="cart-action-inner">
@@ -939,10 +998,10 @@ export default function PublicMenu({
                   </div>
                   <button
                     className="checkout-btn"
-                    disabled={subtotal < store.min_order_cents || submitting}
+                    disabled={!storeOpen.open || subtotal < store.min_order_cents || submitting}
                     onClick={checkout}
                   >
-                    {submitting ? 'Enviando...' : 'Confirmar Pedido'}
+                    {!storeOpen.open ? 'Loja fechada' : submitting ? 'Enviando...' : 'Confirmar Pedido'}
                   </button>
                 </div>
               </div>
