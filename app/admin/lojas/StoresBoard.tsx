@@ -5,6 +5,7 @@ import { CalendarDays, CreditCard, Flame, Package, Star, User, Wallet, X } from 
 import { PLAN_LIMITS } from '@/lib/stripe/plans'
 import { fmtCents } from '@/lib/format'
 import PlanToggle from './PlanToggle'
+import BillingControl, { type BillingInfo } from './BillingControl'
 
 export type AdminStore = {
   id: string
@@ -18,6 +19,7 @@ export type AdminStore = {
   createdAt: string
   mpConnected: boolean
   mpUserId?: string
+  billing: BillingInfo
 }
 
 type SortKey = 'recent' | 'orders' | 'gmv' | 'name'
@@ -180,6 +182,7 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
                   Ver cardápio ↗
                 </a>
                 <PlanToggle storeId={store.id} isPro={store.isPro} />
+                <BillingControl storeId={store.id} billing={store.billing} />
               </div>
             </article>
           )

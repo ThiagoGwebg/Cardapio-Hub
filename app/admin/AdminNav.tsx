@@ -46,6 +46,19 @@ const LINKS = [
       </svg>
     ),
   },
+  {
+    href: '/admin/faturas',
+    label: 'Faturas',
+    exact: false,
+    icon: (
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 3h12l4 4v14H4z" />
+        <path d="M16 3v4h4" />
+        <path d="M8 12h8" />
+        <path d="M8 16h5" />
+      </svg>
+    ),
+  },
 ] as const
 
 export default function AdminNav({ email }: { email: string }) {

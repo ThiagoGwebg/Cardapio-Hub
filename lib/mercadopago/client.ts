@@ -151,8 +151,10 @@ export function verifyWebhookSignature(params: {
   xSignature: string | null
   xRequestId: string | null
   dataId: string | null
+  /** Segredo alternativo: a conta da plataforma (cobrança de mensalidade) tem o seu. */
+  secret?: string
 }): boolean {
-  const secret = process.env.MP_WEBHOOK_SECRET
+  const secret = params.secret || process.env.MP_WEBHOOK_SECRET
   if (!secret || !params.xSignature) return false
 
   const parts = Object.fromEntries(

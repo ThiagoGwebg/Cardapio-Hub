@@ -145,6 +145,8 @@ export function friendlyOrderError(message?: string | null): string {
   // A RPC recusa pedido fora da grade de horário com um código, não com texto:
   // a mensagem pro cliente é montada aqui (o horário em si já aparece no banner).
   if (msg.includes('fora_horario')) return 'A loja está fechada neste horário. Tente novamente quando ela abrir.'
+  // Mensalidade da plataforma suspensa: o cliente não precisa saber o motivo real.
+  if (msg.includes('loja_suspensa')) return 'Esta loja está temporariamente indisponível. Tente novamente mais tarde.'
   if (msg && SAFE_ORDER_ERROR.test(msg)) return msg
   return 'Não foi possível registrar o pedido. Revise os itens e tente novamente.'
 }

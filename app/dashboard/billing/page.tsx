@@ -6,6 +6,9 @@ import { LITE_PRICE_LABEL } from '@/lib/stripe/plans'
 import { UsageMeter } from '@/components/dashboard/ProUpsell'
 import { openBillingPortal } from './actions'
 import SubmitButton from '@/components/ui/SubmitButton'
+import { fmtCents } from '@/lib/format'
+import InvoicePix from './InvoicePix'
+import { getPixPayloadForPlan, renderPixQrDataUrl } from '@/lib/billing/pix'
 
 const ERROR_MESSAGES: Record<string, string> = {
   stripe_not_configured: 'Cobrança ainda não configurada (faltam as chaves do Stripe).',
@@ -56,9 +59,25 @@ export default async function BillingPage({
 
   const { data: sub } = await supabase
     .from('subscriptions')
-    .select('current_period_end')
+    .select('current_period_end, stripe_customer_id, billing_enabled, billing_status, price_cents, next_due_date')
     .eq('store_id', store.id)
     .maybeSingle()
+
+  // Fatura da mensalidade em aberto (o lojista pagando a plataforma).
+  const { data: invoice } = await supabase
+    .from('plan_invoices')
+    .select('amount_cents, due_date, status')
+    .eq('store_id', store.id)
+    .in('status', ['open', 'overdue', 'awaiting_confirmation'])
+    .order('due_date', { ascending: true })
+    .limit(1)
+    .maybeSingle()
+
+  const suspended = sub?.billing_status === 'suspended'
+
+  // QR Pix estático da plataforma, por plano. Renderizado no servidor.
+  const pixPayload = invoice ? await getPixPayloadForPlan(isPro ? 'pro' : 'free') : null
+  const qrDataUrl = pixPayload ? await renderPixQrDataUrl(pixPayload) : null
 
   return (
     <>
@@ -76,6 +95,33 @@ export default async function BillingPage({
           <PartyPopper size={14} strokeWidth={2.2} />
           Assinatura confirmada! Bem-vindo ao Pro
         </p>
+      )}
+
+      {suspended && (
+        <div
+          className="settings-card"
+          style={{ borderLeft: '4px solid var(--red)', marginBottom: 16 }}
+        >
+          <div className="settings-section-title" style={{ color: 'var(--red)' }}>
+            Cardápio fora do ar
+          </div>
+          <p style={{ fontSize: 13, marginBottom: 0 }}>
+            Seu cardápio está indisponível para os clientes por causa da mensalidade em atraso.
+            Assim que o pagamento cair, ele volta ao ar automaticamente.
+          </p>
+        </div>
+      )}
+
+      {invoice && (
+        <InvoicePix
+          amountLabel={fmtCents(invoice.amount_cents)}
+          dueLabel={new Date(`${invoice.due_date}T12:00:00Z`).toLocaleDateString('pt-BR')}
+          overdue={invoice.status === 'overdue'}
+          planLabel={isPro ? 'Pro' : 'Lite'}
+          pixPayload={pixPayload}
+          qrDataUrl={qrDataUrl}
+          awaitingConfirmation={invoice.status === 'awaiting_confirmation'}
+        />
       )}
 
       <div className="settings-card">
@@ -96,11 +142,19 @@ export default async function BillingPage({
           </>
         )}
 
-        {isPro ? (
+        {sub?.next_due_date && sub.billing_enabled && (
+          <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 12 }}>
+            Próximo vencimento: {new Date(`${sub.next_due_date}T12:00:00Z`).toLocaleDateString('pt-BR')}
+            {sub.price_cents ? ` · ${fmtCents(sub.price_cents)}/mês` : ''}
+          </p>
+        )}
+
+        {/* O portal do Stripe só existe para quem tem assinatura de cartão de verdade. */}
+        {sub?.stripe_customer_id ? (
           <form action={openBillingPortal}>
             <SubmitButton className="save-btn" pendingLabel="Abrindo…">Gerenciar assinatura</SubmitButton>
           </form>
-        ) : (
+        ) : isPro ? null : (
           <Link href="/contato" className="save-btn" style={{ marginTop: 12, display: 'inline-block' }}>
             Quero fazer upgrade pro Pro
           </Link>
