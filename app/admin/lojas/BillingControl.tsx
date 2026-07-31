@@ -2,12 +2,15 @@
 
 import { useState, useTransition } from 'react'
 import { CircleDollarSign, Power, RotateCcw } from 'lucide-react'
+import { fmtCents } from '@/lib/format'
 import { setStoreBilling, reactivateStore } from './actions'
 
 export type BillingInfo = {
   enabled: boolean
   status: 'current' | 'past_due' | 'suspended'
+  /** Derivado do plano no banco (price_for_plan) — não é digitável. */
   priceCents: number
+  planLabel: string
   nextDueDate: string | null
   graceDays: number
 }
@@ -21,7 +24,6 @@ const STATUS_LABEL: Record<BillingInfo['status'], { text: string; color: string 
 /** Controle da mensalidade que a loja paga PARA A PLATAFORMA. */
 export default function BillingControl({ storeId, billing }: { storeId: string; billing: BillingInfo }) {
   const [open, setOpen] = useState(false)
-  const [price, setPrice] = useState((billing.priceCents / 100).toFixed(2))
   const [dueDate, setDueDate] = useState(billing.nextDueDate ?? '')
   const [grace, setGrace] = useState(String(billing.graceDays))
   const [error, setError] = useState<string | null>(null)
@@ -31,15 +33,9 @@ export default function BillingControl({ storeId, billing }: { storeId: string; 
 
   function save(enabled: boolean) {
     setError(null)
-    const cents = Math.round(Number(price.replace(',', '.')) * 100)
-    if (!Number.isFinite(cents) || cents < 0) {
-      setError('Valor inválido.')
-      return
-    }
     startTransition(async () => {
       const res = await setStoreBilling(storeId, {
         enabled,
-        priceCents: cents,
         nextDueDate: dueDate || undefined,
         graceDays: Number(grace) || 0,
       })
@@ -76,13 +72,21 @@ export default function BillingControl({ storeId, billing }: { storeId: string; 
 
       {open && (
         <div className="adm-settings-body" style={{ gap: 8, width: '100%' }}>
-          <label className="adm-field">
-            Mensalidade (R$)
-            <input value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" />
-          </label>
+          <div className="adm-field">
+            Mensalidade
+            <strong style={{ fontSize: 16, color: 'var(--ink)' }}>
+              {fmtCents(billing.priceCents)}/mês · plano {billing.planLabel}
+            </strong>
+            <span className="adm-field-hint">
+              Definido pelo plano. Para mudar o valor, mude o plano da loja.
+            </span>
+          </div>
           <label className="adm-field">
             Próximo vencimento
             <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+            <span className="adm-field-hint">
+              Preenchido automaticamente na criação da conta (30 dias). Só mexa em caso de acordo.
+            </span>
           </label>
           <label className="adm-field">
             Carência (dias após vencer antes de suspender)

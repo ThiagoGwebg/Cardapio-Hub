@@ -3,8 +3,10 @@ import { fmtCents } from '@/lib/format'
 // Mensalidade que o LOJISTA paga para a plataforma. Não confundir com o pagamento
 // do cliente final (Mercado Pago OAuth, dinheiro que cai na conta do lojista).
 //
-// Estes são os valores PADRÃO: cada loja tem o próprio `subscriptions.price_cents`,
-// definido no /admin, para permitir preço sob medida sem mexer no código.
+// ATENÇÃO: quem MANDA no valor cobrado é a função `price_for_plan` no banco — um
+// trigger grava `subscriptions.price_cents` a cada mudança de plano, e o admin não
+// digita valor. Estes números aqui são só para exibição (rótulos e a conferência do
+// QR em /admin/faturas). Mudar o preço = recriar `price_for_plan` E atualizar aqui.
 export const DEFAULT_PLAN_PRICE_CENTS: Record<'free' | 'pro', number> = {
   free: 2900, // plano Lite
   pro: 8900,

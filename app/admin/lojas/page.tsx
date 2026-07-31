@@ -87,6 +87,7 @@ export default async function AdminStoresPage() {
         enabled: !!sub?.billing_enabled,
         status: (sub?.billing_status as 'current' | 'past_due' | 'suspended') ?? 'current',
         priceCents: sub?.price_cents ?? DEFAULT_PLAN_PRICE_CENTS[sub?.plan === 'pro' ? 'pro' : 'free'],
+        planLabel: sub?.plan === 'pro' ? 'Pro' : 'Lite',
         nextDueDate: sub?.next_due_date ?? null,
         graceDays: sub?.grace_days ?? DEFAULT_GRACE_DAYS,
       },

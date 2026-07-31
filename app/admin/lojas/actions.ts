@@ -27,22 +27,20 @@ export async function setStorePlan(storeId: string, plan: 'free' | 'pro'): Promi
  */
 export async function setStoreBilling(
   storeId: string,
-  input: { enabled: boolean; priceCents?: number; nextDueDate?: string; graceDays?: number }
+  input: { enabled: boolean; nextDueDate?: string; graceDays?: number }
 ): Promise<{ ok: boolean; error?: string }> {
   await requireAdmin()
   if (!storeId) return { ok: false, error: 'Dados inválidos.' }
   if (input.enabled && !input.nextDueDate) {
     return { ok: false, error: 'Informe a data do próximo vencimento.' }
   }
-  if (input.priceCents !== undefined && (!Number.isInteger(input.priceCents) || input.priceCents < 0)) {
-    return { ok: false, error: 'Valor inválido.' }
-  }
 
+  // O valor NÃO vem daqui: `price_cents` é derivado do plano por trigger no banco
+  // (price_for_plan). Digitar preço permitia loja Pro cobrando valor de Lite.
   const patch: Record<string, unknown> = {
     billing_enabled: input.enabled,
     updated_at: new Date().toISOString(),
   }
-  if (input.priceCents !== undefined) patch.price_cents = input.priceCents
   if (input.nextDueDate) patch.next_due_date = input.nextDueDate
   if (input.graceDays !== undefined) patch.grace_days = input.graceDays
 
