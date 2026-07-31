@@ -1,12 +1,13 @@
 import type { Metadata, Viewport } from 'next'
 import { requireAdmin } from '@/lib/admin'
+import { brandIcons } from '@/lib/brandIcons'
 import AdminNav from './AdminNav'
 import './admin.css'
 
 export const metadata: Metadata = {
   manifest: '/admin/manifest.webmanifest',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Painel Cardápio Hub' },
-  icons: { apple: '/admin/app-icon.svg' },
+  icons: brandIcons('/admin/app-icon.svg'),
   robots: { index: false, follow: false },
 }
 

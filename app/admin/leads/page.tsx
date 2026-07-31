@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import '../admin.css'
 import { requireAdmin } from '@/lib/admin'
+import { brandIcons } from '@/lib/brandIcons'
 import { fetchLeads } from './actions'
 import LeadsBoard from './LeadsBoard'
 
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
   title: 'Leads — Cardápio Hub',
   manifest: '/admin/leads/manifest.webmanifest',
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent', title: 'Leads' },
-  icons: { apple: '/admin/leads/app-icon.svg' },
+  icons: brandIcons('/admin/leads/app-icon.svg'),
   robots: { index: false, follow: false },
 }
 
