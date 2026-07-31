@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { CircleDollarSign, Power, RotateCcw } from 'lucide-react'
+import { CircleDollarSign, Power, RotateCcw, Wrench } from 'lucide-react'
 import { fmtCents } from '@/lib/format'
-import { setStoreBilling, reactivateStore } from './actions'
+import { setStoreBilling, reactivateStore, setSetupUnlocked } from './actions'
 
 export type BillingInfo = {
   enabled: boolean
@@ -13,6 +13,8 @@ export type BillingInfo = {
   planLabel: string
   nextDueDate: string | null
   graceDays: number
+  /** Painel liberado para montagem assistida antes do 1º pagamento. */
+  setupUnlocked: boolean
 }
 
 const STATUS_LABEL: Record<BillingInfo['status'], { text: string; color: string }> = {
@@ -44,6 +46,14 @@ export default function BillingControl({ storeId, billing }: { storeId: string; 
     })
   }
 
+  function toggleSetup() {
+    setError(null)
+    startTransition(async () => {
+      const res = await setSetupUnlocked(storeId, !billing.setupUnlocked)
+      if (!res.ok) setError(res.error || 'Erro ao liberar o painel.')
+    })
+  }
+
   function reactivate() {
     if (!window.confirm('Religar a loja e CANCELAR as faturas em aberto? Use só em acordo por fora.')) return
     setError(null)
@@ -58,16 +68,30 @@ export default function BillingControl({ storeId, billing }: { storeId: string; 
       <button className="adm-btn ghost" onClick={() => setOpen((v) => !v)} disabled={pending}>
         <CircleDollarSign size={13} strokeWidth={2.4} />{' '}
         {billing.enabled ? (
-          <span style={{ color: status.color }}>{status.text}</span>
+          <span style={{ color: status.color }}>
+            {status.text}
+            {billing.setupUnlocked && ' · montagem'}
+          </span>
         ) : (
           'Cobrança off'
         )}
       </button>
 
       {billing.status === 'suspended' && (
-        <button className="adm-btn ghost" onClick={reactivate} disabled={pending}>
-          <RotateCcw size={13} strokeWidth={2.4} /> Religar
-        </button>
+        <>
+          <button
+            className="adm-btn ghost"
+            onClick={toggleSetup}
+            disabled={pending}
+            title="Abre o painel para montar o cardápio junto com o cliente. O cardápio público continua fora do ar até o pagamento."
+          >
+            <Wrench size={13} strokeWidth={2.4} />{' '}
+            {billing.setupUnlocked ? 'Fechar montagem' : 'Liberar montagem'}
+          </button>
+          <button className="adm-btn ghost" onClick={reactivate} disabled={pending}>
+            <RotateCcw size={13} strokeWidth={2.4} /> Religar
+          </button>
+        </>
       )}
 
       {open && (

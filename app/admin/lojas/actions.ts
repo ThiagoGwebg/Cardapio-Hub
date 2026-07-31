@@ -53,6 +53,28 @@ export async function setStoreBilling(
 }
 
 /**
+ * Abre o painel de uma loja ainda não paga para a montagem assistida do cardápio.
+ * NÃO coloca o cardápio no ar nem libera pedidos — só o pagamento faz isso.
+ */
+export async function setSetupUnlocked(
+  storeId: string,
+  unlocked: boolean
+): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
+  if (!storeId) return { ok: false, error: 'Dados inválidos.' }
+
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('subscriptions')
+    .update({ setup_unlocked: unlocked, updated_at: new Date().toISOString() })
+    .eq('store_id', storeId)
+
+  if (error) return { ok: false, error: error.message }
+  revalidatePath('/admin/lojas')
+  return { ok: true }
+}
+
+/**
  * Religa uma loja suspensa sem exigir o Pix (perdão de dívida / acordo por fora).
  * Cancela as faturas vencidas para o ciclo não suspender de novo no dia seguinte.
  */

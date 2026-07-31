@@ -31,6 +31,7 @@ type SubRow = {
   price_cents: number | null
   next_due_date: string | null
   grace_days: number | null
+  setup_unlocked: boolean | null
 }
 
 type StoreStat = { store_id: string; orders: number; gmv_cents: number }
@@ -45,7 +46,7 @@ export default async function AdminStoresPage() {
     supabase
       .from('stores')
       .select(
-        'id, owner_id, slug, name, is_open, created_at, mp_connected, subscriptions(plan, status, billing_enabled, billing_status, price_cents, next_due_date, grace_days)'
+        'id, owner_id, slug, name, is_open, created_at, mp_connected, subscriptions(plan, status, billing_enabled, billing_status, price_cents, next_due_date, grace_days, setup_unlocked)'
       )
       .order('created_at', { ascending: false }),
     supabase.rpc('admin_store_stats', { p_month_start: monthStart.toISOString() }),
@@ -90,6 +91,7 @@ export default async function AdminStoresPage() {
         planLabel: sub?.plan === 'pro' ? 'Pro' : 'Lite',
         nextDueDate: sub?.next_due_date ?? null,
         graceDays: sub?.grace_days ?? DEFAULT_GRACE_DAYS,
+        setupUnlocked: !!sub?.setup_unlocked,
       },
     }
   })
