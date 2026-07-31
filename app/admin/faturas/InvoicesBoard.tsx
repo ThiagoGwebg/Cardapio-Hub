@@ -80,45 +80,53 @@ export default function InvoicesBoard({ invoices }: { invoices: AdminInvoice[] }
 
   return (
     <>
-      <div className="adm-stats">
-        <div className="adm-stat">
-          <span className="adm-stat-label">A receber</span>
-          <strong className="adm-stat-value">{fmtCents(totals.aReceber)}</strong>
+      <div className="adm-store-summary">
+        <div className="adm-summary-cell">
+          <span className="adm-summary-num">{fmtCents(totals.aReceber)}</span>
+          <span className="adm-summary-label">A receber</span>
         </div>
-        <div className="adm-stat">
-          <span className="adm-stat-label">Vencido</span>
-          <strong className="adm-stat-value" style={{ color: 'var(--amber)' }}>
+        <div className="adm-summary-cell">
+          <span className="adm-summary-num" style={{ color: 'var(--amber)' }}>
             {fmtCents(totals.vencido)}
-          </strong>
+          </span>
+          <span className="adm-summary-label">Vencido</span>
         </div>
-        <div className="adm-stat">
-          <span className="adm-stat-label">Recebido</span>
-          <strong className="adm-stat-value" style={{ color: 'var(--green)' }}>
+        <div className="adm-summary-cell">
+          <span className="adm-summary-num" style={{ color: 'var(--green)' }}>
             {fmtCents(totals.recebido)}
-          </strong>
+          </span>
+          <span className="adm-summary-label">Recebido</span>
         </div>
       </div>
 
-      <div className="adm-toolbar">
-        <label className="adm-search">
-          <Search size={14} strokeWidth={2.4} />
+      <div className="adm-store-toolbar">
+        <div className="adm-store-search">
+          <Search size={16} strokeWidth={2} />
           <input
             placeholder="Buscar loja…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             aria-label="Buscar loja"
           />
-        </label>
-        <div className="adm-tabs">
-          {(['conferir', 'todas', 'aberto', 'vencidas', 'pagas'] as Filter[]).map((f) => {
-            const count = f === 'conferir' ? invoices.filter((i) => i.status === 'awaiting_confirmation').length : 0
-            return (
-              <button key={f} className={`adm-tab ${filter === f ? 'active' : ''}`} onClick={() => setFilter(f)}>
-                {FILTER_LABEL[f]}
-                {count > 0 && ` (${count})`}
-              </button>
-            )
-          })}
+          {q && (
+            <button className="adm-store-search-clear" onClick={() => setQ('')} aria-label="Limpar busca">
+              <X size={14} strokeWidth={2.4} />
+            </button>
+          )}
+        </div>
+        <div className="adm-store-filters">
+          <div className="adm-seg">
+            {(['conferir', 'todas', 'aberto', 'vencidas', 'pagas'] as Filter[]).map((f) => {
+              const count =
+                f === 'conferir' ? invoices.filter((i) => i.status === 'awaiting_confirmation').length : 0
+              return (
+                <button key={f} className={filter === f ? 'on' : ''} onClick={() => setFilter(f)}>
+                  {FILTER_LABEL[f]}
+                  {count > 0 && ` (${count})`}
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
 
@@ -127,21 +135,25 @@ export default function InvoicesBoard({ invoices }: { invoices: AdminInvoice[] }
       {shown.length === 0 ? (
         <p className="adm-subtitle">Nenhuma fatura aqui.</p>
       ) : (
-        <div className="adm-grid">
+        <div className="adm-store-list">
           {shown.map((inv) => {
             const meta = STATUS_META[inv.status]
             return (
-              <article key={inv.id} className="adm-card">
-                <header style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                  <div>
-                    <strong style={{ fontSize: 15 }}>{inv.storeName}</strong>
-                    <div style={{ fontSize: 11, opacity: 0.6 }}>/{inv.storeSlug}</div>
+              <article key={inv.id} className="adm-store-card">
+                <div className="adm-store-main">
+                  <div className="adm-store-name">
+                    {inv.storeName}
+                    <span className="adm-badge" style={{ color: meta.color }}>
+                      {meta.label}
+                    </span>
+                    {inv.suspended && (
+                      <span className="adm-badge" style={{ color: 'var(--red)' }}>
+                        suspensa
+                      </span>
+                    )}
                   </div>
-                  <span style={{ color: meta.color, fontSize: 11, fontWeight: 700 }}>
-                    {meta.label}
-                    {inv.suspended && ' · suspensa'}
-                  </span>
-                </header>
+                  <div className="adm-store-meta">/{inv.storeSlug}</div>
+                </div>
 
                 <p style={{ fontSize: 20, fontWeight: 800, margin: '10px 0 2px' }}>
                   {fmtCents(inv.amountCents)}
@@ -161,7 +173,7 @@ export default function InvoicesBoard({ invoices }: { invoices: AdminInvoice[] }
                 )}
 
                 {inv.status !== 'paid' && inv.status !== 'canceled' && (
-                  <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                  <div className="adm-store-actions">
                     <button
                       className="adm-btn pro"
                       disabled={pending}

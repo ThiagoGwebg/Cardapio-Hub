@@ -1979,3 +1979,63 @@ a.adm-stat:hover {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ── Cobrança de mensalidade (/admin/faturas e controle no /admin/lojas) ──────
+   Campos escuros próprios: .form-input vem do globals.css e é claro (painel do
+   lojista), então destoa no tema escuro do admin. */
+.adm-field {
+  display: grid;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--faint);
+}
+.adm-field input,
+.adm-field textarea {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  color: var(--ink);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  padding: 9px 11px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.adm-field textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  resize: vertical;
+}
+.adm-field input:focus,
+.adm-field textarea:focus {
+  border-color: rgba(255, 87, 34, 0.55);
+}
+.adm-field-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.adm-field-hint {
+  font-size: 10px;
+  color: var(--faint);
+  opacity: 0.8;
+}
+.adm-settings-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+.adm-settings-body {
+  display: grid;
+  gap: 16px;
+  margin-top: 14px;
+}

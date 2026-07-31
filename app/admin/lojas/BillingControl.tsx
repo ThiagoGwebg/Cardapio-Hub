@@ -75,36 +75,21 @@ export default function BillingControl({ storeId, billing }: { storeId: string; 
       )}
 
       {open && (
-        <div style={{ display: 'grid', gap: 8, marginTop: 10, width: '100%' }}>
-          <label style={{ fontSize: 11, opacity: 0.7 }}>
+        <div className="adm-settings-body" style={{ gap: 8, width: '100%' }}>
+          <label className="adm-field">
             Mensalidade (R$)
-            <input
-              className="form-input"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              inputMode="decimal"
-            />
+            <input value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" />
           </label>
-          <label style={{ fontSize: 11, opacity: 0.7 }}>
+          <label className="adm-field">
             Próximo vencimento
-            <input
-              className="form-input"
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-            />
+            <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
           </label>
-          <label style={{ fontSize: 11, opacity: 0.7 }}>
+          <label className="adm-field">
             Carência (dias após vencer antes de suspender)
-            <input
-              className="form-input"
-              value={grace}
-              onChange={(e) => setGrace(e.target.value)}
-              inputMode="numeric"
-            />
+            <input value={grace} onChange={(e) => setGrace(e.target.value)} inputMode="numeric" />
           </label>
 
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <div className="adm-field-row">
             <button className="adm-btn pro" onClick={() => save(true)} disabled={pending}>
               <Power size={13} strokeWidth={2.4} /> {billing.enabled ? 'Salvar' : 'Ligar cobrança'}
             </button>
@@ -114,8 +99,8 @@ export default function BillingControl({ storeId, billing }: { storeId: string; 
               </button>
             )}
           </div>
-          <p style={{ fontSize: 10, opacity: 0.55, margin: 0 }}>
-            Com a cobrança ligada, a fatura é emitida 7 dias antes do vencimento e o cardápio
+          <p className="adm-field-hint" style={{ margin: 0 }}>
+            Com a cobrança ligada, a fatura é emitida alguns dias antes do vencimento e o cardápio
             sai do ar depois da carência.
           </p>
         </div>
