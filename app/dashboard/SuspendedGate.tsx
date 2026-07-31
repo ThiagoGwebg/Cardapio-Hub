@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Rocket } from 'lucide-react'
 import { fmtCents } from '@/lib/format'
 import InvoicePix from './billing/InvoicePix'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -26,19 +26,33 @@ export default async function SuspendedGate({ storeId }: { storeId: string }) {
     .eq('store_id', storeId)
     .maybeSingle<{ plan: 'free' | 'pro' }>()
 
+  // Loja que nunca pagou está na ATIVAÇÃO, não em atraso — o texto de cobrança
+  // vencida assustaria um cliente novo que acabou de criar a conta.
+  const { count: paidCount } = await admin
+    .from('plan_invoices')
+    .select('id', { count: 'exact', head: true })
+    .eq('store_id', storeId)
+    .eq('status', 'paid')
+  const firstPayment = (paidCount ?? 0) === 0
+
   const pixPayload = invoice ? await getPixPayloadForPlan(sub?.plan === 'pro' ? 'pro' : 'free') : null
   const qrDataUrl = pixPayload ? await renderPixQrDataUrl(pixPayload) : null
 
   return (
     <div style={{ maxWidth: 460, margin: '0 auto', padding: '48px 16px' }}>
       <div style={{ textAlign: 'center', marginBottom: 24 }}>
-        <AlertTriangle size={40} strokeWidth={2} style={{ color: 'var(--red)' }} />
+        {firstPayment ? (
+          <Rocket size={40} strokeWidth={2} style={{ color: 'var(--accent, #FF5722)' }} />
+        ) : (
+          <AlertTriangle size={40} strokeWidth={2} style={{ color: 'var(--red)' }} />
+        )}
         <h1 style={{ fontSize: 22, fontWeight: 800, fontFamily: 'Nunito, sans-serif', margin: '12px 0 6px' }}>
-          Cardápio temporariamente fora do ar
+          {firstPayment ? 'Ative seu cardápio' : 'Cardápio temporariamente fora do ar'}
         </h1>
         <p style={{ fontSize: 13, color: 'var(--muted)' }}>
-          A mensalidade está em atraso. Pague pelo Pix abaixo e tudo volta ao ar
-          automaticamente, sem precisar avisar ninguém.
+          {firstPayment
+            ? 'Falta só o primeiro pagamento. Assim que ele for confirmado, seu cardápio entra no ar e o painel é liberado.'
+            : 'A mensalidade está em atraso. Pague pelo Pix abaixo e tudo volta ao ar automaticamente, sem precisar avisar ninguém.'}
         </p>
       </div>
 
@@ -46,7 +60,8 @@ export default async function SuspendedGate({ storeId }: { storeId: string }) {
         <InvoicePix
           amountLabel={fmtCents(invoice.amount_cents)}
           dueLabel={new Date(`${invoice.due_date}T12:00:00Z`).toLocaleDateString('pt-BR')}
-          overdue
+          overdue={!firstPayment}
+          firstPayment={firstPayment}
           planLabel={sub?.plan === 'pro' ? 'Pro' : 'Lite'}
           pixPayload={pixPayload}
           qrDataUrl={qrDataUrl}

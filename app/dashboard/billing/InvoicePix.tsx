@@ -19,6 +19,8 @@ type Props = {
   awaitingConfirmation: boolean
   /** Abre já com o QR aberto (tela de loja suspensa: não faz sentido esconder). */
   startOpen?: boolean
+  /** Primeira mensalidade: é ativação, não atraso — muda o texto. */
+  firstPayment?: boolean
 }
 
 export default function InvoicePix({
@@ -30,6 +32,7 @@ export default function InvoicePix({
   qrDataUrl,
   awaitingConfirmation,
   startOpen = false,
+  firstPayment = false,
 }: Props) {
   const [copied, setCopied] = useState(false)
   const [claimed, setClaimed] = useState(awaitingConfirmation)
@@ -64,7 +67,8 @@ export default function InvoicePix({
         <p style={{ fontSize: 13, margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
           <Clock size={15} strokeWidth={2.2} />
           Recebemos seu aviso de pagamento de {amountLabel}. Assim que confirmarmos no extrato,
-          seu plano é renovado — normalmente no mesmo dia.
+          {firstPayment ? ' seu cardápio entra no ar' : ' seu plano é renovado'} — normalmente no
+          mesmo dia.
         </p>
       </div>
     )
@@ -73,7 +77,7 @@ export default function InvoicePix({
   return (
     <div className="settings-card">
       <div className="settings-section-title">
-        {overdue ? 'Mensalidade em atraso' : 'Mensalidade em aberto'}
+        {firstPayment ? 'Primeira mensalidade' : overdue ? 'Mensalidade em atraso' : 'Mensalidade em aberto'}
       </div>
 
       <p style={{ fontSize: 20, fontWeight: 800, fontFamily: 'Nunito, sans-serif', marginBottom: 4 }}>
@@ -90,7 +94,11 @@ export default function InvoicePix({
         }}
       >
         {overdue && <AlertTriangle size={14} strokeWidth={2.2} />}
-        {overdue ? `Venceu em ${dueLabel}` : `Vence em ${dueLabel}`}
+        {firstPayment
+          ? 'Libera o acesso e coloca seu cardápio no ar'
+          : overdue
+            ? `Venceu em ${dueLabel}`
+            : `Vence em ${dueLabel}`}
       </p>
 
       {error && <p style={{ color: 'var(--red)', fontSize: 12, marginBottom: 12 }}>{error}</p>}
@@ -102,7 +110,8 @@ export default function InvoicePix({
       ) : !showPix ? (
         <>
           <button type="button" className="save-btn" onClick={() => setShowPix(true)}>
-            <RefreshCw size={15} strokeWidth={2.3} /> Renovar plano {planLabel}
+            <RefreshCw size={15} strokeWidth={2.3} />{' '}
+            {firstPayment ? `Ativar plano ${planLabel}` : `Renovar plano ${planLabel}`}
           </button>
           <p style={{ fontSize: 11, color: 'var(--muted2)', marginTop: 10 }}>
             Pagamento por Pix — o QR Code do seu plano aparece aqui.
