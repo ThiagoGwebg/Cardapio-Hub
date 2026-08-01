@@ -1,5 +1,6 @@
 import { absoluteUrl } from '@/lib/seo'
 import { DAY_KEYS, sanitizeOpeningHours, type DayKey } from '@/lib/openingHours'
+import { e164 } from '@/lib/phone'
 
 // SEO do cardápio público. É a página que mais tem chance de rankear no Google:
 // conteúdo real, local e único ("pizzaria x delivery", "hamburguer bairro y").
@@ -54,13 +55,6 @@ const brl = (cents: number) => (cents / 100).toFixed(2)
  * número é curto ou incompleto — telefone inválido no schema é pior que ausente:
  * o Google pode descartar o bloco todo por dado inconsistente.
  */
-function e164(raw: string | null): string | undefined {
-  const digits = (raw ?? '').replace(/\D/g, '')
-  if (digits.length === 10 || digits.length === 11) return `+55${digits}`
-  if ((digits.length === 12 || digits.length === 13) && digits.startsWith('55')) return `+${digits}`
-  return undefined
-}
-
 /** Lista legível dos modos de entrega — usada na description e no schema. */
 export function serviceLabels(store: Pick<SeoStore, 'delivery_enabled' | 'pickup_enabled' | 'dine_in_enabled'>) {
   const out: string[] = []

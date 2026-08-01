@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getCurrentStore } from '@/lib/store'
 import { isStorePro } from '@/lib/plan'
 import { getBaseUrl } from '@/lib/baseUrl'
+import { waLink } from '@/lib/phone'
 import { ProLockedSection } from '@/components/dashboard/ProUpsell'
 import CopyField from './CopyField'
 
@@ -10,7 +11,9 @@ export default async function LinksPage() {
   const isPro = await isStorePro(supabase, store.id)
   const base = getBaseUrl()
   const menuUrl = `${base}/loja/${store.slug}`
-  const waUrl = store.whatsapp_number ? `https://wa.me/${store.whatsapp_number.replace(/\D/g, '')}` : ''
+  // Número inválido (ou senha digitada no campo errado) devolve string vazia e o
+  // card do WhatsApp some — melhor não oferecer link nenhum do que um link quebrado.
+  const waUrl = waLink(store.whatsapp_number)
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=16&data=${encodeURIComponent(menuUrl)}`
 
   return (

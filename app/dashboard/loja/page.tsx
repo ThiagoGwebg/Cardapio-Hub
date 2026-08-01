@@ -2,6 +2,7 @@ import { CircleCheck } from 'lucide-react'
 import { getCurrentStore } from '@/lib/store'
 import { getConnectedMpAccount } from '@/lib/mercadopago/tokens'
 import { fmtCents } from '@/lib/format'
+import { fmtPhone } from '@/lib/phone'
 import { isStorePro } from '@/lib/plan'
 import type { StoreTheme } from '@/lib/storeTheme'
 import { updateStore, updateOnlinePayment, disconnectMercadoPago, addZone, deleteZone } from './actions'
@@ -136,7 +137,16 @@ export default async function LojaPage({ searchParams }: { searchParams: Promise
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">WhatsApp</label>
-              <input className="form-input" name="whatsapp" defaultValue={store.whatsapp_number ?? ''} />
+              <input
+                className="form-input"
+                name="whatsapp"
+                type="tel"
+                inputMode="tel"
+                placeholder="(19) 99999-8888"
+                title="DDD + número, ex.: (19) 99999-8888"
+                pattern="[^0-9]*([0-9][^0-9]*){10,11}"
+                defaultValue={fmtPhone(store.whatsapp_number)}
+              />
             </div>
             <div className="form-group">
               <label className="form-label">Pedido mínimo (R$)</label>

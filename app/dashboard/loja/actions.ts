@@ -12,6 +12,7 @@ import {
   DEFAULT_ACCENT_COLOR,
 } from '@/lib/storeTheme'
 import { sanitizeOpeningHours } from '@/lib/openingHours'
+import { brNationalNumber } from '@/lib/phone'
 import { revalidatePath } from 'next/cache'
 
 /**
@@ -37,7 +38,14 @@ export async function updateStore(formData: FormData) {
 
   const name = String(formData.get('name') || store.name)
   const address = String(formData.get('address') || '')
-  const whatsapp_number = String(formData.get('whatsapp') || '')
+  // WhatsApp: guardamos só os dígitos nacionais (DDD + número). Um valor inválido
+  // e não-vazio preserva o que já estava salvo, em vez de trocar um número bom por
+  // lixo — mesma política de sanitizeHexColor/sanitizeOpeningHours logo abaixo.
+  // Campo vazio continua sendo uma limpeza intencional e vira null.
+  const whatsappRaw = String(formData.get('whatsapp') || '').trim()
+  const whatsapp_number = whatsappRaw
+    ? (brNationalNumber(whatsappRaw) ?? store.whatsapp_number)
+    : null
   const is_open = formData.get('isOpen') === 'on'
   const min_order = Number(formData.get('minOrder') || 0)
 

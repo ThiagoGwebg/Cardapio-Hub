@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { slugify } from '@/lib/slug'
+import { brNationalNumber, isValidBrPhone } from '@/lib/phone'
 import { redirect } from 'next/navigation'
 
 export async function signup(formData: FormData) {
@@ -12,6 +13,13 @@ export async function signup(formData: FormData) {
 
   if (!email || !password || !storeName) {
     return { error: 'Preencha todos os campos.' }
+  }
+
+  // Validado antes do signUp pra não deixar uma conta órfã caso o número esteja errado.
+  // O checkout por WhatsApp depende inteiramente desse campo — já aconteceu de uma senha
+  // ser digitada aqui e a loja subir com um link de contato quebrado.
+  if (whatsapp && !isValidBrPhone(whatsapp)) {
+    return { error: 'WhatsApp inválido. Use DDD + número, ex.: (19) 99999-8888.' }
   }
 
   const supabase = await createClient()
@@ -45,7 +53,7 @@ export async function signup(formData: FormData) {
     owner_id: data.user!.id,
     slug,
     name: storeName,
-    whatsapp_number: whatsapp || null,
+    whatsapp_number: brNationalNumber(whatsapp),
   })
 
   if (storeError) {
