@@ -21,6 +21,11 @@
   --radius-sm: 8px;
   --radius-xs: 6px;
 
+  /* Desconto/aviso do cupom: os --green/--yellow globais são pastéis pensados
+     para fundo escuro e somem no branco do cardápio. */
+  --discount: #16A34A;
+  --warn: #B45309;
+
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -45,6 +50,9 @@
   --radius: 12px;
   --radius-sm: 8px;
   --radius-xs: 6px;
+
+  --discount: #81C995;
+  --warn: #FDD663;
 
   background: var(--bg);
   color: var(--text);
@@ -279,7 +287,112 @@
   color: var(--text2);
 }
 .storefront .cart-sum-row span:last-child { font-weight: 700; color: var(--text); }
+.storefront .cart-sum-row.is-discount span:last-child { color: var(--discount); }
+.storefront .cart-sum-strike { color: var(--muted); font-weight: 400; margin-right: 6px; }
+.storefront .cart-sum-row.is-total {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 15px;
+  color: var(--text);
+  font-weight: 700;
+}
+.storefront .cart-sum-row.is-total span:last-child { font-size: 17px; font-weight: 900; }
 .storefront .cart-error { color: var(--red); font-size: 12.5px; font-weight: 600; margin-top: 8px; }
+.storefront .cart-action-bar .cart-error { margin: 0; }
+
+/* Cabeçalho do drawer com voltar (checkout em etapas) */
+.storefront .cart-drawer-head-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.storefront .cart-back {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--surface3);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.storefront .cart-back:hover { color: var(--text); background: var(--border); }
+
+/* Progresso dos 3 passos */
+.storefront .cart-steps {
+  display: flex;
+  gap: 4px;
+  padding: 10px 16px 0;
+  flex-shrink: 0;
+}
+.storefront .cart-step-bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--border);
+  transition: background 0.25s;
+}
+.storefront .cart-step-bar.done { background: var(--primary); }
+
+/* Cupom */
+.storefront .coupon-row { display: flex; gap: 8px; }
+.storefront .coupon-row .form-input { flex: 1; min-width: 0; }
+.storefront .coupon-apply {
+  flex-shrink: 0;
+  padding: 0 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.storefront .coupon-apply:hover:not(:disabled) { background: var(--primary); color: #fff; }
+.storefront .coupon-apply:disabled { opacity: 0.45; cursor: default; }
+.storefront .coupon-applied {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--primary);
+  background: var(--surface);
+}
+.storefront .coupon-applied-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--primary);
+}
+.storefront .coupon-applied-desc { font-size: 12.5px; color: var(--text2); }
+.storefront .coupon-remove {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.storefront .coupon-remove:hover { color: var(--red); }
+.storefront .coupon-msg {
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--warn);
+}
 
 /* Barra de ação FIXA no rodapé (Total + Confirmar) */
 .storefront .cart-action-bar {

@@ -7,6 +7,7 @@ import {
   CalendarClock,
   Check,
   ChefHat,
+  ChevronLeft,
   Clock,
   Copy,
   CreditCard,
@@ -30,7 +31,7 @@ import { buildStorefrontVars, sanitizeMenuLayout, type StoreTheme } from '@/lib/
 import { resolveStoreOpen, type StoreOpenState } from '@/lib/openingHours'
 import { IconPin, IconUtensils, IconClose, IconSun, IconMoon } from '@/components/icons'
 import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } from '@/lib/orderHistory'
-import { loadCart, saveCart, clearCart } from '@/lib/cartStorage'
+import { loadCart, saveCart, clearCart, loadCustomer, saveCustomer } from '@/lib/cartStorage'
 import InstallPwaButton from '@/components/InstallPwaButton'
 import './loja.css'
 
@@ -123,6 +124,30 @@ function paymentHint(p: Payment, orderType: string, onlinePix: boolean): string 
   return 'Na entrega'
 }
 
+// Checkout em 3 passos dentro do próprio drawer: a folha única com item,
+// endereço e pagamento empilhados parecia carrinho mas pedia formulário longo,
+// e o cliente perdia de vista quanto faltava para terminar.
+type Step = 'cart' | 'delivery' | 'payment'
+const STEPS: Step[] = ['cart', 'delivery', 'payment']
+const STEP_TITLE: Record<Step, string> = {
+  cart: 'Seu Pedido',
+  delivery: 'Entrega e contato',
+  payment: 'Pagamento',
+}
+
+// Resultado da RPC preview_coupon — mesma regra do create_order, só que sem
+// consumir o cupom. Serve para mostrar o desconto ANTES de confirmar.
+type CouponPreview = {
+  valid: boolean
+  reason?: string
+  code?: string
+  kind?: string
+  value?: number
+  free_shipping?: boolean
+  discount_cents?: number
+  min_order_cents?: number
+}
+
 function unitOf(item: CartItem) {
   return item.base_cents + item.options.reduce((s, o) => s + o.price_delta_cents, 0)
 }
@@ -176,6 +201,10 @@ export default function PublicMenu({
   const [cart, setCart] = useState<CartItem[]>([])
   const [cartHydrated, setCartHydrated] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
+  const [stepState, setStep] = useState<Step>('cart')
+  // Carrinho vazio não tem passo de entrega nem de pagamento — derivado, para o
+  // último item removido não deixar a folha presa numa etapa sem conteúdo.
+  const step: Step = cart.length === 0 ? 'cart' : stepState
   const [toast, setToast] = useState<string | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [modalProduct, setModalProduct] = useState<Product | null>(null)
@@ -289,6 +318,21 @@ export default function PublicMenu({
   const [cepMsg, setCepMsg] = useState<string | null>(null)
   const [tableNumber, setTableNumber] = useState('')
 
+  // Cliente recorrente não redigita nome, telefone e endereço a cada pedido — o
+  // carrinho já sobrevivia ao reload, os dados dele não. Preenchido ao entrar no
+  // passo de entrega (e não num efeito de montagem): é onde os campos aparecem,
+  // e assim nada do localStorage participa da hidratação.
+  const customerPrefilled = useRef(false)
+  function prefillCustomer() {
+    if (customerPrefilled.current) return
+    customerPrefilled.current = true
+    const saved = loadCustomer(store.slug)
+    if (!saved) return
+    if (saved.name) setCustomerName((v) => v || saved.name!)
+    if (saved.phone) setCustomerPhone((v) => v || saved.phone!)
+    if (saved.address) setAddr((a) => ({ ...a, ...saved.address }))
+  }
+
   async function lookupCep(raw: string) {
     const cep = raw.replace(/\D/g, '')
     if (cep.length !== 8) return
@@ -328,6 +372,11 @@ export default function PublicMenu({
     }
   }
   const [coupon, setCoupon] = useState('')
+  // Cupom só vira desconto depois de validado pela RPC. `applied` guarda o
+  // retorno; `couponMsg` mostra o motivo quando não vale.
+  const [couponApplied, setCouponApplied] = useState<CouponPreview | null>(null)
+  const [couponMsg, setCouponMsg] = useState<string | null>(null)
+  const [couponChecking, setCouponChecking] = useState(false)
 
   // Pagamento dentro do app (Mercado Pago): loja com pagamento online ligado e conta
   // conectada. Nesse caso o Pix vira online (QR na tela do pedido) e o cartão
@@ -354,16 +403,31 @@ export default function PublicMenu({
   // Layout escolhido no painel Pro (default = 'list', igual ao visual atual).
   const menuLayout = sanitizeMenuLayout(theme.menuLayout)
 
+  // Busca por nome, descrição e categoria: quem procura "sem lactose" ou
+  // "porção" está descrevendo o item, não digitando o nome exato dele.
+  // Categoria que casa com a busca mantém todos os produtos dela.
   const filteredMenu = useMemo(() => {
     const q = search.trim().toLowerCase()
     if (!q) return menu
     return menu
-      .map((cat) => ({ ...cat, products: cat.products.filter((p) => p.name.toLowerCase().includes(q)) }))
+      .map((cat) => {
+        if (cat.name.toLowerCase().includes(q)) return cat
+        return {
+          ...cat,
+          products: cat.products.filter(
+            (p) =>
+              p.name.toLowerCase().includes(q) ||
+              (p.description ?? '').toLowerCase().includes(q)
+          ),
+        }
+      })
       .filter((cat) => cat.products.length > 0)
   }, [menu, search])
 
+  // Observa as seções realmente renderizadas (as filtradas) — durante a busca as
+  // outras nem existem no DOM.
   useEffect(() => {
-    const sections = menu
+    const sections = filteredMenu
       .map((cat) => document.getElementById(`section-${cat.id}`))
       .filter((el): el is HTMLElement => !!el)
     if (sections.length === 0) return
@@ -377,7 +441,7 @@ export default function PublicMenu({
     )
     sections.forEach((el) => observer.observe(el))
     return () => observer.disconnect()
-  }, [menu])
+  }, [filteredMenu])
 
   function scrollToSection(id: string) {
     const el = document.getElementById(`section-${id}`)
@@ -393,9 +457,21 @@ export default function PublicMenu({
     () => zones.find((z) => z.neighborhood.trim().toLowerCase() === addr.neighborhood.trim().toLowerCase()),
     [zones, addr.neighborhood]
   )
-  const deliveryFee = orderType === 'delivery' ? (zone ? zone.fee_cents : store.delivery_fee_cents) : 0
-  const total = subtotal + deliveryFee
+  const baseDeliveryFee = orderType === 'delivery' ? (zone ? zone.fee_cents : store.delivery_fee_cents) : 0
+  // Cupom de frete grátis zera a entrega; os outros descontam do subtotal.
+  const freeShipping = !!couponApplied?.valid && !!couponApplied.free_shipping
+  const deliveryFee = freeShipping ? 0 : baseDeliveryFee
+  const discount = couponApplied?.valid ? couponApplied.discount_cents ?? 0 : 0
+  const total = Math.max(0, subtotal + deliveryFee - discount)
   const etaMin = orderType === 'delivery' ? store.estimated_delivery_min : store.estimated_prep_min
+
+  // Mínimo efetivo: o da loja e o do bairro escolhido — o create_order cobra os
+  // dois, então a tela precisa cobrar os dois também, senão o pedido só falha
+  // depois de todo o formulário preenchido.
+  const minOrderCents = Math.max(
+    store.min_order_cents,
+    orderType === 'delivery' && zone ? zone.min_order_cents : 0
+  )
 
   // ---- Product modal ----
   function openProduct(p: Product) {
@@ -475,6 +551,110 @@ export default function PublicMenu({
     )
   }
 
+  // Validação por passo: o erro aparece ao lado do botão que o cliente acabou de
+  // apertar, em vez de no meio de um formulário de trinta campos.
+  function validateStep(s: Step): string | null {
+    if (s === 'cart') {
+      return cart.length === 0 ? 'Seu carrinho está vazio.' : null
+    }
+    if (s === 'delivery') {
+      if (!customerName.trim()) return 'Informe seu nome pra continuar.'
+      if (orderType === 'delivery' && !addr.neighborhood.trim()) return 'Informe o bairro de entrega.'
+      if (orderType === 'delivery' && !addr.street.trim()) return 'Informe a rua de entrega.'
+      if (orderType === 'dine_in' && !tableNumber.trim()) return 'Informe o número da mesa.'
+      return null
+    }
+    if (payments.length > 0 && !payment) return 'Escolha a forma de pagamento.'
+    return null
+  }
+
+  function goNext() {
+    const problem = validateStep(step)
+    if (problem) {
+      setError(problem)
+      return
+    }
+    setError(null)
+    if (step === 'cart') {
+      prefillCustomer()
+      setStep('delivery')
+    }
+    else if (step === 'delivery') setStep('payment')
+    else checkout()
+  }
+
+  function goBack() {
+    setError(null)
+    const i = STEPS.indexOf(step)
+    if (i > 0) setStep(STEPS[i - 1])
+  }
+
+  async function applyCoupon() {
+    const code = coupon.trim()
+    if (!code) return
+    setCouponChecking(true)
+    setCouponMsg(null)
+    const supabase = createClient()
+    const { data, error: rpcError } = await supabase.rpc('preview_coupon', {
+      p_store_id: store.id,
+      p_code: code,
+      p_subtotal_cents: subtotal,
+    })
+    setCouponChecking(false)
+    if (rpcError || !data) {
+      setCouponApplied(null)
+      setCouponMsg('Não deu pra validar o cupom agora. Tente de novo.')
+      return
+    }
+    const preview = data as CouponPreview
+    if (!preview.valid) {
+      setCouponApplied(null)
+      setCouponMsg(preview.reason ?? 'Cupom inválido.')
+      return
+    }
+    setCouponApplied(preview)
+    setCouponMsg(null)
+  }
+
+  function removeCoupon() {
+    setCoupon('')
+    setCouponApplied(null)
+    setCouponMsg(null)
+  }
+
+  // O carrinho continua editável com o cupom aplicado: mudar a quantidade muda o
+  // subtotal e, com ele, o desconto (e pode derrubar o pedido mínimo do cupom).
+  useEffect(() => {
+    if (!couponApplied?.valid) return
+    const code = couponApplied.code
+    if (!code) return
+    let cancelled = false
+    const t = setTimeout(async () => {
+      const supabase = createClient()
+      const { data, error: rpcError } = await supabase.rpc('preview_coupon', {
+        p_store_id: store.id,
+        p_code: code,
+        p_subtotal_cents: subtotal,
+      })
+      if (cancelled || rpcError || !data) return
+      const preview = data as CouponPreview
+      if (preview.valid) {
+        setCouponApplied(preview)
+        setCouponMsg(null)
+      } else {
+        setCouponApplied(null)
+        setCouponMsg(preview.reason ?? 'Cupom não vale mais para este pedido.')
+      }
+    }, 400)
+    return () => {
+      cancelled = true
+      clearTimeout(t)
+    }
+    // Só o subtotal dispara a revalidação; `couponApplied` entra como referência
+    // do código aplicado e reavaliá-lo aqui viraria laço.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal, store.id])
+
   async function checkout() {
     setError(null)
     if (!storeOpen.open) {
@@ -500,7 +680,9 @@ export default function PublicMenu({
       payment_method: payment || null,
       change_for_cents: payment === 'cash' && changeFor ? Math.round(Number(changeFor) * 100) : null,
       table_number: orderType === 'dine_in' ? tableNumber : null,
-      coupon_code: coupon || null,
+      // Só o cupom já validado vai para a RPC — mandar um código não conferido
+      // faria o create_order abortar o pedido inteiro por causa do cupom.
+      coupon_code: couponApplied?.valid ? couponApplied.code ?? null : null,
       address:
         orderType === 'delivery'
           ? {
@@ -532,6 +714,12 @@ export default function PublicMenu({
       return setError(friendlyOrderError(rpcError.message))
     }
 
+    saveCustomer(store.slug, {
+      name: customerName,
+      phone: customerPhone,
+      address: orderType === 'delivery' ? addr : undefined,
+    })
+
     saveOrderToHistory({
       id: String(orderId),
       storeSlug: store.slug,
@@ -544,7 +732,7 @@ export default function PublicMenu({
     router.push(`/pedido/${orderId}`)
   }
 
-  const minToReach = store.min_order_cents - subtotal
+  const minToReach = minOrderCents - subtotal
 
   return (
     <div className={`storefront storefront-${themeMode} menu-layout-${menuLayout}`} style={styleVars}>
@@ -694,7 +882,7 @@ export default function PublicMenu({
       <div className="storefront-layout">
         <div className="storefront-main">
           <nav className="menu-nav" style={{ justifyContent: 'flex-start', borderTop: 'none', marginBottom: 20 }}>
-            {menu.map((cat) => (
+            {filteredMenu.map((cat) => (
               <span
                 key={cat.id}
                 className={`menu-nav-item ${activeCategory === cat.id ? 'active' : ''}`}
@@ -757,9 +945,24 @@ export default function PublicMenu({
         <aside className={`cart-drawer ${cartOpen ? 'open' : ''}`} aria-label="Carrinho">
           <span className="cart-grip" aria-hidden onClick={() => setCartOpen(false)} />
           <div className="cart-drawer-header">
-            <h2 className="cart-drawer-title">Seu Pedido</h2>
+            <div className="cart-drawer-head-left">
+              {step !== 'cart' && (
+                <button className="cart-back" onClick={goBack} aria-label="Voltar">
+                  <ChevronLeft size={20} strokeWidth={2.4} />
+                </button>
+              )}
+              <h2 className="cart-drawer-title">{STEP_TITLE[step]}</h2>
+            </div>
             <button className="cart-close" onClick={() => setCartOpen(false)}><IconClose /></button>
           </div>
+
+          {cart.length > 0 && (
+            <div className="cart-steps" role="progressbar" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={STEPS.indexOf(step) + 1}>
+              {STEPS.map((s, i) => (
+                <span key={s} className={`cart-step-bar ${i <= STEPS.indexOf(step) ? 'done' : ''}`} />
+              ))}
+            </div>
+          )}
 
           {cart.length === 0 ? (
             <div className="cart-empty" style={{ display: 'flex' }}>
@@ -769,6 +972,7 @@ export default function PublicMenu({
           ) : (
             <>
               <div className="cart-scroll">
+              {step === 'cart' && (
               <div className="cart-items" style={{ display: 'flex' }}>
                 {cart.map((item) => (
                   <div className="cart-item" key={item.lineId}>
@@ -795,8 +999,12 @@ export default function PublicMenu({
                   </div>
                 ))}
               </div>
+              )}
 
               <div className="cart-form">
+                {/* ── Passo 2: entrega e contato ── */}
+                {step === 'delivery' && (
+                <>
                 {/* Tipo de pedido */}
                 {enabledTypes.length > 1 && (
                   <div className="ordertype-row">
@@ -885,7 +1093,12 @@ export default function PublicMenu({
                     <input className="form-input" placeholder="Número da mesa" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)} />
                   </div>
                 )}
+                </>
+                )}
 
+                {/* ── Passo 3: pagamento ── */}
+                {step === 'payment' && (
+                <>
                 {/* Pagamento */}
                 {payments.length > 0 && (
                   <div className="payment-grid">
@@ -956,14 +1169,48 @@ export default function PublicMenu({
                   </div>
                 )}
 
+                {/* Cupom: só vira desconto depois de validado — antes disso o
+                    cliente digitava um código, não recebia resposta nenhuma e
+                    só descobria se valia depois do pedido enviado. */}
                 <div className="form-group">
-                  <input className="form-input" placeholder="Cupom (opcional)" value={coupon} onChange={(e) => setCoupon(e.target.value.toUpperCase())} />
+                  {couponApplied?.valid ? (
+                    <div className="coupon-applied">
+                      <span className="coupon-applied-tag">
+                        <Check size={14} strokeWidth={3} /> {couponApplied.code}
+                      </span>
+                      <span className="coupon-applied-desc">
+                        {couponApplied.free_shipping
+                          ? 'Frete grátis aplicado'
+                          : `Desconto de ${fmtCents(couponApplied.discount_cents ?? 0)}`}
+                      </span>
+                      <button type="button" className="coupon-remove" onClick={removeCoupon}>
+                        Remover
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="coupon-row">
+                      <input
+                        className="form-input"
+                        placeholder="Cupom (opcional)"
+                        value={coupon}
+                        onChange={(e) => { setCoupon(e.target.value.toUpperCase()); setCouponMsg(null) }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyCoupon() } }}
+                      />
+                      <button
+                        type="button"
+                        className="coupon-apply"
+                        disabled={!coupon.trim() || couponChecking}
+                        onClick={applyCoupon}
+                      >
+                        {couponChecking ? '...' : 'Aplicar'}
+                      </button>
+                    </div>
+                  )}
+                  {couponMsg && <p className="coupon-msg">{couponMsg}</p>}
                 </div>
                 <div className="form-group">
                   <input className="form-input" placeholder="Observação (opcional)" value={note} onChange={(e) => setNote(e.target.value)} />
                 </div>
-
-                {error && <p className="cart-error">{error}</p>}
 
                 <div className="cart-summary">
                   <div className="cart-sum-row">
@@ -973,10 +1220,32 @@ export default function PublicMenu({
                   {orderType === 'delivery' && (
                     <div className="cart-sum-row">
                       <span>Entrega{zone ? ` (${zone.neighborhood})` : ''}</span>
-                      <span>{deliveryFee ? fmtCents(deliveryFee) : 'Grátis'}</span>
+                      <span>
+                        {freeShipping && baseDeliveryFee > 0 ? (
+                          <>
+                            <s className="cart-sum-strike">{fmtCents(baseDeliveryFee)}</s> Grátis
+                          </>
+                        ) : deliveryFee ? (
+                          fmtCents(deliveryFee)
+                        ) : (
+                          'Grátis'
+                        )}
+                      </span>
                     </div>
                   )}
+                  {discount > 0 && (
+                    <div className="cart-sum-row is-discount">
+                      <span>Desconto{couponApplied?.code ? ` (${couponApplied.code})` : ''}</span>
+                      <span>− {fmtCents(discount)}</span>
+                    </div>
+                  )}
+                  <div className="cart-sum-row is-total">
+                    <span>Total</span>
+                    <span>{fmtCents(total)}</span>
+                  </div>
                 </div>
+                </>
+                )}
               </div>{/* /cart-form */}
               </div>{/* /cart-scroll */}
 
@@ -989,8 +1258,16 @@ export default function PublicMenu({
                   </div>
                 )}
                 {storeOpen.open && minToReach > 0 && (
-                  <div className="cart-minimum">Faltam {fmtCents(minToReach)} para o pedido mínimo</div>
+                  <div className="cart-minimum">
+                    Faltam {fmtCents(minToReach)} para o pedido mínimo
+                    {orderType === 'delivery' && zone && zone.min_order_cents > store.min_order_cents
+                      ? ` em ${zone.neighborhood}`
+                      : ''}
+                  </div>
                 )}
+                {/* O erro fica colado no botão que o cliente apertou — no meio do
+                    formulário ele caía fora da tela. */}
+                {error && <p className="cart-error">{error}</p>}
                 <div className="cart-action-inner">
                   <div className="cart-action-total">
                     <span className="cart-action-total-label">Total</span>
@@ -998,10 +1275,16 @@ export default function PublicMenu({
                   </div>
                   <button
                     className="checkout-btn"
-                    disabled={!storeOpen.open || subtotal < store.min_order_cents || submitting}
-                    onClick={checkout}
+                    disabled={!storeOpen.open || minToReach > 0 || submitting}
+                    onClick={goNext}
                   >
-                    {!storeOpen.open ? 'Loja fechada' : submitting ? 'Enviando...' : 'Confirmar Pedido'}
+                    {!storeOpen.open
+                      ? 'Loja fechada'
+                      : submitting
+                        ? 'Enviando...'
+                        : step === 'payment'
+                          ? 'Confirmar Pedido'
+                          : 'Continuar'}
                   </button>
                 </div>
               </div>
