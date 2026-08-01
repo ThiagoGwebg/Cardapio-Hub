@@ -1,4 +1,6 @@
-const FAQS = [
+// Exportado porque a home usa a mesma lista para gerar o schema FAQPage —
+// o texto visível e o JSON-LD precisam bater, senão o Google trata como spam.
+export const FAQS = [
   {
     q: 'Preciso saber programar para usar?',
     a: 'Não. Você preenche os dados da sua loja e monta o cardápio direto pelo painel, sem escrever nenhuma linha de código.',

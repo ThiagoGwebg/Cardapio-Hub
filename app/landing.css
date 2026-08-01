@@ -1320,3 +1320,40 @@
   color: var(--text);
 }
 
+
+/* ── Páginas de segmento (/para/[segmento]) ──
+   Grade de 3 dores. Não reaproveita .l-features-grid porque aquela é de 4 colunas
+   (a home tem 4 cards + variações big/wide) e sobraria uma coluna vazia aqui. */
+.l-pains-grid {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .l-pains-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Lista de links pros outros segmentos: centralizada e quebrando linha. */
+.l-segment-links {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 22px;
+}
+
+.l-segment-links a {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.l-segment-links a:hover {
+  color: var(--text);
+}

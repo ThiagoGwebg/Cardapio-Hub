@@ -2,10 +2,22 @@ import type { Metadata } from 'next'
 import '../landing.css'
 import Link from 'next/link'
 import LandingLeadForm from '@/components/landing/LandingLeadForm'
+import { absoluteUrl } from '@/lib/seo'
+
+const DESCRIPTION =
+  'Fale com a gente e coloque seu cardápio digital no ar hoje: a partir de R$ 29/mês, sem comissão por venda e sem cartão de crédito para começar.'
 
 export const metadata: Metadata = {
-  title: 'Fale com a gente — Cardápio Hub',
-  description: 'Deixe seus dados e o nosso time coloca seu cardápio digital no ar com você.',
+  // Sem sufixo manual: o template do layout raiz já acrescenta "— Cardápio Hub".
+  title: 'Fale com a gente',
+  description: DESCRIPTION,
+  alternates: { canonical: absoluteUrl('/contato') },
+  openGraph: {
+    type: 'website',
+    url: absoluteUrl('/contato'),
+    title: 'Fale com a gente — Cardápio Hub',
+    description: DESCRIPTION,
+  },
 }
 
 export default function ContatoPage() {

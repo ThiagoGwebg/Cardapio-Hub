@@ -11,8 +11,8 @@ export default function LandingHero() {
             Do balcão pro <em>celular</em> do seu cliente.
           </h1>
           <p className="l-hero-sub">
-            Cardápio, pedidos e caixa da sua lanchonete ou barraca num painel só — sem
-            precisar anotar nada no bloquinho.
+            Cardápio digital com QR Code, pedidos e caixa da sua lanchonete ou barraca num
+            painel só — sem precisar anotar nada no bloquinho.
           </p>
           <div className="l-hero-ctas">
             <Link href="/contato" className="l-btn-primary large">Quero minha loja no ar</Link>

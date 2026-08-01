@@ -1,9 +1,12 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import '../landing.css'
+import { absoluteUrl } from '@/lib/seo'
 
-export const metadata = {
-  title: 'Política de Privacidade — Cardápio Hub',
-  description: 'Como o Cardápio Hub coleta, usa e protege seus dados.',
+export const metadata: Metadata = {
+  title: 'Política de Privacidade',
+  description: 'Como o Cardápio Hub coleta, usa e protege seus dados e os dados dos seus clientes.',
+  alternates: { canonical: absoluteUrl('/privacidade') },
 }
 
 export default function PrivacyPage() {

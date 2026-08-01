@@ -1,49 +1,53 @@
-'use client'
+import type { Metadata } from 'next'
+import LandingShell from '@/components/landing/LandingShell'
+import { FAQS } from '@/components/landing/LandingFaq'
+import {
+  absoluteUrl,
+  faqSchema,
+  jsonLd,
+  organizationSchema,
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  SITE_TITLE,
+  softwareApplicationSchema,
+  websiteSchema,
+} from '@/lib/seo'
 
-import { useEffect, useState } from 'react'
-import './landing.css'
-import LandingHeader from '@/components/landing/LandingHeader'
-import LandingHero from '@/components/landing/LandingHero'
-import LandingStory from '@/components/landing/LandingStory'
-import LandingFeatures from '@/components/landing/LandingFeatures'
-import LandingHowItWorks from '@/components/landing/LandingHowItWorks'
-import LandingPricing from '@/components/landing/LandingPricing'
-import LandingFaq from '@/components/landing/LandingFaq'
-import LandingFinalCta from '@/components/landing/LandingFinalCta'
-import LandingFooter from '@/components/landing/LandingFooter'
+export const metadata: Metadata = {
+  // `absolute` para a home não virar "… — Cardápio Hub — Cardápio Hub" pelo template.
+  title: { absolute: `${SITE_NAME} — ${SITE_TITLE}` },
+  description: SITE_DESCRIPTION,
+  keywords: SITE_KEYWORDS,
+  alternates: { canonical: absoluteUrl('/') },
+  openGraph: {
+    type: 'website',
+    url: absoluteUrl('/'),
+    title: `${SITE_NAME} — ${SITE_TITLE}`,
+    description: SITE_DESCRIPTION,
+  },
+}
 
 export default function Home() {
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark')
-
-  useEffect(() => {
-    const saved = localStorage.getItem('landing-theme')
-    if (saved === 'dark' || saved === 'light') {
-      setThemeMode(saved)
-    } else {
-      const isSystemLight = window.matchMedia('(prefers-color-scheme: light)').matches
-      setThemeMode(isSystemLight ? 'light' : 'dark')
-    }
-  }, [])
-
-  const toggleThemeMode = () => {
-    const next = themeMode === 'light' ? 'dark' : 'light'
-    setThemeMode(next)
-    localStorage.setItem('landing-theme', next)
-  }
-
   return (
-    <div className={`landing ${themeMode}`}>
-      <LandingHeader themeMode={themeMode} toggleThemeMode={toggleThemeMode} />
-      <LandingHero />
-      <LandingStory />
-      <div className="l-perforation" />
-      <LandingFeatures />
-      <div className="l-perforation" />
-      <LandingHowItWorks />
-      <LandingPricing />
-      <LandingFaq />
-      <LandingFinalCta />
-      <LandingFooter />
-    </div>
+    <>
+      {/* Um único bloco de JSON-LD com @graph: menos bytes e as entidades já
+          referenciadas entre si pelos @id (organização ↔ site ↔ software). */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd({
+            '@context': 'https://schema.org',
+            '@graph': [
+              organizationSchema(),
+              websiteSchema(),
+              softwareApplicationSchema(),
+              faqSchema(FAQS),
+            ],
+          }),
+        }}
+      />
+      <LandingShell />
+    </>
   )
 }

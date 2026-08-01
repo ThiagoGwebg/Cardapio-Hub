@@ -2,10 +2,21 @@ import type { Metadata } from 'next'
 import '../landing.css'
 import Link from 'next/link'
 import LandingCourierForm from '@/components/landing/LandingCourierForm'
+import { absoluteUrl } from '@/lib/seo'
+
+const DESCRIPTION =
+  'Seja entregador parceiro: cadastre-se para fazer entregas para os restaurantes, lanchonetes e pizzarias parceiras do Cardápio Hub na sua região.'
 
 export const metadata: Metadata = {
-  title: 'Seja Entregador Parceiro — Cardápio Hub',
-  description: 'Cadastre-se para fazer entregas para os restaurantes parceiros do Cardápio Hub na sua região.',
+  title: 'Seja entregador parceiro',
+  description: DESCRIPTION,
+  alternates: { canonical: absoluteUrl('/entregadores') },
+  openGraph: {
+    type: 'website',
+    url: absoluteUrl('/entregadores'),
+    title: 'Seja entregador parceiro — Cardápio Hub',
+    description: DESCRIPTION,
+  },
 }
 
 export default function EntregadoresPage() {

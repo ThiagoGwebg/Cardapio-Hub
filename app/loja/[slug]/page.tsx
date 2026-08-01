@@ -3,7 +3,10 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { isStorePro } from '@/lib/plan'
 import { resolveStoreOpen } from '@/lib/openingHours'
 import { notFound } from 'next/navigation'
+import { jsonLd } from '@/lib/seo'
+import { storeSchema, type SeoStore } from '@/lib/storeSeo'
 import PublicMenu from './PublicMenu'
+import StoreUnavailable from './StoreUnavailable'
 
 export default async function LojaPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -16,6 +19,10 @@ export default async function LojaPage({ params }: { params: Promise<{ slug: str
     .maybeSingle()
 
   if (!store) notFound()
+
+  // Mensalidade da plataforma suspensa: o cardápio sai do ar. O cliente final não
+  // precisa saber o motivo — vê apenas que a loja está indisponível.
+  if (store.billing_suspended) return <StoreUnavailable name={store.name} />
 
   // Selo "Feito com Cardápio Hub" aparece só em lojas Free (white-label é Pro).
   // subscriptions não é legível pelo anon (RLS), então usamos o client admin no servidor.
@@ -102,12 +109,20 @@ export default async function LojaPage({ params }: { params: Promise<{ slug: str
     .filter((c) => c.products.length > 0)
 
   return (
-    <PublicMenu
-      store={store}
-      menu={menu}
-      zones={zones ?? []}
-      initialOpen={resolveStoreOpen(store, new Date())}
-      showBranding={!isPro}
-    />
+    <>
+      {/* Restaurant + Menu completo. É o que faz o cardápio concorrer nas buscas
+          "<loja> delivery" e aparecer com pratos e preço no resultado do Google. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd(storeSchema(store as SeoStore, menu)) }}
+      />
+      <PublicMenu
+        store={store}
+        menu={menu}
+        zones={zones ?? []}
+        initialOpen={resolveStoreOpen(store, new Date())}
+        showBranding={!isPro}
+      />
+    </>
   )
 }
