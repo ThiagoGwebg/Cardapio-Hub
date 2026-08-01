@@ -6,6 +6,9 @@ import { getBaseUrl } from '@/lib/baseUrl'
 
 export const SITE_NAME = 'Cardápio Hub'
 
+/** E-mail de contato mostrado ao lojista. Sempre importe daqui — nada de string solta. */
+export const SUPPORT_EMAIL = 'thiagoribeiro18181@gmail.com'
+
 /** Título da home. Curto o bastante pra não ser truncado na SERP (~60 caracteres). */
 export const SITE_TITLE = 'Cardápio digital e sistema de pedidos sem comissão'
 

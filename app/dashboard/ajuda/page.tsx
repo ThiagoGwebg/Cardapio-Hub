@@ -1,5 +1,6 @@
 import { Lightbulb, Mail, Rocket } from 'lucide-react'
 import Link from 'next/link'
+import { SUPPORT_EMAIL } from '@/lib/seo'
 
 export default function AjudaPage() {
   return (
@@ -103,8 +104,8 @@ export default function AjudaPage() {
         </div>
         <div style={{ fontSize: 12, color: 'var(--muted)' }}>
           Entre em contato pelo e-mail{' '}
-          <a href="mailto:suporte@cardapiohub.com" style={{ color: 'var(--primary)', fontWeight: 600 }}>
-            suporte@cardapiohub.com
+          <a href={`mailto:${SUPPORT_EMAIL}`} style={{ color: 'var(--primary)', fontWeight: 600 }}>
+            {SUPPORT_EMAIL}
           </a>
         </div>
       </div>
