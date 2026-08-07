@@ -30,7 +30,7 @@ import {
   type LeadRow,
 } from './actions'
 
-type Filter = 'novo' | 'contatado' | 'fechado' | 'todos'
+type Filter = 'novo' | 'contatado' | 'fechado' | 'perdido' | 'todos'
 
 const STATUS_META: Record<string, { label: string; color: string; bg: string }> = {
   novo: { label: 'Novo', color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.12)' },
@@ -242,6 +242,7 @@ export default function LeadsBoard({ initialLeads }: { initialLeads: LeadRow[] }
     novo: leads.filter((l) => l.status === 'novo').length,
     contatado: leads.filter((l) => l.status === 'contatado').length,
     fechado: leads.filter((l) => l.status === 'fechado').length,
+    perdido: leads.filter((l) => l.status === 'perdido').length,
     todos: leads.length,
   }
   const conversion = counts.todos > 0 ? Math.round((counts.fechado / counts.todos) * 100) : 0
@@ -357,6 +358,9 @@ export default function LeadsBoard({ initialLeads }: { initialLeads: LeadRow[] }
             </button>
             <button className={`leads-tab ${filter === 'fechado' ? 'active' : ''}`} onClick={() => setFilter('fechado')}>
               Clientes {counts.fechado > 0 && <span className="leads-tab-count green">{counts.fechado}</span>}
+            </button>
+            <button className={`leads-tab ${filter === 'perdido' ? 'active' : ''}`} onClick={() => setFilter('perdido')}>
+              Perdidos {counts.perdido > 0 && <span className="leads-tab-count muted">{counts.perdido}</span>}
             </button>
             <button className={`leads-tab ${filter === 'todos' ? 'active' : ''}`} onClick={() => setFilter('todos')}>
               Todos <span className="leads-tab-count muted">{counts.todos}</span>

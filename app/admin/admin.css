@@ -1262,20 +1262,23 @@ a.adm-stat:hover {
   color: var(--ink);
 }
 
+/* As abas nunca podem sumir: quebram em linhas em vez de serem cortadas
+   pela borda do container quando a janela é estreita. */
 .leads-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 5px;
   margin-top: 12px;
   padding-bottom: 12px;
   background: transparent;
-  overflow-x: auto;
   scrollbar-width: none;
 }
 .leads-tabs::-webkit-scrollbar {
   display: none;
 }
 .leads-tab {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 104px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--muted);
