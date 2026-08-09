@@ -746,7 +746,9 @@ export default function PublicMenu({
         )}
         <span className="storefront-topbar-name">{store.name}</span>
         <div className="storefront-topbar-actions">
-          <InstallPwaButton storeName={store.name} appIconSrc={theme.logoUrl || `/loja/${store.slug}/app-icon.svg`} />
+          {/* Instalação do app desligada por enquanto no cardápio — o componente fica
+              montado só pra registrar o service worker (offline + push). */}
+          <InstallPwaButton hideButton storeName={store.name} appIconSrc={theme.logoUrl || `/loja/${store.slug}/app-icon.svg`} />
           {myOrders.length > 0 && (
             <button className="my-orders-btn" onClick={() => setMyOrdersOpen(true)}>
               Meus pedidos {myOrders.length > 1 ? `(${myOrders.length})` : ''}

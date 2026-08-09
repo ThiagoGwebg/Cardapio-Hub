@@ -221,7 +221,10 @@ export default function DashboardShell({ store, children }: { store: Store; chil
         <NavLinks />
 
         <div style={{ marginTop: 'auto', padding: '18px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {/* Instalação do app desligada por enquanto no painel do lojista — o componente
+              fica montado só pra registrar o service worker (offline + push). */}
           <InstallPwaButton
+            hideButton
             storeName={store.name}
             appIconSrc="/dashboard/app-icon.svg"
             scope="/dashboard"

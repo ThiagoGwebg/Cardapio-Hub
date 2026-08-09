@@ -36,6 +36,7 @@ export default function InstallPwaButton({
   title,
   subtitle = 'Peça em segundos, direto da tela inicial',
   benefits = DEFAULT_BENEFITS,
+  hideButton = false,
 }: {
   storeName: string
   appIconSrc: string
@@ -44,6 +45,11 @@ export default function InstallPwaButton({
   title?: string
   subtitle?: string
   benefits?: Benefit[]
+  /**
+   * Esconde o botão mas mantém o registro do service worker (cache offline + push).
+   * Usado enquanto a instalação do app está desligada na loja e no painel do lojista.
+   */
+  hideButton?: boolean
 }) {
   const [mounted, setMounted] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
@@ -114,6 +120,7 @@ export default function InstallPwaButton({
   }, [scope])
 
   if (!mounted) return null
+  if (hideButton) return null
   if (installed) return null
   if (!canInstall && !isIos()) return null
 
