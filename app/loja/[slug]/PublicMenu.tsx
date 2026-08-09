@@ -152,6 +152,24 @@ function unitOf(item: CartItem) {
   return item.base_cents + item.options.reduce((s, o) => s + o.price_delta_cents, 0)
 }
 
+/**
+ * Acréscimo mínimo inevitável do produto: soma, em cada grupo obrigatório, as
+ * opções mais baratas que o cliente é forçado a marcar. Grupo opcional não
+ * entra — ninguém precisa marcar nada nele — e grupo obrigatório com opção
+ * grátis também não, porque dá pra sair pagando só o preço base.
+ */
+function minForcedExtraCents(p: Product) {
+  return p.groups.reduce((total, g) => {
+    const need = g.required ? Math.max(1, g.min_select) : Math.max(0, g.min_select)
+    if (need === 0) return total
+    const cheapest = g.options
+      .map((o) => o.price_delta_cents)
+      .sort((a, b) => a - b)
+      .slice(0, need)
+    return total + cheapest.reduce((s, c) => s + c, 0)
+  }, 0)
+}
+
 type OrderSummary = { status: string; payment_status?: string | null; order_number: number | null; total_cents: number; item_count: number }
 
 const ORDER_STATUS_META: Record<string, { Icon: LucideIcon; cls: string }> = {
@@ -918,7 +936,7 @@ export default function PublicMenu({
                         <div className="product-desc">{p.description}</div>
                         <div className="product-footer">
                           <div className="product-price">
-                            {p.groups.length > 0 ? 'a partir de ' : ''}
+                            {minForcedExtraCents(p) > 0 ? 'a partir de ' : ''}
                             {fmtCents(p.price_cents)}
                           </div>
                           <button
