@@ -1,4 +1,4 @@
-import { Check, Minus, PartyPopper } from 'lucide-react'
+import { Check, Clock, Minus, PartyPopper } from 'lucide-react'
 import Link from 'next/link'
 import { getCurrentStore } from '@/lib/store'
 import { getStoreUsage } from '@/lib/plan'
@@ -74,6 +74,17 @@ export default async function BillingPage({
     .maybeSingle()
 
   const suspended = sub?.billing_status === 'suspended'
+
+  // Pedido de upgrade já aberto: o CTA vira status, senão o lojista pede duas vezes.
+  const { data: upgradeRequest } = isPro
+    ? { data: null }
+    : await supabase
+        .from('plan_upgrade_requests')
+        .select('created_at')
+        .eq('store_id', store.id)
+        .eq('status', 'pending')
+        .limit(1)
+        .maybeSingle<{ created_at: string }>()
 
   // QR Pix estático da plataforma, por plano. Renderizado no servidor.
   const pixPayload = invoice ? await getPixPayloadForPlan(isPro ? 'pro' : 'free') : null
@@ -154,8 +165,14 @@ export default async function BillingPage({
           <form action={openBillingPortal}>
             <SubmitButton className="save-btn" pendingLabel="Abrindo…">Gerenciar assinatura</SubmitButton>
           </form>
-        ) : isPro ? null : (
-          <Link href="/contato" className="save-btn" style={{ marginTop: 12, display: 'inline-block' }}>
+        ) : isPro ? null : upgradeRequest ? (
+          <p style={{ fontSize: 12, color: 'var(--green)', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 0 }}>
+            <Clock size={14} strokeWidth={2.2} />
+            Pedido de upgrade enviado em {new Date(upgradeRequest.created_at).toLocaleDateString('pt-BR')} — nosso
+            time entra em contato em até 1 dia útil.
+          </p>
+        ) : (
+          <Link href="/dashboard/billing/upgrade" className="save-btn" style={{ marginTop: 12, display: 'inline-block' }}>
             Quero fazer upgrade pro Pro
           </Link>
         )}
@@ -181,8 +198,8 @@ export default async function BillingPage({
             ))}
           </tbody>
         </table>
-        {!isPro && (
-          <Link href="/contato" className="save-btn" style={{ marginTop: 16, display: 'inline-block' }}>
+        {!isPro && !upgradeRequest && (
+          <Link href="/dashboard/billing/upgrade" className="save-btn" style={{ marginTop: 16, display: 'inline-block' }}>
             Quero o Pro — falar com a gente
           </Link>
         )}

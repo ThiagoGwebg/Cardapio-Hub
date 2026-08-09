@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { notifyPaymentClaimed } from '@/lib/notify'
+import { brNationalNumber } from '@/lib/phone'
 
 /**
  * "Já paguei": o lojista declara que enviou o Pix. Como o QR é estático (o banco
@@ -46,6 +47,52 @@ export async function claimInvoicePayment(): Promise<{ ok: boolean; error?: stri
 
   revalidatePath('/dashboard/billing')
   return { ok: true }
+}
+
+/**
+ * Pedido de upgrade pro Pro feito de dentro do painel. Não cobra nem troca o
+ * plano: registra a intenção para o time atender em /admin/lojas, onde o Pro é
+ * ativado à mão (a mensalidade nova sai pela fatura Pix do ciclo).
+ *
+ * A loja vem da SESSÃO, nunca do form — senão um lojista pediria upgrade por outro.
+ */
+export async function requestProUpgrade(formData: FormData) {
+  const { store, user } = await getCurrentStore()
+  const admin = createAdminClient()
+
+  const { data: sub } = await admin
+    .from('subscriptions')
+    .select('plan, status')
+    .eq('store_id', store.id)
+    .maybeSingle<{ plan: string; status: string }>()
+
+  // Já é Pro (ou a aba ficou aberta desde antes da ativação): nada a pedir.
+  if (sub?.plan === 'pro' && sub.status === 'active') {
+    redirect('/dashboard/billing')
+  }
+
+  const note = ((formData.get('note') as string | null) || '').trim().slice(0, 500)
+  const rawPhone = (formData.get('phone') as string | null) || ''
+  // Guarda só o que dá pra ligar: número inválido viraria contato quebrado no admin.
+  const phone = brNationalNumber(rawPhone) ?? brNationalNumber(store.whatsapp_number)
+
+  const { error } = await admin.from('plan_upgrade_requests').insert({
+    store_id: store.id,
+    requested_by: user.id,
+    from_plan: sub?.plan === 'pro' ? 'pro' : 'free',
+    to_plan: 'pro',
+    contact_phone: phone,
+    note: note || null,
+  })
+
+  // 23505 = já existe pedido pendente (índice único parcial). Duplo clique não é erro.
+  if (error && error.code !== '23505') {
+    redirect('/dashboard/billing/upgrade?error=falhou')
+  }
+
+  revalidatePath('/dashboard/billing')
+  revalidatePath('/dashboard/billing/upgrade')
+  redirect('/dashboard/billing/upgrade?enviado=1')
 }
 
 export async function openBillingPortal() {

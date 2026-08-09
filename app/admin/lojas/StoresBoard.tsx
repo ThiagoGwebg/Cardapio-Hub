@@ -1,10 +1,11 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { CalendarDays, CreditCard, Flame, Package, Star, User, Wallet, X } from 'lucide-react'
+import { ArrowUpCircle, CalendarDays, CreditCard, Flame, Package, Star, User, Wallet, X } from 'lucide-react'
 import { PLAN_LIMITS } from '@/lib/stripe/plans'
 import { fmtCents } from '@/lib/format'
 import PlanToggle from './PlanToggle'
+import UpgradeRequest from './UpgradeRequest'
 import BillingControl, { type BillingInfo } from './BillingControl'
 
 export type AdminStore = {
@@ -19,6 +20,8 @@ export type AdminStore = {
   createdAt: string
   mpConnected: boolean
   mpUserId?: string
+  /** Pedido de upgrade em aberto que o lojista fez pelo painel. */
+  upgradeRequest: { createdAt: string; phone: string | null; note: string | null } | null
   billing: BillingInfo
 }
 
@@ -39,17 +42,20 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
   const [q, setQ] = useState('')
   const [sort, setSort] = useState<SortKey>('recent')
   const [onlyPro, setOnlyPro] = useState<'all' | 'pro' | 'lite'>('all')
+  const [onlyRequested, setOnlyRequested] = useState(false)
 
   const totals = useMemo(() => {
     const gmv = stores.reduce((s, x) => s + x.gmvCents, 0)
     const orders = stores.reduce((s, x) => s + x.orders, 0)
     const pro = stores.filter((s) => s.isPro).length
-    return { gmv, orders, pro }
+    const requested = stores.filter((s) => s.upgradeRequest).length
+    return { gmv, orders, pro, requested }
   }, [stores])
 
   const visible = useMemo(() => {
     const term = q.trim().toLowerCase()
     let list = stores.filter((s) => {
+      if (onlyRequested && !s.upgradeRequest) return false
       if (onlyPro === 'pro' && !s.isPro) return false
       if (onlyPro === 'lite' && s.isPro) return false
       if (!term) return true
@@ -62,7 +68,7 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
       return +new Date(b.createdAt) - +new Date(a.createdAt)
     })
     return list
-  }, [stores, q, sort, onlyPro])
+  }, [stores, q, sort, onlyPro, onlyRequested])
 
   const limit = PLAN_LIMITS.free.maxOrdersPerMonth
 
@@ -80,6 +86,10 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
         <div className="adm-summary-cell">
           <span className="adm-summary-num">{totals.pro}</span>
           <span className="adm-summary-label">Assinantes Pro</span>
+        </div>
+        <div className="adm-summary-cell">
+          <span className={`adm-summary-num ${totals.requested > 0 ? 'wants-pro' : ''}`}>{totals.requested}</span>
+          <span className="adm-summary-label">Pediram o Pro</span>
         </div>
       </div>
 
@@ -109,6 +119,15 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
               </button>
             ))}
           </div>
+          {totals.requested > 0 && (
+            <button
+              className={`adm-req-filter ${onlyRequested ? 'on' : ''}`}
+              onClick={() => setOnlyRequested((v) => !v)}
+              aria-pressed={onlyRequested}
+            >
+              <ArrowUpCircle size={13} strokeWidth={2.4} /> Pediram o Pro ({totals.requested})
+            </button>
+          )}
           <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} aria-label="Ordenar lojas">
             {SORTS.map((s) => (
               <option key={s.key} value={s.key}>
@@ -132,6 +151,11 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
                   <span className={`adm-badge ${store.isPro ? 'pro' : ''}`}>
                     {store.isPro ? <><Star size={11} strokeWidth={2.6} /> Pro</> : 'Lite'}
                   </span>
+                  {store.upgradeRequest && (
+                    <span className="adm-badge wants-pro" title="O lojista pediu o upgrade pelo painel">
+                      <ArrowUpCircle size={11} strokeWidth={2.6} /> Pediu o Pro
+                    </span>
+                  )}
                   {!store.isOpen && <span className="adm-badge closed">Fechada</span>}
                   {store.mpConnected && (
                     <span className="adm-badge" title={store.mpUserId ? `Conta MP ${store.mpUserId}` : 'Mercado Pago conectado'}>
@@ -160,6 +184,9 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
                     })}
                   </span>
                 </div>
+                {store.upgradeRequest && (
+                  <UpgradeRequest storeId={store.id} storeName={store.name} request={store.upgradeRequest} />
+                )}
                 {!store.isPro && (
                   <div className="adm-usage" title={`Limite do plano Lite: ${limit} pedidos/mês`}>
                     <div className="adm-usage-track">

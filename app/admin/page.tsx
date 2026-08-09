@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { CircleCheck, ClipboardList, Flame, Plus, Store } from 'lucide-react'
+import { ArrowUpCircle, CircleCheck, ClipboardList, Flame, Plus, Store } from 'lucide-react'
 import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -61,6 +61,13 @@ type FeedOrder = {
   stores: StoreRel
 }
 
+type UpgradeRequestRow = {
+  id: string
+  created_at: string
+  note: string | null
+  stores: StoreRel
+}
+
 function storeOf(rel: StoreRel) {
   return Array.isArray(rel) ? rel[0] : rel
 }
@@ -80,7 +87,7 @@ export default async function AdminHomePage() {
   // mais antigo por causa da diferença UTC↔SP no limite inferior.
   const chartStart = new Date(now.getTime() - (CHART_DAYS + 1) * DAY_MS)
 
-  const [overviewRes, leadsRes, storesRes, subsRes, feedRes, recentLeadsRes] = await Promise.all([
+  const [overviewRes, leadsRes, storesRes, subsRes, feedRes, recentLeadsRes, upgradesRes] = await Promise.all([
     supabase.rpc('admin_overview', {
       p_month_start: monthStart.toISOString(),
       p_prev_start: prevMonthStart.toISOString(),
@@ -99,6 +106,13 @@ export default async function AdminHomePage() {
       .from('leads')
       .select('id, name, company, created_at')
       .eq('status', 'novo')
+      .order('created_at', { ascending: false })
+      .limit(5),
+    supabase
+      .from('plan_upgrade_requests')
+      // count exato: a lista mostra 5, mas o número do topo precisa do total.
+      .select('id, created_at, note, stores(name, slug)', { count: 'exact' })
+      .eq('status', 'pending')
       .order('created_at', { ascending: false })
       .limit(5),
   ])
@@ -120,6 +134,10 @@ export default async function AdminHomePage() {
   }
   const conversion = leadCounts.total > 0 ? Math.round((leadCounts.fechado / leadCounts.total) * 100) : 0
   const recentLeads = recentLeadsRes.data || []
+
+  // ── Pedidos de upgrade (lojista clicou "Quero o Pro" no painel) ──
+  const upgradeRequests = (upgradesRes.data || []) as UpgradeRequestRow[]
+  const upgradeCount = upgradesRes.count ?? upgradeRequests.length
 
   // ── Pedidos e dinheiro (agregados no servidor) ────────────
   const ordersMonth = ov.orders_month
@@ -207,6 +225,10 @@ export default async function AdminHomePage() {
         <Link href="/admin/lojas" className="adm-stat">
           <span className="adm-stat-num pro">{proCount}</span>
           <span className="adm-stat-label">Assinantes Pro</span>
+        </Link>
+        <Link href="/admin/lojas" className={`adm-stat ${upgradeCount > 0 ? 'highlight' : ''}`}>
+          <span className={`adm-stat-num ${upgradeCount > 0 ? 'wants-pro' : ''}`}>{upgradeCount}</span>
+          <span className="adm-stat-label">Pedidos de upgrade</span>
         </Link>
       </div>
 
@@ -301,6 +323,35 @@ export default async function AdminHomePage() {
                       <span className="adm-feed-total">{fmtCents(orderValue(o))}</span>
                       <span className={`adm-feed-status st-${o.status}`}>{STATUS_LABEL[o.status] || o.status}</span>
                     </div>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </section>
+
+        <section className="adm-panel">
+          <div className="adm-panel-head">
+            <h2><ArrowUpCircle size={17} strokeWidth={2.2} /> Pediram o Pro</h2>
+            <Link href="/admin/lojas" className="adm-panel-link">ativar planos →</Link>
+          </div>
+          <p className="adm-panel-hint">
+            Lojistas que clicaram em &quot;Quero fazer upgrade pro Pro&quot; dentro do painel — é só ativar o Pro na
+            loja que o pedido se fecha sozinho.
+          </p>
+          {upgradeRequests.length === 0 ? (
+            <p className="adm-panel-empty">
+              <CircleCheck size={15} strokeWidth={2.2} /> Nenhum pedido de upgrade em aberto.
+            </p>
+          ) : (
+            <ul className="adm-mini-list">
+              {upgradeRequests.map((r) => {
+                const store = storeOf(r.stores)
+                return (
+                  <li key={r.id}>
+                    <span className="adm-mini-name">{store?.name || 'Loja'}</span>
+                    {r.note && <span className="adm-mini-sub">{r.note}</span>}
+                    <span className="adm-mini-date">{fmtWhen(r.created_at, now)}</span>
                   </li>
                 )
               })}

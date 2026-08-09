@@ -17,7 +17,36 @@ export async function setStorePlan(storeId: string, plan: 'free' | 'pro'): Promi
     .eq('store_id', storeId)
 
   if (error) return { ok: false, error: error.message }
+
+  // Ativar o Pro atende qualquer pedido aberto que o lojista tenha feito no painel.
+  if (plan === 'pro') {
+    await supabase
+      .from('plan_upgrade_requests')
+      .update({ status: 'done', resolved_at: new Date().toISOString() })
+      .eq('store_id', storeId)
+      .eq('status', 'pending')
+  }
+
   revalidatePath('/admin/lojas')
+  revalidatePath('/admin')
+  return { ok: true }
+}
+
+/** Arquiva o pedido de upgrade sem ativar o Pro (lojista desistiu, ficou pro mês que vem). */
+export async function dismissUpgradeRequest(storeId: string): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin()
+  if (!storeId) return { ok: false, error: 'Dados inválidos.' }
+
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('plan_upgrade_requests')
+    .update({ status: 'dismissed', resolved_at: new Date().toISOString() })
+    .eq('store_id', storeId)
+    .eq('status', 'pending')
+
+  if (error) return { ok: false, error: error.message }
+  revalidatePath('/admin/lojas')
+  revalidatePath('/admin')
   return { ok: true }
 }
 
