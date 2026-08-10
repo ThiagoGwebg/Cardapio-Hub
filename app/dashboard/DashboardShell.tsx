@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Bell, HardDrive, X, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { playNewOrderBeep } from '@/lib/sound'
 import InstallPwaButton from '@/components/InstallPwaButton'
 import PushNotificationPrompt from '@/components/PushNotificationPrompt'
+import { resolveStoreOpen, type StoreOpenState } from '@/lib/openingHours'
 import LogoutButton from './LogoutButton'
 import ThemeToggle from './ThemeToggle'
 import './dashboard.css'
@@ -44,9 +45,27 @@ const NAV_CONFIG = [
   { href: '/dashboard/ajuda', label: 'Ajuda' },
 ]
 
-type Store = { id: string; name: string; address: string | null; is_open: boolean }
+type Store = {
+  id: string
+  name: string
+  address: string | null
+  is_open: boolean
+  /** Grade semanal (JSONB cru do banco) — parseada por resolveStoreOpen. */
+  opening_hours?: unknown
+  auto_hours?: boolean | null
+}
 
-export default function DashboardShell({ store, children }: { store: Store; children: React.ReactNode }) {
+export default function DashboardShell({
+  store,
+  initialOpen,
+  children,
+}: {
+  store: Store
+  /** Estado aberta/fechada calculado no servidor — o painel não pode piscar
+   *  "Aberto" antes da hidratação numa loja fechada pela grade de horário. */
+  initialOpen: StoreOpenState
+  children: React.ReactNode
+}) {
   const [open, setOpen] = useState(false)
   const [novoCount, setNovoCount] = useState(0)
   const [pulse, setPulse] = useState(false)
@@ -150,6 +169,31 @@ export default function DashboardShell({ store, children }: { store: Store; chil
     }
   }
 
+  // Relógio do lojista. Null no 1º render (servidor e cliente partem do mesmo
+  // `initialOpen`, sem mismatch de hidratação) e depois bate a cada minuto — o
+  // painel costuma ficar aberto atravessando a hora de fechar.
+  const [nowTs, setNowTs] = useState<number | null>(null)
+  useEffect(() => {
+    const init = setTimeout(() => setNowTs(Date.now()), 0)
+    const tick = setInterval(() => setNowTs(Date.now()), 60_000)
+    return () => {
+      clearTimeout(init)
+      clearInterval(tick)
+    }
+  }, [])
+
+  // Mesmo estado que o cardápio público mostra: interruptor manual + grade.
+  const storeOpen = useMemo(
+    () => (nowTs === null ? initialOpen : resolveStoreOpen(store, new Date(nowTs))),
+    [store, nowTs, initialOpen]
+  )
+  const badgeLabel = storeOpen.open ? '● Aberto' : '● Fechado'
+  const badgeClass = `open-badge ${storeOpen.open ? '' : 'is-closed-badge'}`
+  // Fechada pela grade: explica o porquê, senão parece que o painel travou.
+  const badgeTitle = storeOpen.reason === 'schedule'
+    ? `Fora do horário de funcionamento${storeOpen.nextLabel ? ` — abre ${storeOpen.nextLabel}` : ''}`
+    : undefined
+
   // Destaca "Início" quando está exatamente em /dashboard
   function isActive(href: string) {
     if (href === '/dashboard') return pathname === '/dashboard'
@@ -200,7 +244,7 @@ export default function DashboardShell({ store, children }: { store: Store; chil
         <div className="mobile-topbar-title">
           cardápio<span>ágil</span>
         </div>
-        <span className={`open-badge ${store.is_open ? '' : 'is-closed-badge'}`}>{store.is_open ? '● Aberto' : '● Fechado'}</span>
+        <span className={badgeClass} title={badgeTitle}>{badgeLabel}</span>
       </div>
 
       {open && <div className="sidebar-overlay" onClick={() => setOpen(false)} />}
@@ -215,7 +259,10 @@ export default function DashboardShell({ store, children }: { store: Store; chil
         <div className="sidebar-store">
           <div className="sidebar-store-name">{store.name}</div>
           <div className="sidebar-store-loc">{store.address || 'Endereço não definido'}</div>
-          <div className="open-badge">{store.is_open ? '● Aberto' : '● Fechado'}</div>
+          <div className={badgeClass} title={badgeTitle}>{badgeLabel}</div>
+          {storeOpen.reason === 'schedule' && storeOpen.nextLabel && (
+            <div className="sidebar-store-loc">Abre {storeOpen.nextLabel}</div>
+          )}
         </div>
 
         <NavLinks />

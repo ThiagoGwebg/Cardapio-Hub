@@ -2,6 +2,7 @@ import { ClipboardList, Lightbulb, Link2, Settings, Utensils } from 'lucide-reac
 import { getCurrentStore } from '@/lib/store'
 import { fmtCents, fmtSince, spDayStart } from '@/lib/format'
 import { getStoreUsage } from '@/lib/plan'
+import { resolveStoreOpen } from '@/lib/openingHours'
 import Link from 'next/link'
 import OnboardingChecklist from '@/components/dashboard/OnboardingChecklist'
 import SignupTracker from '@/components/analytics/SignupTracker'
@@ -35,6 +36,8 @@ export default async function DashboardHomePage() {
 
   const todayRevenue = (todayOrders ?? []).reduce((s, o) => s + o.total_cents, 0)
   const todayCount = (todayOrders ?? []).length
+  // Aberta/fechada segue a mesma regra do cardápio público (grade de horário incluída).
+  const storeOpen = resolveStoreOpen(store, new Date())
 
   // Determina etapa do onboarding
   const hasProducts = (productCount ?? 0) > 0
@@ -64,7 +67,7 @@ export default async function DashboardHomePage() {
         <div className="stat-card">
           <div className="stat-label">Pedidos hoje</div>
           <div className="stat-value">{todayCount}</div>
-          <div className="stat-sub">{store.is_open ? 'Loja aberta' : 'Loja fechada'}</div>
+          <div className="stat-sub">{storeOpen.open ? 'Loja aberta' : 'Loja fechada'}</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Faturamento hoje</div>

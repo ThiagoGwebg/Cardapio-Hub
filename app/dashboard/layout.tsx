@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { brandIcons } from '@/lib/brandIcons'
 import { getCurrentStore } from '@/lib/store'
+import { resolveStoreOpen } from '@/lib/openingHours'
 import DashboardShell from './DashboardShell'
 import SuspendedGate from './SuspendedGate'
 import BillingBanner from './BillingBanner'
@@ -32,20 +33,30 @@ export default async function DashboardLayout({ children }: { children: React.Re
     setupUnlocked = !!sub?.setup_unlocked
   }
 
-  const shellStore = { id: store.id, name: store.name, address: store.address, is_open: store.is_open }
+  const shellStore = {
+    id: store.id,
+    name: store.name,
+    address: store.address,
+    is_open: store.is_open,
+    opening_hours: store.opening_hours,
+    auto_hours: store.auto_hours,
+  }
+  // Mesmo cálculo do cardápio público: o badge do painel precisa dizer a mesma
+  // coisa que o cliente vê, incluindo a grade de dias/horários.
+  const initialOpen = resolveStoreOpen(shellStore, new Date())
 
   // Mensalidade suspensa: o painel inteiro dá lugar à tela de pagamento.
   // `stores.billing_suspended` é mantida por trigger a partir de subscriptions.billing_status.
   if (store.billing_suspended && !setupUnlocked) {
     return (
-      <DashboardShell store={shellStore}>
+      <DashboardShell store={shellStore} initialOpen={initialOpen}>
         <SuspendedGate storeId={store.id} />
       </DashboardShell>
     )
   }
 
   return (
-    <DashboardShell store={shellStore}>
+    <DashboardShell store={shellStore} initialOpen={initialOpen}>
       {store.billing_suspended ? <SetupModeBanner /> : <BillingBanner storeId={store.id} />}
       {children}
     </DashboardShell>
