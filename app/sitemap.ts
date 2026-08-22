@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { absoluteUrl } from '@/lib/seo'
+import { absoluteUrl, isIndexableStoreSlug } from '@/lib/seo'
 import { SEGMENTS } from '@/lib/segments'
 
 // Sitemap dinâmico: páginas institucionais + o cardápio público de cada loja.
@@ -67,7 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const [stores, withMenu] = await Promise.all([getStores(), getStoresWithMenu()])
   const storePages: MetadataRoute.Sitemap = stores
-    .filter((s) => !!s.slug && withMenu.has(s.id))
+    .filter((s) => !!s.slug && withMenu.has(s.id) && isIndexableStoreSlug(s.slug))
     .map((s) => ({
       url: absoluteUrl(`/loja/${s.slug}`),
       lastModified: s.created_at ? new Date(s.created_at) : now,

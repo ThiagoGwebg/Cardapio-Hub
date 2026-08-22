@@ -27,6 +27,40 @@ export const SITE_KEYWORDS = [
   'cardápio digital grátis para testar',
 ]
 
+/**
+ * O que o produto faz, em uma linha cada. Alimenta o `featureList` do JSON-LD e o
+ * /llms.txt — os dois precisam dizer a mesma coisa, senão o modelo lê uma versão e
+ * o Google indexa outra.
+ */
+export const SITE_FEATURES = [
+  'Cardápio digital com link próprio e QR Code',
+  'Pedidos em tempo real no painel',
+  'Controle de caixa e relatórios de desempenho',
+  'Pagamento por Pix, cartão e dinheiro',
+  'Notificações de pedido por WhatsApp',
+  'Sem comissão por venda',
+]
+
+/**
+ * Lojas internas (teste, demo, a loja da própria Sync Services). Ficam fora do
+ * índice do Google: são cardápio de mentira, e página sem valor real derruba a
+ * avaliação de qualidade do domínio inteiro — o mesmo motivo pelo qual o sitemap
+ * já exclui loja sem produto ativo.
+ *
+ * Lista no código, e não coluna no banco, porque são poucas e conhecidas. Se um dia
+ * passar de meia dúzia, vale trocar por uma flag em stores e um toggle no /admin.
+ */
+export const INTERNAL_STORE_SLUGS = new Set(['admin', 'sync-services'])
+
+/**
+ * Se o cardápio desta loja pode entrar na busca. Precisa ser consultado nos DOIS
+ * lugares: fora do sitemap a página ainda é indexável se alguém linkar, então o
+ * layout da loja também usa isto para emitir noindex.
+ */
+export function isIndexableStoreSlug(slug: string): boolean {
+  return !INTERNAL_STORE_SLUGS.has(slug)
+}
+
 export const SITE_LOCALE = 'pt_BR'
 
 /**
@@ -119,14 +153,7 @@ export function softwareApplicationSchema() {
     description: SITE_DESCRIPTION,
     inLanguage: 'pt-BR',
     publisher: { '@id': absoluteUrl('/#organization') },
-    featureList: [
-      'Cardápio digital com link próprio e QR Code',
-      'Pedidos em tempo real no painel',
-      'Controle de caixa e relatórios de desempenho',
-      'Pagamento por Pix, cartão e dinheiro',
-      'Notificações de pedido por WhatsApp',
-      'Sem comissão por venda',
-    ],
+    featureList: SITE_FEATURES,
     offers: {
       '@type': 'AggregateOffer',
       priceCurrency: 'BRL',

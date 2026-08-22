@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
-import { absoluteUrl } from '@/lib/seo'
+import { absoluteUrl, isIndexableStoreSlug } from '@/lib/seo'
 import { serviceLabels, storeDescription, storeKeywords, type SeoStore } from '@/lib/storeSeo'
 
 // Busca só o necessário pro <head> (nome, tema e campos de SEO). Cacheada por request
@@ -53,6 +53,9 @@ export async function generateMetadata({
   // e o apple-touch-icon do iPhone exige PNG quadrado.
   const icon = `/loja/${slug}/app-icon.png`
   const hasMenu = store ? (await countActiveProducts(store.id)) > 0 : false
+  // Loja interna (teste/demo) nunca entra na busca, mesmo com cardápio montado.
+  // Sair do sitemap não basta: sem o noindex a página ainda é indexável por link.
+  const indexable = hasMenu && isIndexableStoreSlug(slug)
 
   return {
     // `absolute` de propósito: o template do layout raiz acrescentaria
@@ -76,9 +79,9 @@ export async function generateMetadata({
       description,
     },
     robots: {
-      index: hasMenu,
+      index: indexable,
       follow: true,
-      googleBot: { index: hasMenu, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+      googleBot: { index: indexable, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
     },
     manifest: `/loja/${slug}/manifest.webmanifest`,
     // Faz o iPhone abrir em tela cheia (sem a barra de URL) depois de "Adicionar à Tela de Início".
