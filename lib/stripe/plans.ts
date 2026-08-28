@@ -1,7 +1,12 @@
 // Chave interna 'free' = plano Lite (nome de vitrine). Mantida como 'free'
-// para não migrar a coluna subscriptions.plan nem os gates existentes.
+// para não migrar os gates existentes.
+//
+// O Plus é o degrau do meio: solta o cadastro de produtos mas mantém teto de
+// pedidos. É esse teto que o diferencia do Pro — sem ele o plano não teria por
+// que existir.
 export const PLAN_LIMITS = {
   free: { maxProducts: 30, maxOrdersPerMonth: 60 },
+  plus: { maxProducts: Infinity, maxOrdersPerMonth: 300 },
   pro: { maxProducts: Infinity, maxOrdersPerMonth: Infinity },
 } as const
 

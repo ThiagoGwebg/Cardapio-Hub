@@ -3,12 +3,13 @@
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin'
 import { createAdminClient } from '@/lib/supabase/admin'
+import type { BillingPlan } from '@/lib/billing/plans'
 
 // Troca manual de plano (venda assistida / cortesia). Atenção: se a loja tiver
 // assinatura real no Stripe, o webhook pode sobrescrever isso no próximo evento.
-export async function setStorePlan(storeId: string, plan: 'free' | 'pro'): Promise<{ ok: boolean; error?: string }> {
+export async function setStorePlan(storeId: string, plan: BillingPlan): Promise<{ ok: boolean; error?: string }> {
   await requireAdmin()
-  if (!storeId || !['free', 'pro'].includes(plan)) return { ok: false, error: 'Dados inválidos.' }
+  if (!storeId || !['free', 'plus', 'pro'].includes(plan)) return { ok: false, error: 'Dados inválidos.' }
 
   const supabase = createAdminClient()
   const { error } = await supabase
@@ -16,10 +17,20 @@ export async function setStorePlan(storeId: string, plan: 'free' | 'pro'): Promi
     .update({ plan, status: 'active', updated_at: new Date().toISOString() })
     .eq('store_id', storeId)
 
-  if (error) return { ok: false, error: error.message }
+  // O banco recusa 'plus' enquanto a constraint de `subscriptions.plan` não for
+  // migrada. Traduz o erro cru do Postgres, que não diz o que fazer.
+  if (error) {
+    if (plan === 'plus' && /constraint|invalid input value|check/i.test(error.message)) {
+      return {
+        ok: false,
+        error: 'O banco ainda não aceita o plano Plus. Rode a migração de subscriptions.plan antes.',
+      }
+    }
+    return { ok: false, error: error.message }
+  }
 
-  // Ativar o Pro atende qualquer pedido aberto que o lojista tenha feito no painel.
-  if (plan === 'pro') {
+  // Subir de plano atende qualquer pedido aberto que o lojista tenha feito no painel.
+  if (plan !== 'free') {
     await supabase
       .from('plan_upgrade_requests')
       .update({ status: 'done', resolved_at: new Date().toISOString() })

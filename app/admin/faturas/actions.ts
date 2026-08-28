@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { markInvoicePaid, type PlanInvoice } from '@/lib/billing/invoices'
-import { setPixPayloadForPlan, readPixAmountCents } from '@/lib/billing/pix'
+import { setPixPayloadForPlan, readPixAmountCents, type PlanKey } from '@/lib/billing/pix'
 import { setEmitDaysBefore } from '@/lib/billing/settings'
 
 /**
@@ -53,7 +53,7 @@ export async function rejectPaymentClaim(invoiceId: string): Promise<{ ok: boole
 }
 
 /** Cadastra o payload Pix copia-e-cola de um plano (QR estático do banco). */
-export async function savePixPayload(plan: 'free' | 'pro', payload: string): Promise<{ ok: boolean; error?: string; amountCents?: number | null }> {
+export async function savePixPayload(plan: PlanKey, payload: string): Promise<{ ok: boolean; error?: string; amountCents?: number | null }> {
   await requireAdmin()
 
   const clean = payload.trim()

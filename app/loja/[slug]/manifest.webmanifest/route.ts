@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { storeIconVersion } from '@/lib/storeTheme'
 
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -22,7 +23,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
   // houver logo) num quadrado 512×512. Antes o manifest apontava a logo crua: como o upload
   // pode ser JPG/WEBP/SVG e de qualquer proporção, o `type`/`sizes` declarado ficava errado
   // e o Chrome descartava o ícone na hora de instalar a PWA.
-  const icon = `/loja/${slug}/app-icon.png`
+  const icon = `/loja/${slug}/app-icon.png?v=${storeIconVersion(theme)}`
   const icons = [
     { src: icon, sizes: '192x192', type: 'image/png', purpose: 'any' },
     { src: icon, sizes: '512x512', type: 'image/png', purpose: 'any' },

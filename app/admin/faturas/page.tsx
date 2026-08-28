@@ -3,8 +3,8 @@ import { requireAdmin } from '@/lib/admin'
 import { createAdminClient } from '@/lib/supabase/admin'
 import InvoicesBoard, { type AdminInvoice } from './InvoicesBoard'
 import PixSettings from './PixSettings'
-import { getAllPixPayloads } from '@/lib/billing/pix'
-import { DEFAULT_PLAN_PRICE_CENTS } from '@/lib/billing/plans'
+import { getAllPixPayloads, readPixAmountCents } from '@/lib/billing/pix'
+import { DEFAULT_PLAN_PRICE_CENTS, type BillingPlan } from '@/lib/billing/plans'
 import { getBillingSettings } from '@/lib/billing/settings'
 
 export const metadata: Metadata = {
@@ -39,6 +39,16 @@ export default async function AdminInvoicesPage() {
     getBillingSettings(),
   ])
 
+  // Valor embutido em cada QR já cadastrado. Conferido AQUI, na carga da página, e
+  // não só na hora de salvar: um payload gravado antes de um reajuste continuaria
+  // exibindo "✓" pra sempre, e o lojista pagaria o preço velho sem ninguém notar.
+  const storedAmounts = Object.fromEntries(
+    (Object.keys(DEFAULT_PLAN_PRICE_CENTS) as BillingPlan[]).map((plan) => {
+      const payload = pixPayloads[plan]
+      return [plan, payload ? readPixAmountCents(payload) : null]
+    }),
+  ) as Record<BillingPlan, number | null>
+
   const storeById = new Map<string, { name: string; slug: string; suspended: boolean }>()
   for (const s of (storesRes.data || []) as { id: string; name: string; slug: string; billing_suspended: boolean }[]) {
     storeById.set(s.id, { name: s.name, slug: s.slug, suspended: !!s.billing_suspended })
@@ -70,6 +80,7 @@ export default async function AdminInvoicesPage() {
       <PixSettings
         initial={pixPayloads}
         expected={DEFAULT_PLAN_PRICE_CENTS}
+        stored={storedAmounts}
         emitDaysBefore={billingSettings.emitDaysBefore}
       />
       <InvoicesBoard invoices={invoices} />

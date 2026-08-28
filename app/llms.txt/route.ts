@@ -1,8 +1,8 @@
 import { FAQS } from '@/components/landing/LandingFaq'
 import { SEGMENTS } from '@/lib/segments'
+import { MARKETING_PLANS } from '@/lib/plansMarketing'
 import {
   absoluteUrl,
-  ENTRY_PRICE_BRL,
   SITE_DESCRIPTION,
   SITE_FEATURES,
   SITE_NAME,
@@ -63,16 +63,14 @@ ${SITE_FEATURES.map((f) => `- ${f}`).join('\n')}
 
 ## Planos
 
-- **Lite — R$ ${ENTRY_PRICE_BRL}/mês**: até 30 produtos e 60 pedidos por mês. Sem comissão por venda.
-- **Pro**: produtos e pedidos ilimitados, marca própria sem o selo da plataforma,
-  CRM de clientes, relatórios avançados e notificações por WhatsApp.
+${MARKETING_PLANS.map((p) => `- **${p.name} — R$ ${p.priceBRL}/mês**: ${p.schemaDescription}`).join('\n')}
 
 Sem comissão por venda em nenhum dos planos. Não é preciso cartão de crédito para testar.
 
 ## Páginas principais
 
 - [${SITE_NAME} — ${SITE_TITLE}](${absoluteUrl('/')}): página inicial, com recursos, planos e perguntas frequentes.
-- [Falar com o time](${absoluteUrl('/contato')}): contato comercial e solicitação do plano Pro.
+- [Falar com o time](${absoluteUrl('/contato')}): contato comercial e contratação dos planos.
 - [Para entregadores](${absoluteUrl('/entregadores')}): como funciona a entrega para quem faz as corridas.
 - [Política de privacidade](${absoluteUrl('/privacidade')}): tratamento de dados pessoais.
 

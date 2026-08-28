@@ -4,7 +4,7 @@ import { getConnectedMpAccount } from '@/lib/mercadopago/tokens'
 import { fmtCents } from '@/lib/format'
 import { fmtPhone } from '@/lib/phone'
 import { isStorePro } from '@/lib/plan'
-import type { StoreTheme } from '@/lib/storeTheme'
+import { sanitizeLogoShape, type StoreTheme } from '@/lib/storeTheme'
 import { updateStore, updateOnlinePayment, disconnectMercadoPago, addZone, deleteZone } from './actions'
 import DisconnectMpButton from './DisconnectMpButton'
 import PixKeyField from '@/components/PixKeyField'
@@ -219,6 +219,17 @@ export default async function LojaPage({ searchParams }: { searchParams: Promise
             hint="Imagem quadrada (ideal 512×512). PNG, JPG, WEBP ou SVG até 5 MB."
             defaultUrl={theme.logoUrl || ''}
           />
+
+          <div className="toggle-row">
+            <div>
+              <div className="toggle-label">Logo redonda</div>
+              <div className="toggle-desc">Recorta a logo em círculo no cardápio e no ícone do app. Desligue se a sua logo usa os cantos da imagem.</div>
+            </div>
+            <label className="toggle-switch">
+              <input type="checkbox" name="logoShape" value="round" defaultChecked={sanitizeLogoShape(theme.logoShape) === 'round'} />
+              <span className="toggle-slider"></span>
+            </label>
+          </div>
 
           <ImageUploadField
             kind="banner"

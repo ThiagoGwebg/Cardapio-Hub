@@ -14,6 +14,12 @@ import { DEFAULT_STORE_FONT } from '@/lib/plan'
  */
 export type StoreTheme = {
   logoUrl?: string
+  /**
+   * Recorte da logo no cardápio/ícone. 'round' (padrão) corta em círculo — some a
+   * "moldura" de cantos quando o arquivo é quadrado com arte redonda. 'square'
+   * mantém o quadrado arredondado, para logos que usam os cantos.
+   */
+  logoShape?: LogoShape
   bannerUrl?: string
   primaryColor?: string
   /** Cor secundária — usada em detalhes/realces sutis do cardápio público. */
@@ -28,6 +34,14 @@ export type StoreTheme = {
 
 /** Layouts disponíveis para a listagem de produtos no cardápio público. */
 export type MenuLayout = 'grid' | 'list'
+
+/** Formatos de recorte da logo. */
+export type LogoShape = 'round' | 'square'
+
+/** Normaliza um valor de recorte desconhecido ('round' é o padrão). */
+export function sanitizeLogoShape(value: string | undefined): LogoShape {
+  return value === 'square' ? 'square' : 'round'
+}
 
 export const MENU_LAYOUTS: {
   value: MenuLayout
@@ -66,6 +80,24 @@ export function hexToRgb(hex: string): string {
   const g = (int >> 8) & 255
   const b = int & 255
   return `${r}, ${g}, ${b}`
+}
+
+/**
+ * Versão do ícone da loja, derivada da logo em uso.
+ *
+ * A rota `/loja/<slug>/app-icon.png` redesenha a logo e é servida com cache longo
+ * no CDN. Como a URL dessa rota não muda quando o lojista troca a logo, sem isto o
+ * CDN continua entregando o ícone antigo por até um dia — pra todo mundo, inclusive
+ * em aba anônima, já que o cache é do servidor. Anexar esta versão à URL cria um
+ * endereço novo a cada logo nova, então o ícone troca no mesmo instante.
+ */
+export function storeIconVersion(theme: StoreTheme | null | undefined): string {
+  // O recorte entra no hash porque também muda o desenho do ícone gerado.
+  const src = (theme?.logoUrl ?? '').trim() + '|' + sanitizeLogoShape(theme?.logoShape)
+  if (!(theme?.logoUrl ?? '').trim()) return '0'
+  let hash = 0
+  for (let i = 0; i < src.length; i++) hash = (Math.imul(31, hash) + src.charCodeAt(i)) | 0
+  return (hash >>> 0).toString(36)
 }
 
 /** Normaliza um valor de layout desconhecido para um layout válido. */

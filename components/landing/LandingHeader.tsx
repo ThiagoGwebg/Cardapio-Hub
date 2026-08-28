@@ -22,7 +22,7 @@ export default function LandingHeader({ themeMode, toggleThemeMode }: LandingHea
         <div className="l-nav-cta">
           <Link href="/login" className="l-btn-ghost">Entrar</Link>
           <Link href="/contato" className="l-btn-primary">Fale com a gente</Link>
-          
+
           <button
             onClick={toggleThemeMode}
             className="l-theme-toggle"

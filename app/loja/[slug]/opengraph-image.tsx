@@ -29,7 +29,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     .eq('slug', slug)
     .maybeSingle()
 
-  const store = data as (Partial<SeoStore> & { theme: { primaryColor?: string; logoUrl?: string } | null }) | null
+  const store = data as (Partial<SeoStore> & { theme: { primaryColor?: string; logoUrl?: string; logoShape?: string } | null }) | null
   const name = store?.name || 'Cardápio'
   const color = store?.theme?.primaryColor || '#FF5722'
   const logoUrl = store?.theme?.logoUrl?.trim()
@@ -64,7 +64,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
             style={{
               width: 148,
               height: 148,
-              borderRadius: 28,
+              borderRadius: store?.theme?.logoShape === 'square' ? 28 : 999,
               objectFit: 'cover',
               border: '4px solid rgba(255,255,255,0.85)',
             }}

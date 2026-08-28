@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { MARKETING_PLANS } from '@/lib/plansMarketing'
 
 export default function LandingPricing() {
   return (
@@ -10,44 +11,33 @@ export default function LandingPricing() {
       </div>
 
       <div className="l-pricing-grid">
-        <div className="l-plan-card">
-          <div className="l-plan-name">Lite</div>
-          <div className="l-plan-price">R$ 29<span> / mês</span></div>
-          <p className="l-plan-desc">
-            Para colocar sua loja no ar com o essencial e começar a vender já.
-          </p>
-          <ul className="l-plan-list">
-            <li>Até 30 produtos no cardápio</li>
-            <li>Até 60 pedidos por mês</li>
-            <li>Cor e logo personalizáveis</li>
-            <li>Painel de pedidos, caixa e desempenho</li>
-            <li>Sem comissão por venda</li>
-          </ul>
-          <Link href="/contato" className="l-plan-cta outline">Quero o Lite</Link>
-        </div>
-
-        <div className="l-plan-card featured">
-          <span className="l-plan-badge">a maioria escolhe esse</span>
-          <div className="l-plan-name">Pro</div>
-          <div className="l-plan-price">Sob medida<span> / mês</span></div>
-          <p className="l-plan-desc">
-            Para quem já vende e quer crescer sem limite de produtos ou pedidos.
-          </p>
-          <ul className="l-plan-list">
-            <li>Produtos e pedidos ilimitados</li>
-            <li>Cores, fontes e aviso promocional no cardápio</li>
-            <li>Sua marca, sem selo Cardápio Hub</li>
-            <li>Clientes fiéis (CRM) + relatórios avançados de 30/90 dias</li>
-            <li>Notificações de pedido por WhatsApp</li>
-            <li>Vários usuários e mais de uma loja na mesma conta</li>
-            <li>QR Code para imprimir e exportação em CSV</li>
-            <li>Suporte prioritário</li>
-            <li>Cancele quando quiser, direto pelo painel</li>
-          </ul>
-          <Link href="/contato" className="l-plan-cta primary">Quero o Pro</Link>
-        </div>
+        {MARKETING_PLANS.map((plan) => (
+          <div className={`l-plan-card ${plan.featured ? 'featured' : ''}`} key={plan.key}>
+            {plan.featured && <span className="l-plan-badge">a maioria escolhe esse</span>}
+            <div className="l-plan-head">
+              <div className="l-plan-name">{plan.name}</div>
+              <div className="l-plan-price">
+                R$ {plan.priceBRL}<span> / mês</span>
+              </div>
+            </div>
+            <p className="l-plan-desc">{plan.tagline}</p>
+            <ul className="l-plan-list">
+              {plan.features.map((f) => (
+                <li key={f}>{f}</li>
+              ))}
+            </ul>
+            <Link
+              href="/contato"
+              className={`l-plan-cta ${plan.featured ? 'primary' : 'outline'}`}
+            >
+              {plan.ctaLabel}
+            </Link>
+          </div>
+        ))}
       </div>
-      <p className="l-pricing-note">Fale com a gente e mostramos o valor exato do Pro pro seu segmento.</p>
+      <p className="l-pricing-note">
+        Sem cartão de crédito para começar — a gente configura a loja junto com você.
+      </p>
     </section>
   )
 }

@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getCurrentStore } from '@/lib/store'
 import { getStoreUsage } from '@/lib/plan'
-import { LITE_PRICE_LABEL } from '@/lib/stripe/plans'
-import { planPriceLabel } from '@/lib/billing/plans'
+import { DEFAULT_PLAN_PRICE_CENTS, planLabel } from '@/lib/billing/plans'
+import { fmtCents } from '@/lib/format'
 import { UsageMeter } from '@/components/dashboard/ProUpsell'
 import SubmitButton from '@/components/ui/SubmitButton'
 import { fmtPhone } from '@/lib/phone'
@@ -88,7 +88,7 @@ export default async function UpgradePage({
             </span>
           </p>
           <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 0 }}>
-            Até lá seu cardápio continua funcionando normalmente no plano Lite — nada muda e nada é cobrado agora.
+            Até lá seu cardápio continua funcionando normalmente no plano {planLabel(usage.plan)} — nada muda e nada é cobrado agora.
           </p>
         </div>
       ) : (
@@ -97,7 +97,7 @@ export default async function UpgradePage({
             <div className="settings-section-title">Sua loja</div>
             <p style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{store.name}</p>
             <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 16 }}>
-              Hoje no Lite · {LITE_PRICE_LABEL}/mês → Pro · {planPriceLabel('pro')}/mês
+              Hoje no {planLabel(usage.plan)} · {fmtCents(DEFAULT_PLAN_PRICE_CENTS[usage.plan])}/mês → Pro · {fmtCents(DEFAULT_PLAN_PRICE_CENTS.pro)}/mês
             </p>
 
             <UsageMeter label="Produtos cadastrados" used={usage.productCount} limit={usage.maxProducts} />

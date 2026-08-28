@@ -3,7 +3,7 @@ import { requireAdmin } from '@/lib/admin'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { spMonthStart } from '@/lib/format'
 import StoresBoard, { type AdminStore } from './StoresBoard'
-import { DEFAULT_PLAN_PRICE_CENTS, DEFAULT_GRACE_DAYS } from '@/lib/billing/plans'
+import { DEFAULT_PLAN_PRICE_CENTS, DEFAULT_GRACE_DAYS, planLabel, type BillingPlan } from '@/lib/billing/plans'
 
 export const metadata: Metadata = {
   title: 'Lojas — Admin Cardápio Hub',
@@ -82,12 +82,16 @@ export default async function AdminStoresPage() {
     const sub = Array.isArray(store.subscriptions) ? store.subscriptions[0] : store.subscriptions
     const stat = statByStore.get(store.id)
     const upgrade = upgradeByStore.get(store.id)
+    // Mesma regra do getStorePlan(): assinatura não-ativa vale como Lite.
+    const activePlan: BillingPlan =
+      sub?.status !== 'active' ? 'free' : sub.plan === 'pro' ? 'pro' : sub.plan === 'plus' ? 'plus' : 'free'
     return {
       id: store.id,
       name: store.name,
       slug: store.slug,
       email: emailByUser.get(store.owner_id),
-      isPro: sub?.plan === 'pro' && sub?.status === 'active',
+      plan: activePlan,
+      isPro: activePlan === 'pro',
       isOpen: store.is_open,
       orders: stat?.orders ?? 0,
       gmvCents: stat?.gmv_cents ?? 0,
@@ -100,8 +104,8 @@ export default async function AdminStoresPage() {
       billing: {
         enabled: !!sub?.billing_enabled,
         status: (sub?.billing_status as 'current' | 'past_due' | 'suspended') ?? 'current',
-        priceCents: sub?.price_cents ?? DEFAULT_PLAN_PRICE_CENTS[sub?.plan === 'pro' ? 'pro' : 'free'],
-        planLabel: sub?.plan === 'pro' ? 'Pro' : 'Lite',
+        priceCents: sub?.price_cents ?? DEFAULT_PLAN_PRICE_CENTS[activePlan],
+        planLabel: planLabel(activePlan),
         nextDueDate: sub?.next_due_date ?? null,
         graceDays: sub?.grace_days ?? DEFAULT_GRACE_DAYS,
         setupUnlocked: !!sub?.setup_unlocked,

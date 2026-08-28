@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { getCurrentStore } from '@/lib/store'
-import { isStorePro } from '@/lib/plan'
+import { getStorePlan } from '@/lib/plan'
 import { getBaseUrl } from '@/lib/baseUrl'
 import { waLink } from '@/lib/phone'
 import { ProLockedSection } from '@/components/dashboard/ProUpsell'
@@ -8,7 +8,11 @@ import CopyField from './CopyField'
 
 export default async function LinksPage() {
   const { supabase, store } = await getCurrentStore()
-  const isPro = await isStorePro(supabase, store.id)
+  // QR pra imprimir entra a partir do Plus (o card de planos promete isso);
+  // o selo removido do cardapio continua sendo so do Pro.
+  const plan = await getStorePlan(supabase, store.id)
+  const hasQr = plan !== 'free'
+  const isPro = plan === 'pro'
   const base = getBaseUrl()
   const menuUrl = `${base}/loja/${store.slug}`
   // Número inválido (ou senha digitada no campo errado) devolve string vazia e o
@@ -35,7 +39,7 @@ export default async function LinksPage() {
         </div>
       )}
 
-      {isPro ? (
+      {hasQr ? (
         <div className="settings-card">
           <div className="settings-section-title">
             QR Code do cardápio <span className="pro-badge">Pro</span>

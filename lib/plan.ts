@@ -1,23 +1,39 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import type { BillingPlan } from '@/lib/billing/plans'
 import { PLAN_LIMITS } from '@/lib/stripe/plans'
 
 /**
- * Retorna true se a loja tem assinatura Pro ativa.
- * Usado para liberar personalizações avançadas (cor, fonte etc.).
- * Logo e banner NÃO dependem disso — são liberados em todos os planos.
+ * Plano ATIVO da loja. Assinatura inativa cai para 'free' — é o mesmo critério
+ * que `isStorePro` sempre usou, agora explícito e com três saídas.
  */
-export async function isStorePro(supabase: SupabaseClient, storeId: string): Promise<boolean> {
+export async function getStorePlan(supabase: SupabaseClient, storeId: string): Promise<BillingPlan> {
   const { data } = await supabase
     .from('subscriptions')
     .select('plan, status')
     .eq('store_id', storeId)
     .maybeSingle()
 
-  return data?.plan === 'pro' && data?.status === 'active'
+  if (data?.status !== 'active') return 'free'
+  if (data.plan === 'pro') return 'pro'
+  if (data.plan === 'plus') return 'plus'
+  return 'free'
+}
+
+/**
+ * Retorna true se a loja tem assinatura Pro ativa.
+ * Usado para liberar personalizações avançadas (cor, fonte etc.).
+ * Logo e banner NÃO dependem disso — são liberados em todos os planos.
+ *
+ * Continua sendo Pro ESTRITO: o Plus não herda recurso de Pro. Quem precisa
+ * saber "não é Lite" deve usar `getStorePlan()` e comparar, não isto.
+ */
+export async function isStorePro(supabase: SupabaseClient, storeId: string): Promise<boolean> {
+  return (await getStorePlan(supabase, storeId)) === 'pro'
 }
 
 export type StoreUsage = {
   isPro: boolean
+  plan: BillingPlan
   productCount: number
   ordersThisMonth: number
   maxProducts: number
@@ -33,8 +49,8 @@ export async function getStoreUsage(supabase: SupabaseClient, storeId: string): 
   monthStart.setDate(1)
   monthStart.setHours(0, 0, 0, 0)
 
-  const [pro, productsRes, ordersRes] = await Promise.all([
-    isStorePro(supabase, storeId),
+  const [plan, productsRes, ordersRes] = await Promise.all([
+    getStorePlan(supabase, storeId),
     supabase.from('products').select('id', { count: 'exact', head: true }).eq('store_id', storeId),
     supabase
       .from('orders')
@@ -46,9 +62,10 @@ export async function getStoreUsage(supabase: SupabaseClient, storeId: string): 
       .gte('created_at', monthStart.toISOString()),
   ])
 
-  const limits = pro ? PLAN_LIMITS.pro : PLAN_LIMITS.free
+  const limits = PLAN_LIMITS[plan]
   return {
-    isPro: pro,
+    isPro: plan === 'pro',
+    plan,
     productCount: productsRes.count ?? 0,
     ordersThisMonth: ordersRes.count ?? 0,
     maxProducts: limits.maxProducts,

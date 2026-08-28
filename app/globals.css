@@ -2087,11 +2087,18 @@ tr:hover td {
 .storefront-logo {
   width: 76px;
   height: 76px;
-  border-radius: 16px;
+  /* Circular (estilo iFood): logos redondas em fundo quadrado deixavam os cantos
+     do arquivo aparecendo como uma "moldura" em volta da arte. A loja pode
+     desligar o recorte nas configurações (theme.logoShape = 'square'). */
+  border-radius: 50%;
   object-fit: cover;
   border: 1px solid var(--border);
   background: var(--surface2);
   flex-shrink: 0;
+}
+
+.storefront-logo.is-square {
+  border-radius: 16px;
 }
 
 .storefront-info {
@@ -3342,7 +3349,6 @@ body:has(.storefront) {
   .storefront .storefront-logo {
     width: 58px;
     height: 58px;
-    border-radius: 14px;
   }
   .storefront .storefront-name {
     font-size: 22px;
@@ -3806,8 +3812,12 @@ body:has(.storefront) {
   .hbar-label { flex-basis: 96px; }
 }
 
-/* Tabela comparativa Free × Pro (Assinatura) */
+/* Tabela comparativa dos planos (Assinatura) */
 .plan-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+/* Com 3 colunas de plano a primeira (nome do recurso) precisa de teto, senão
+   ela come o espaço e as colunas de plano ficam espremidas. */
+.plan-table th:first-child { width: 40%; }
 
 .plan-table th {
   text-align: left;
@@ -3817,6 +3827,25 @@ body:has(.storefront) {
   color: var(--muted2);
   padding: 8px 10px;
   border-bottom: 1px solid var(--border);
+}
+
+/* Preço sob o nome do plano, no cabeçalho da coluna. */
+.plan-table-price {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text2);
+}
+
+.plan-table-pro .plan-table-price { color: var(--primary); }
+
+/* Numa tela estreita a tabela rola dentro do card em vez de estourar a página. */
+@media (max-width: 720px) {
+  .plan-table-scroll { overflow-x: auto; }
+  .plan-table { min-width: 520px; }
 }
 
 .plan-table td {

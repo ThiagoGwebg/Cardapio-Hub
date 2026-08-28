@@ -1,20 +1,43 @@
 /* ══════════════════════════════════════════
-   LANDING PAGE — página inicial pública do SaaS
-   Escopado com prefixo .l- para não colidir com
-   as classes do dashboard/storefront em globals.css
+   LANDING PAGE — páginas públicas do SaaS
+   (home, /para/[segmento], /contato, /entregadores, /privacidade)
+
+   Escopado com prefixo .l- para não colidir com as classes do
+   dashboard/storefront em globals.css.
+
+   A página é lida como uma sequência de FAIXAS de largura total:
+   hero (quente) → conteúdo → faixa teal → conteúdo → CTA (ember) → rodapé.
+   As faixas escuras (.l-easy, .l-final-cta, .l-footer) não trocam de cor com o
+   tema: são pontuação da página e o texto branco em cima delas já nasce com
+   contraste AA nos dois modos.
 ══════════════════════════════════════════ */
 
 .landing {
   overflow-x: hidden;
+
+  /* Gradientes das faixas. Ficam como custom properties pra faixa e brilho
+     nunca saírem de sincronia quando um dos dois for ajustado. */
+  --l-ember: linear-gradient(152deg, #1C120D 0%, #2E1509 44%, #4B1C07 100%);
+  --l-teal: linear-gradient(152deg, #14343C 0%, #0E5462 46%, #0A7183 100%);
+  --l-ink: #14100E;
+
+  /* Largura útil de todas as seções — um número só, usado por .l-nav via
+     padding calculado e pelos wrappers internos via max-width. */
+  --l-max: 1120px;
 }
 
 .l-container {
-  max-width: 1120px;
+  max-width: var(--l-max);
   margin: 0 auto;
   padding: 0 24px;
 }
 
-/* ── Nav ── */
+/* ══════════════════════════════════════════
+   NAV
+   O padding lateral com max() centraliza o conteúdo em 1120px sem exigir um
+   wrapper interno — /contato, /privacidade e /para montam o <header> com os
+   filhos soltos e continuam alinhados com o resto da página.
+══════════════════════════════════════════ */
 .l-nav {
   position: sticky;
   top: 0;
@@ -22,18 +45,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px;
-  background: rgba(18, 18, 18, 0.85);
-  backdrop-filter: blur(8px);
+  gap: 16px;
+  padding: 14px max(24px, calc((100% - var(--l-max)) / 2));
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
 
 .l-logo {
   font-family: 'Nunito', sans-serif;
   font-weight: 900;
-  font-size: 20px;
+  font-size: 21px;
+  letter-spacing: -0.4px;
   color: var(--text);
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .l-logo em {
@@ -49,7 +75,7 @@
 
 .l-nav-links a {
   color: var(--text2);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   text-decoration: none;
   transition: color 0.15s;
@@ -65,19 +91,21 @@
   gap: 10px;
 }
 
+/* ── Botões ── */
 .l-btn-ghost {
-  padding: 9px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  padding: 9px 17px;
+  border-radius: 999px;
+  border: 1px solid var(--border2);
   color: var(--text2);
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
+  white-space: nowrap;
   transition: all 0.15s;
 }
 
 .l-btn-ghost:hover {
-  border-color: var(--border2);
+  border-color: var(--text2);
   color: var(--text);
 }
 
@@ -85,31 +113,28 @@
   background: var(--primary);
   color: #fff;
   border: none;
-  border-radius: var(--radius-sm);
-  padding: 10px 18px;
+  border-radius: 999px;
+  padding: 10px 20px;
   font-family: 'Nunito', sans-serif;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 13px;
   text-decoration: none;
   display: inline-block;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(255, 87, 34, 0.28);
   transition: all 0.15s;
 }
 
 .l-btn-primary:hover {
   background: var(--primary-d);
   transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(255, 87, 34, 0.34);
 }
 
-.l-btn-primary.large {
-  padding: 14px 28px;
-  font-size: 15px;
-  border-radius: var(--radius);
-}
-
+.l-btn-primary.large,
 .l-btn-ghost.large {
-  padding: 13px 26px;
+  padding: 15px 30px;
   font-size: 15px;
-  border-radius: var(--radius);
 }
 
 /* mobile nav toggle (checkbox hack, no JS) */
@@ -126,102 +151,158 @@
   padding: 4px 8px;
 }
 
-/* ── Hero ── */
+/* ══════════════════════════════════════════
+   HERO — faixa quente de largura total
+══════════════════════════════════════════ */
 .l-hero {
-  background: var(--bg);
-  padding: 64px 0 0;
-  border-bottom: 1px solid var(--border);
+  position: relative;
+  isolation: isolate;
+  padding: 72px 0 0;
+  background: linear-gradient(168deg, #1B1310 0%, #241610 42%, #140E0C 100%);
   overflow: hidden;
 }
 
+/* Brilho laranja atrás do mockup. Em elemento próprio (e não numa segunda camada
+   de background) porque só ele precisa de opacidade e blend próprios. */
+.l-hero-glow {
+  position: absolute;
+  inset: -20% -10% auto;
+  height: 120%;
+  background:
+    radial-gradient(ellipse 40% 55% at 72% 38%, rgba(255, 87, 34, 0.38), transparent 70%),
+    radial-gradient(ellipse 34% 42% at 12% 8%, rgba(38, 198, 218, 0.16), transparent 72%);
+  pointer-events: none;
+  z-index: -1;
+}
+
 .l-hero-grid {
-  max-width: 1120px;
+  max-width: var(--l-max);
   margin: 0 auto;
-  padding: 0 24px 90px;
+  padding: 0 24px 96px;
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
   gap: 24px;
-  align-items: start;
+  align-items: center;
   position: relative;
 }
 
+/* Sobretítulo tipográfico, não componente: um fio laranja curto e versalete
+   espaçado. Pílula com bolinha acesa acima da headline é o clichê nº1 de
+   landing gerada por IA — e ainda competia com o próprio H1 pela atenção. */
 .l-tag {
-  display: inline-block;
-  font-family: 'Inter', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--teal);
-  letter-spacing: 1px;
-  margin-bottom: 18px;
-  border-bottom: 2px solid var(--teal);
-  padding-bottom: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.58);
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.l-tag::before {
+  content: '';
+  width: 30px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary);
+  flex-shrink: 0;
 }
 
 .l-h1 {
   font-family: 'Nunito', sans-serif;
   font-weight: 900;
-  font-size: 60px;
-  line-height: 0.96;
-  letter-spacing: -1.5px;
-  color: var(--text);
-  margin-bottom: 24px;
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 0.98;
+  letter-spacing: -1.8px;
+  color: #fff;
+  margin-bottom: 22px;
   max-width: 620px;
 }
 
+/* Traço de marcador desenhado à mão (SVG inline), não um retângulo de gradiente:
+   as pontas afinam, a espessura varia e o traço passa levemente do fim da
+   palavra — é o que faz parecer marcado por alguém e não pintado por script.
+   Vive num ::after posicionado por `bottom` (e não em background-position) pra
+   não depender do cálculo de baseline, que muda com o line-height 0.98. */
 .l-h1 em {
   font-style: normal;
-  color: var(--primary);
+  color: #fff;
+  position: relative;
+  z-index: 0;
+  white-space: nowrap;
+}
+
+.l-h1 em::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -0.05em;
+  right: -0.07em;
+  /* Ancorado pelo TOPO, na altura da ascendente (~0.98em), e não por `bottom`:
+     a caixa da fonte do Nunito desce ~0.35em abaixo da linha de base, então
+     `bottom: 0` jogaria o traço flutuando longe da palavra. */
+  top: 0.98em;
+  height: 0.17em;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M2 8.4C48 3.6 118 1.9 198 3.9L196.6 9.2C119 7.4 49 9.1 3.4 12.6Z' fill='%23FF5722'/%3E%3C/svg%3E")
+    no-repeat center / 100% 100%;
+  transform: rotate(-0.7deg);
+  pointer-events: none;
 }
 
 .l-hero-sub {
-  color: var(--muted);
-  font-size: 16px;
-  line-height: 1.6;
-  max-width: 400px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 16.5px;
+  line-height: 1.65;
+  max-width: 430px;
   margin-bottom: 30px;
 }
 
 .l-hero-ctas {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
   margin-bottom: 22px;
   flex-wrap: wrap;
 }
 
+.l-hero .l-btn-ghost {
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+
+.l-hero .l-btn-ghost:hover {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Usado pela /para/[segmento] no lugar do botão secundário. */
 .l-hero-link {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: var(--text2);
+  color: rgba(255, 255, 255, 0.72);
   text-decoration: underline;
-  text-decoration-color: var(--border2);
-  text-underline-offset: 3px;
+  text-decoration-color: rgba(255, 255, 255, 0.3);
+  text-underline-offset: 4px;
 }
 
 .l-hero-link:hover {
-  color: var(--text);
+  color: #fff;
 }
 
 .l-hero-trust {
-  color: var(--muted2);
-  font-size: 12px;
-  font-family: 'Inter', monospace;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12.5px;
+  font-family: 'Inter', sans-serif;
 }
 
-/* hero mockup — tilted, bleeding off the edge */
+/* hero mockup — flutuando em perspectiva */
 .l-mockup-wrap {
   position: relative;
   padding-top: 20px;
   perspective: 1400px;
-}
-
-.l-mockup-wrap::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 55% 55% at 55% 60%, rgba(255, 87, 34, 0.25), transparent 72%);
-  pointer-events: none;
-  z-index: 0;
 }
 
 .l-mockup-photo {
@@ -233,23 +314,22 @@
   margin-left: auto;
   margin-right: -20px;
   display: block;
-  filter: drop-shadow(0 20px 32px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 26px 40px rgba(0, 0, 0, 0.55));
   transform-origin: center center;
   transform-style: preserve-3d;
   animation: l-phone-spin 8s ease-in-out infinite;
   will-change: transform;
 }
 
-/* giro/flutuação 3D em loop — sensação de o celular rodando em perspectiva */
 @keyframes l-phone-spin {
   0% {
-    transform: rotateY(-18deg) rotateX(5deg) translateY(0);
+    transform: rotateY(-16deg) rotateX(5deg) translateY(0);
   }
   50% {
-    transform: rotateY(18deg) rotateX(-3deg) translateY(-16px);
+    transform: rotateY(16deg) rotateX(-3deg) translateY(-16px);
   }
   100% {
-    transform: rotateY(-18deg) rotateX(5deg) translateY(0);
+    transform: rotateY(-16deg) rotateX(5deg) translateY(0);
   }
 }
 
@@ -267,7 +347,110 @@
   }
 }
 
-/* ── Perforation divider (recibo picotado) ── */
+/* ══════════════════════════════════════════
+   PROOF — faixa fina de promessas, logo abaixo do hero
+══════════════════════════════════════════ */
+.l-proof {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.l-proof-inner {
+  max-width: var(--l-max);
+  margin: 0 auto;
+  padding: 4px 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.l-proof-item {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 20px 18px;
+  border-right: 1px dashed var(--border);
+}
+
+.l-proof-item:last-child {
+  border-right: none;
+}
+
+.l-proof-key {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 17px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.l-proof-val {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .l-proof-inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .l-proof-item:nth-child(2n) {
+    border-right: none;
+  }
+
+  .l-proof-item:nth-child(-n + 2) {
+    border-bottom: 1px dashed var(--border);
+  }
+}
+
+/* ══════════════════════════════════════════
+   SHELL DE SEÇÃO
+══════════════════════════════════════════ */
+.l-section {
+  padding: 92px 24px;
+}
+
+.l-section.tight {
+  padding-top: 24px;
+}
+
+.l-section-head {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 52px;
+}
+
+.l-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  font-family: 'Inter', sans-serif;
+}
+
+.l-eyebrow.light {
+  color: #7BE3F2;
+}
+
+.l-h2 {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: clamp(26px, 3.6vw, 36px);
+  line-height: 1.12;
+  color: var(--text);
+  margin-bottom: 12px;
+  letter-spacing: -0.6px;
+}
+
+.l-section-sub {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* Divisor picotado (recibo) — usado pela /para entre seções. */
 .l-perforation {
   height: 1px;
   background-image: linear-gradient(to right, var(--border2) 60%, transparent 0%);
@@ -276,29 +459,453 @@
   background-repeat: repeat-x;
 }
 
-/* ── Story strip (depoimento estilo recibo/post-it) ── */
-.l-story {
-  padding: 56px 24px;
+/* ── Selo de plano (spotlights e azulejos) ──
+   Escala de três degraus, do neutro ao quente: sem classe = todos os planos,
+   .plus = Plus e Pro, .pro = só Pro. A cor sobe junto com o plano, então dá pra
+   ler a grade inteira sem parar pra decifrar cada rótulo. */
+.l-plan-tag {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--muted) 12%, transparent);
+  color: var(--muted);
+  border: 1px solid var(--border2);
+  white-space: nowrap;
+}
+
+.l-plan-tag.plus {
+  background: var(--teal-l);
+  color: var(--teal);
+  border-color: color-mix(in srgb, var(--teal) 30%, transparent);
+}
+
+.l-plan-tag.pro {
+  background: var(--primary-l);
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 34%, transparent);
+}
+
+/* ══════════════════════════════════════════
+   SPOTLIGHTS — linhas alternadas texto ↔ visual
+══════════════════════════════════════════ */
+.l-spots {
+  max-width: var(--l-max);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 88px;
+}
+
+.l-spot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+
+/* Inverte a ordem nas linhas pares — o zigue-zague é o que impede a seção de
+   virar três blocos idênticos empilhados. */
+.l-spot:nth-child(even) .l-spot-copy {
+  order: 2;
+}
+
+.l-spot-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.l-spot-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 27px;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.l-spot-desc {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--muted);
+  max-width: 460px;
+}
+
+.l-spot-visual {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.l-spot-visual::before {
+  content: '';
+  position: absolute;
+  inset: -8%;
+  background: radial-gradient(ellipse 55% 55% at 50% 50%, var(--primary-l), transparent 70%);
+  pointer-events: none;
+}
+
+.l-spot-photo {
+  position: relative;
+  width: 100%;
+  max-width: 290px;
+  height: auto;
+  filter: drop-shadow(0 20px 34px rgba(0, 0, 0, 0.42));
+}
+
+/* ── Mocks montados em CSS (painel de pedidos e desempenho) ── */
+.l-mock {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.l-mock-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  background: var(--surface2);
   border-bottom: 1px solid var(--border);
 }
 
+.l-mock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border2);
+}
+
+.l-mock-bar-title {
+  margin-left: 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.l-mock-live {
+  margin-left: auto;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--green);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.l-mock-live::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--green);
+  animation: l-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes l-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .l-mock-live::before {
+    animation: none;
+  }
+}
+
+.l-mock-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 16px;
+}
+
+.l-mock-col-head {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  border-bottom: 2px solid currentColor;
+}
+
+.l-mock-col-head.amber {
+  color: var(--yellow);
+}
+
+.l-mock-col-head.teal {
+  color: var(--teal);
+}
+
+.l-mock-col-head.green {
+  color: var(--green);
+}
+
+.l-mock-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 10px;
+  font-size: 11px;
+  color: var(--text2);
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+
+.l-mock-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 18px 16px 6px;
+}
+
+.l-mock-kpis > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.l-mock-kpi-label {
+  font-size: 10px;
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.l-mock-kpi-value {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.l-mock-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 108px;
+  padding: 16px;
+}
+
+.l-mock-bars span {
+  flex: 1;
+  border-radius: 5px 5px 2px 2px;
+  background: linear-gradient(to top, var(--primary), color-mix(in srgb, var(--primary) 45%, transparent));
+}
+
+.l-mock-bars span:last-child {
+  background: linear-gradient(to top, var(--teal), color-mix(in srgb, var(--teal) 45%, transparent));
+}
+
+@media (max-width: 900px) {
+  .l-spots {
+    gap: 64px;
+  }
+
+  .l-spot {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  /* No empilhado o visual sempre vem depois do texto — inverter no mobile só
+     confunde quem lê de cima pra baixo. */
+  .l-spot:nth-child(even) .l-spot-copy {
+    order: 0;
+  }
+
+  .l-spot-title {
+    font-size: 23px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   AZULEJOS DE FUNCIONALIDADES
+══════════════════════════════════════════ */
+.l-tiles {
+  max-width: var(--l-max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+/* O fundo fica FORA da transição de propósito: o tema é aplicado depois da
+   hidratação (o LandingShell lê o localStorage num efeito), e qualquer
+   propriedade de cor em transição anima a troca — 12 azulejos piscando do
+   escuro pro claro no carregamento. Borda e transform seguem animando no hover,
+   que é onde a transição serve pra alguma coisa. */
+.l-tile {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.l-tile:hover {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  background-color: var(--surface2);
+  transform: translateY(-2px);
+}
+
+.l-tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: var(--primary-l);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.l-tile-label {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--text);
+  margin-bottom: auto;
+}
+
+@media (max-width: 900px) {
+  .l-tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ══════════════════════════════════════════
+   FAIXA "TÃO FÁCIL" — teal, texto branco nos dois temas
+══════════════════════════════════════════ */
+.l-easy {
+  background: var(--l-teal);
+  padding: 84px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.l-easy::before {
+  content: '';
+  position: absolute;
+  inset: auto -10% -40% auto;
+  width: 60%;
+  height: 90%;
+  background: radial-gradient(ellipse at center, rgba(38, 198, 218, 0.22), transparent 70%);
+  pointer-events: none;
+}
+
+.l-easy-inner {
+  max-width: var(--l-max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 56px;
+  align-items: center;
+  position: relative;
+}
+
+.l-easy-visual {
+  display: flex;
+  justify-content: center;
+}
+
+.l-easy-photo {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.45));
+  transform: rotate(-3deg);
+}
+
+.l-easy-copy .l-h2 {
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.l-easy-copy p {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 15px;
+  line-height: 1.7;
+  max-width: 520px;
+  margin-bottom: 14px;
+}
+
+.l-easy-copy p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 900px) {
+  .l-easy-inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .l-easy-visual {
+    order: 2;
+  }
+}
+
+/* ══════════════════════════════════════════
+   STORY — depoimento em recibo
+══════════════════════════════════════════ */
+.l-story {
+  padding: 76px 24px;
+}
+
 .l-story-inner {
-  max-width: 1120px;
+  max-width: var(--l-max);
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 48px;
   flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px;
 }
 
 .l-receipt {
   background: #fdfaf3;
   color: #2a2620;
-  font-family: 'Inter', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   line-height: 1.7;
   padding: 20px 22px;
-  max-width: 300px;
+  max-width: 290px;
   transform: rotate(-2deg);
   box-shadow: var(--shadow-lg);
   position: relative;
@@ -312,11 +919,7 @@
   left: 0;
   right: 0;
   height: 8px;
-  background: repeating-linear-gradient(
-    -45deg,
-    #fdfaf3 0 4px,
-    var(--bg) 4px 8px
-  );
+  background: repeating-linear-gradient(-45deg, #fdfaf3 0 4px, var(--surface) 4px 8px);
 }
 
 .l-receipt::before {
@@ -340,78 +943,147 @@
 }
 
 .l-story-eyebrow {
-  font-family: 'Inter', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 700;
   color: var(--primary);
   letter-spacing: 1px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .l-story-headline {
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
-  font-size: 22px;
+  font-size: 21px;
   color: var(--text);
-  line-height: 1.35;
+  line-height: 1.4;
   max-width: 520px;
 }
 
-/* ── Section shell ── */
-.l-section {
-  padding: 88px 24px;
+.l-story-jump {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border2);
 }
 
-.l-section.tight {
-  padding-top: 60px;
-}
-
-.l-section-head {
-  text-align: center;
-  max-width: 620px;
-  margin: 0 auto 52px;
-}
-
-.l-eyebrow {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--primary);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-  font-family: 'Inter', monospace;
-}
-
-.l-h2 {
+.l-story-jump-from,
+.l-story-jump-to {
   font-family: 'Nunito', sans-serif;
   font-weight: 900;
-  font-size: 32px;
-  color: var(--text);
-  margin-bottom: 12px;
-  letter-spacing: -0.3px;
+  font-size: 30px;
+  line-height: 1;
 }
 
-.l-section-sub {
+.l-story-jump-from {
+  color: var(--muted2);
+  text-decoration: line-through;
+}
+
+.l-story-jump-to {
+  color: var(--green);
+}
+
+.l-story-jump-arrow {
+  color: var(--muted2);
+  font-size: 18px;
+}
+
+.l-story-jump-label {
+  font-size: 12.5px;
   color: var(--muted);
-  font-size: 15px;
-  line-height: 1.6;
 }
 
-/* ── Features bento grid (tamanhos variados, sem ícone-em-quadrado) ── */
-.l-features-grid {
-  max-width: 1120px;
+@media (max-width: 860px) {
+  .l-story-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 28px 22px;
+    gap: 28px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   COMO FUNCIONA — três cards ligados
+══════════════════════════════════════════ */
+.l-flow {
+  max-width: var(--l-max);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: minmax(150px, auto);
-  gap: 14px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  position: relative;
 }
 
+.l-flow-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 24px;
+  position: relative;
+}
+
+/* Traço picotado ligando um card ao próximo — mesmo motivo do divisor de recibo. */
+.l-flow-card:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 50px;
+  right: -16px;
+  width: 16px;
+  height: 1px;
+  background-image: linear-gradient(to right, var(--border2) 55%, transparent 0%);
+  background-size: 6px 1px;
+}
+
+.l-flow-num {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 15px;
+  color: var(--primary);
+  background: var(--primary-l);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.l-flow-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.l-flow-desc {
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+@media (max-width: 860px) {
+  .l-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .l-flow-card:not(:last-child)::after {
+    display: none;
+  }
+}
+
+/* ══════════════════════════════════════════
+   CARDS DE FUNCIONALIDADE (/para/[segmento] — grade de dores)
+══════════════════════════════════════════ */
 .l-feature-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
+  border-radius: 16px;
+  padding: 26px 24px;
   transition: border-color 0.15s, transform 0.15s;
   display: flex;
   flex-direction: column;
@@ -423,41 +1095,11 @@
   transform: translateY(-2px);
 }
 
-.l-feature-card.big {
-  grid-column: span 2;
-  grid-row: span 2;
-  position: relative;
-  overflow: hidden;
-}
-
-.l-feature-photo {
-  position: absolute;
-  top: -16px;
-  right: -24px;
-  width: 190px;
-  height: auto;
-  z-index: 0;
-  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.4));
-  -webkit-mask-image: linear-gradient(115deg, transparent 0%, black 30%);
-  mask-image: linear-gradient(115deg, transparent 0%, black 30%);
-}
-
-.l-feature-card.big .l-feature-num,
-.l-feature-card.big .l-feature-title,
-.l-feature-card.big .l-feature-desc {
-  position: relative;
-  z-index: 1;
-}
-
-.l-feature-card.wide {
-  grid-column: span 2;
-}
-
 .l-feature-num {
-  font-family: 'Inter', monospace;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 700;
-  color: var(--muted2);
+  color: var(--primary);
   margin-bottom: auto;
   padding-bottom: 16px;
 }
@@ -465,66 +1107,37 @@
 .l-feature-title {
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
-  font-size: 16px;
+  font-size: 17px;
   color: var(--text);
-  margin-bottom: 6px;
-}
-
-.l-feature-card.big .l-feature-title {
-  font-size: 22px;
+  margin-bottom: 8px;
 }
 
 .l-feature-desc {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
-/* ── How it works — lista estilo ficha/comanda ── */
-.l-steps-layout {
-  max-width: 1120px;
+.l-pains-grid {
+  max-width: var(--l-max);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 48px;
-  align-items: center;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
 }
 
+@media (max-width: 900px) {
+  .l-pains-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══════════════════════════════════════════
+   PASSOS EM LISTA (/para/[segmento])
+══════════════════════════════════════════ */
 .l-steps {
   display: flex;
   flex-direction: column;
-}
-
-.l-steps-photo-wrap {
-  position: relative;
-  display: flex;
-  justify-content: center;
-}
-
-.l-steps-photo-wrap::before {
-  content: '';
-  position: absolute;
-  inset: -20px;
-  background: radial-gradient(ellipse 60% 60% at 50% 45%, rgba(38, 198, 218, 0.16), transparent 72%);
-  pointer-events: none;
-}
-
-.l-steps-photo {
-  position: relative;
-  width: 100%;
-  max-width: 220px;
-  height: auto;
-  filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.45));
-}
-
-@media (max-width: 860px) {
-  .l-steps-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .l-steps-photo-wrap {
-    order: -1;
-  }
 }
 
 .l-step {
@@ -540,7 +1153,7 @@
 }
 
 .l-step-num {
-  font-family: 'Inter', monospace;
+  font-family: 'Inter', sans-serif;
   font-weight: 700;
   font-size: 13px;
   color: var(--primary);
@@ -557,42 +1170,52 @@
 }
 
 .l-step-desc {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
-/* ── Pricing ── */
+/* ══════════════════════════════════════════
+   PLANOS
+══════════════════════════════════════════ */
 .l-pricing-grid {
-  max-width: 820px;
+  max-width: var(--l-max);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  /* `stretch` (e não `start`): as listas têm 5, 6 e 8 itens — sem isso os três
+     cards ficam com alturas diferentes e os botões desalinhados. */
+  align-items: stretch;
 }
 
 .l-plan-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 32px 28px 28px;
+  border-radius: 20px;
+  padding: 34px 26px 30px;
   position: relative;
-  border-top: none;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Fita picotada no topo do card — o mesmo motivo de comanda do resto da página. */
 .l-plan-card::before {
   content: '';
-  display: block;
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
   height: 4px;
-  margin: -1px -1px 24px;
+  border-radius: 0 0 4px 4px;
   background-image: linear-gradient(to right, var(--border2) 55%, transparent 0%);
   background-size: 10px 4px;
   background-repeat: repeat-x;
 }
 
 .l-plan-card.featured {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 1px var(--primary), var(--shadow-lg);
+  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 35%, transparent), var(--shadow-lg);
 }
 
 .l-plan-card.featured::before {
@@ -601,33 +1224,45 @@
 
 .l-plan-badge {
   position: absolute;
-  top: -14px;
+  top: -13px;
   right: 24px;
   background: var(--primary);
   color: #fff;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
-  padding: 4px 12px;
-  font-family: 'Inter', monospace;
-  transform: rotate(4deg);
+  letter-spacing: 0.4px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.32);
+}
+
+.l-plan-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px dashed var(--border2);
 }
 
 .l-plan-name {
   font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-weight: 900;
   font-size: 13px;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 10px;
+  letter-spacing: 1.2px;
 }
 
 .l-plan-price {
   font-family: 'Nunito', sans-serif;
   font-weight: 900;
-  font-size: 30px;
+  font-size: 32px;
+  line-height: 1;
   color: var(--text);
-  margin-bottom: 16px;
 }
 
 .l-plan-price span {
@@ -640,24 +1275,28 @@
   font-size: 13.5px;
   color: var(--muted);
   line-height: 1.6;
-  margin-bottom: 24px;
-  min-height: 65px;
+  margin-bottom: 22px;
+  /* Coluna mais estreita com 3 cards: a frase agora ocupa até 3 linhas. */
+  min-height: 64px;
 }
 
 .l-plan-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 11px;
+  /* Empurra o botão pro rodapé do card, alinhando os três. */
   margin-bottom: 28px;
+  flex: 1;
 }
 
 .l-plan-list li {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--text2);
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: flex-start;
+  line-height: 1.5;
 }
 
 .l-plan-list li::before {
@@ -671,17 +1310,22 @@
   display: block;
   text-align: center;
   width: 100%;
-  border-radius: var(--radius-sm);
-  padding: 12px;
+  border-radius: 999px;
+  padding: 14px;
   font-family: 'Nunito', sans-serif;
-  font-weight: 700;
-  font-size: 14px;
+  font-weight: 800;
+  font-size: 14.5px;
   text-decoration: none;
+  transition: all 0.15s;
 }
 
+/* Borda transparente pra bater com a de 1px do .outline: sem ela o botão do
+   plano em destaque fica 2px mais baixo que os vizinhos na grade de três. */
 .l-plan-cta.primary {
   background: var(--primary);
   color: #fff;
+  border: 1px solid transparent;
+  box-shadow: 0 4px 14px rgba(255, 87, 34, 0.28);
 }
 
 .l-plan-cta.primary:hover {
@@ -689,24 +1333,40 @@
 }
 
 .l-plan-cta.outline {
-  border: 1px solid var(--border);
+  border: 1px solid var(--border2);
   color: var(--text);
 }
 
 .l-plan-cta.outline:hover {
-  border-color: var(--border2);
+  border-color: var(--text2);
 }
 
 .l-pricing-note {
   text-align: center;
   color: var(--muted2);
-  font-size: 12px;
-  margin-top: 24px;
+  font-size: 12.5px;
+  margin-top: 26px;
 }
 
-/* ── FAQ ── */
+/* Três cards densos não cabem abaixo de ~940px sem espremer a lista. Empilha
+   antes disso e segura a largura, senão o card vira uma faixa de 900px de linha. */
+@media (max-width: 940px) {
+  .l-pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 460px;
+    gap: 22px;
+  }
+
+  .l-plan-desc {
+    min-height: 0;
+  }
+}
+
+/* ══════════════════════════════════════════
+   FAQ
+══════════════════════════════════════════ */
 .l-faq {
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -716,16 +1376,22 @@
 .l-faq-item {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 14px;
   overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.l-faq-item:hover,
+.l-faq-item[open] {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
 }
 
 .l-faq-item summary {
   cursor: pointer;
-  padding: 18px 20px;
+  padding: 19px 22px;
   font-family: 'Nunito', sans-serif;
-  font-weight: 700;
-  font-size: 14.5px;
+  font-weight: 800;
+  font-size: 15px;
   color: var(--text);
   list-style: none;
   display: flex;
@@ -741,10 +1407,11 @@
 .l-faq-item summary::after {
   content: '+';
   color: var(--primary);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 400;
+  line-height: 1;
   flex-shrink: 0;
-  transition: transform 0.15s;
+  transition: transform 0.18s;
 }
 
 .l-faq-item[open] summary::after {
@@ -752,67 +1419,169 @@
 }
 
 .l-faq-answer {
-  padding: 0 20px 18px;
+  padding: 0 22px 20px;
   color: var(--muted);
-  font-size: 13.5px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.7;
 }
 
-/* ── Final CTA ── */
+/* ══════════════════════════════════════════
+   CTA FINAL — faixa ember, escura nos dois temas
+══════════════════════════════════════════ */
 .l-final-cta {
-  background: var(--primary);
-  padding: 72px 24px;
-  clip-path: polygon(0 24px, 100% 0, 100% 100%, 0% 100%);
+  background: var(--l-ember);
+  padding: 84px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.l-final-cta::before {
+  content: '';
+  position: absolute;
+  inset: -30% -20% auto auto;
+  width: 70%;
+  height: 140%;
+  background: radial-gradient(ellipse at center, rgba(255, 87, 34, 0.3), transparent 68%);
+  pointer-events: none;
 }
 
 .l-final-cta-inner {
-  max-width: 1120px;
+  max-width: var(--l-max);
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 32px;
+  gap: 40px;
   flex-wrap: wrap;
+  position: relative;
+}
+
+/* Com formulário a faixa vira duas colunas; sem ele, o texto respira sozinho. */
+.l-final-cta.with-form .l-final-cta-inner {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  align-items: center;
+}
+
+.l-final-cta-copy {
+  max-width: 520px;
 }
 
 .l-final-cta .l-h2 {
-  font-size: 30px;
   color: #fff;
-  margin-bottom: 8px;
-  max-width: 480px;
+  margin-bottom: 10px;
 }
 
 .l-final-cta-sub {
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 15px;
-  max-width: 420px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 15.5px;
+  line-height: 1.65;
+}
+
+.l-final-cta-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 20px 0 24px;
+}
+
+.l-final-cta-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.l-final-cta-list li::before {
+  content: '✓';
+  color: var(--green);
+  font-weight: 700;
 }
 
 .l-final-cta .l-btn-primary.large {
-  background: #1a1a1a;
-  flex-shrink: 0;
+  background: #fff;
+  color: #21100A;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
 }
 
 .l-final-cta .l-btn-primary.large:hover {
-  background: #000;
+  background: #FFEDE5;
 }
 
-/* ── Footer ── */
+.l-final-cta-form {
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .l-final-cta.with-form .l-final-cta-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .l-final-cta-list {
+    margin-bottom: 8px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   RODAPÉ — escuro nos dois temas
+══════════════════════════════════════════ */
 .l-footer {
-  border-top: 1px solid var(--border);
-  padding: 40px 24px 28px;
+  background: var(--l-ink);
+  padding: 56px 24px 24px;
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .l-footer-inner {
-  max-width: 1120px;
+  max-width: var(--l-max);
   margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 40px;
+  padding-bottom: 40px;
 }
 
+.l-footer .l-logo {
+  color: #fff;
+}
+
+.l-footer-pitch {
+  margin-top: 14px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 300px;
+}
+
+.l-footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.l-footer-col-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 11.5px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+  margin-bottom: 3px;
+}
+
+.l-footer-col a {
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.l-footer-col a:hover {
+  color: var(--primary);
+}
+
+/* Mantida pra compatibilidade: /para e /entregadores ainda podem cair aqui. */
 .l-footer-links {
   display: flex;
   align-items: center;
@@ -821,121 +1590,64 @@
 }
 
 .l-footer-links a {
-  color: var(--muted);
-  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
   text-decoration: none;
 }
 
 .l-footer-links a:hover {
-  color: var(--text2);
+  color: var(--primary);
+}
+
+.l-segment-links {
+  max-width: var(--l-max);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  padding: 24px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.l-segment-links a {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.42);
+  text-decoration: none;
+}
+
+.l-segment-links a:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.l-footer-bottom {
+  max-width: var(--l-max);
+  margin: 0 auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .l-footer-copy {
-  color: var(--muted2);
   font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+@media (max-width: 860px) {
+  .l-footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
 }
 
 /* ══════════════════════════════════════════
-   RESPONSIVE
+   FORMULÁRIO DE LEAD (home, /contato e /entregadores)
 ══════════════════════════════════════════ */
-@media (max-width: 860px) {
-  .l-nav-links {
-    position: fixed;
-    top: 61px;
-    left: 0;
-    right: 0;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.2s ease;
-  }
-
-  .l-nav-toggle-input:checked ~ .l-nav-links {
-    max-height: 320px;
-  }
-
-  .l-nav-links a {
-    padding: 14px 24px;
-    width: 100%;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .l-nav-cta {
-    padding: 14px 24px;
-    width: 100%;
-  }
-
-  .l-nav-toggle-label {
-    display: block;
-  }
-
-  .l-hero-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    padding-bottom: 48px;
-  }
-
-  .l-hero {
-    padding: 40px 0 0;
-  }
-
-  .l-h1 {
-    font-size: 38px;
-  }
-
-  .l-mockup-photo {
-    margin: 24px auto 0;
-    max-width: 240px;
-  }
-
-  .l-story-inner {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .l-features-grid,
-  .l-pricing-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .l-feature-card.big,
-  .l-feature-card.wide {
-    grid-column: span 1;
-    grid-row: span 1;
-  }
-
-  .l-section {
-    padding: 56px 20px;
-  }
-
-  .l-final-cta-inner {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .l-final-cta .l-h2,
-  .l-final-cta-sub {
-    max-width: none;
-  }
-
-  .l-footer-inner {
-    flex-direction: column;
-    text-align: center;
-  }
-}
-
-/* ── Lead form (teste agora) ── */
 .l-lead-section {
   padding: 88px 24px;
   border-bottom: 1px solid var(--border);
 }
 
 .l-lead-section-inner {
-  max-width: 1120px;
+  max-width: var(--l-max);
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 0.85fr;
@@ -970,15 +1682,16 @@
 }
 
 .l-lead-frame {
-  background: var(--primary);
-  border-radius: 20px;
-  padding: 10px;
+  background: linear-gradient(140deg, var(--primary), color-mix(in srgb, var(--primary) 55%, #7A1F00));
+  border-radius: 22px;
+  padding: 8px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
 }
 
 .l-lead-card {
   background: var(--surface);
-  border-radius: 14px;
-  padding: 28px;
+  border-radius: 16px;
+  padding: 26px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -999,7 +1712,7 @@
   width: 100%;
   padding: 11px 14px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 10px;
   background: var(--surface2);
   color: var(--text);
   font-family: 'Inter', sans-serif;
@@ -1055,7 +1768,7 @@
   background: var(--primary);
   color: #fff;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
   padding: 14px;
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
@@ -1096,32 +1809,6 @@
   line-height: 1.6;
 }
 
-/* Página dedicada /contato */
-.l-contato {
-  min-height: calc(100vh - 72px);
-  display: flex;
-  align-items: center;
-  padding: 56px 24px 80px;
-}
-
-.l-contato-inner {
-  max-width: 1000px;
-  margin: 0 auto;
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 0.9fr;
-  gap: 56px;
-  align-items: center;
-}
-
-.l-contato-head .l-eyebrow {
-  margin-bottom: 12px;
-}
-
-.l-contato-head .l-h2 {
-  margin-bottom: 14px;
-}
-
 /* Sucesso com identidade do WhatsApp */
 .l-lead-frame-wa {
   background: #25d366;
@@ -1159,7 +1846,197 @@
   color: #075e54;
 }
 
+/* Página dedicada /contato e /entregadores */
+.l-contato {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  padding: 56px 24px 80px;
+}
+
+.l-contato-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 0.9fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.l-contato-head .l-eyebrow {
+  margin-bottom: 12px;
+}
+
+.l-contato-head .l-h2 {
+  margin-bottom: 14px;
+}
+
+/* ══════════════════════════════════════════
+   TOGGLE DE TEMA
+══════════════════════════════════════════ */
+.l-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.l-theme-toggle:hover {
+  border-color: var(--text2);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.landing.light .l-theme-toggle:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* ══════════════════════════════════════════
+   TEMAS
+   Só as variáveis mudam — as regras acima já leem tudo de var(), então nenhum
+   componente precisa de override por tema (as faixas escuras são fixas de
+   propósito e ficam iguais nos dois).
+══════════════════════════════════════════ */
+.landing.light {
+  --bg: #FFF8F3;
+  --surface: #FFFFFF;
+  --surface2: #FFF3EC;
+  --surface3: #F1EAE4;
+  --text: #1F1B1A;
+  --text2: #3A3432;
+  --muted: #6F665E;
+  --muted2: #9C938C;
+  --border: #EFE4DA;
+  --border2: #E0D3C7;
+
+  --primary-l: rgba(255, 87, 34, 0.1);
+  --teal: #0E7C8C;
+  --teal-l: rgba(14, 124, 140, 0.1);
+  --green: #2E9E5B;
+
+  --shadow-lg: 0 14px 32px rgba(90, 60, 40, 0.12);
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+.landing.light .l-nav-toggle-label {
+  color: var(--text);
+}
+
+/* O hero é uma faixa escura também no claro — o que muda é a temperatura,
+   pra não brigar com o creme do resto da página. */
+.landing.light .l-hero {
+  background: linear-gradient(168deg, #2A1A13 0%, #3A2015 44%, #1E1410 100%);
+}
+
+.landing.dark {
+  --bg: #121212;
+  --surface: #1A1A1C;
+  --surface2: #232326;
+  --surface3: #2C2C30;
+  --text: #E8EAED;
+  --text2: #D2D4D7;
+  --muted: #9AA0A6;
+  --muted2: #80868B;
+  --border: #2E3033;
+  --border2: #3F4245;
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVO GERAL
+══════════════════════════════════════════ */
 @media (max-width: 860px) {
+  .l-nav-links {
+    position: fixed;
+    top: 61px;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease;
+  }
+
+  .l-nav-toggle-input:checked ~ .l-nav-links {
+    max-height: 320px;
+  }
+
+  .l-nav-links a {
+    padding: 14px 24px;
+    width: 100%;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .l-nav-cta {
+    padding: 14px 24px;
+    width: 100%;
+  }
+
+  .l-nav-toggle-label {
+    display: block;
+  }
+
+  .l-hero {
+    padding: 40px 0 0;
+  }
+
+  .l-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding-bottom: 56px;
+  }
+
+  .l-hero-sub {
+    max-width: none;
+  }
+
+  .l-mockup-photo {
+    margin: 24px auto 0;
+    max-width: 240px;
+  }
+
+  .l-section {
+    padding: 60px 20px;
+  }
+
+  .l-section-head {
+    margin-bottom: 36px;
+  }
+
+  .l-pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .l-easy,
+  .l-final-cta {
+    padding: 60px 20px;
+  }
+
+  .l-final-cta-inner {
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .l-story {
+    padding: 48px 20px;
+  }
+
   .l-lead-section-inner {
     grid-template-columns: 1fr;
   }
@@ -1183,177 +2060,22 @@
   }
 }
 
-/* ── Landing Page Theme Toggle ── */
-.l-theme-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text2);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.l-theme-toggle:hover {
-  border-color: var(--border2);
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.landing.light .l-theme-toggle:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-/* ── Landing Page Light Theme ── */
-.landing.light {
-  --bg: #FFF8F3; /* Premium warm cream */
-  --surface: #FFFFFF;
-  --surface2: #FFF3EC;
-  --surface3: #F1EAE4;
-  --text: #1F1B1A;
-  --text2: #3A3432;
-  --muted: #7A7168;
-  --muted2: #A79E97;
-  --border: #ECE3DB;
-  --border2: #F3ECE6;
-  
-  background: var(--bg);
-  color: var(--text);
-}
-
-/* Specific overrides for landing light mode */
-.landing.light .l-nav {
-  background: rgba(255, 248, 243, 0.85);
-  border-bottom: 1px solid var(--border);
-}
-
-.landing.light .l-logo {
-  color: var(--text);
-}
-
-.landing.light .l-nav-links a {
-  color: var(--text2);
-}
-
-.landing.light .l-nav-links a:hover {
-  color: var(--text);
-}
-
-.landing.light .l-btn-ghost {
-  border-color: var(--border);
-  color: var(--text2);
-}
-
-.landing.light .l-btn-ghost:hover {
-  border-color: var(--border2);
-  color: var(--text);
-}
-
-.landing.light .l-nav-toggle-label {
-  color: var(--text);
-}
-
-.landing.light .l-story-grid {
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-
-.landing.light .l-feature-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-
-.landing.light .l-faq-item {
-  border-bottom: 1px solid var(--border);
-}
-
-.landing.light .l-pricing-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-
-.landing.light .l-pricing-card.premium {
-  border-color: var(--primary);
-  background: var(--surface);
-}
-
-.landing.light .l-final-cta .l-btn-primary.large {
-  background: var(--text);
-  color: var(--bg);
-}
-
-.landing.light .l-final-cta .l-btn-primary.large:hover {
-  background: var(--text2);
-}
-
-.landing.light .l-perforation {
-  background-image: linear-gradient(to right, var(--border) 60%, transparent 0%);
-}
-
-.landing.light .l-receipt::before,
-.landing.light .l-receipt::after {
-  background: repeating-linear-gradient(
-    -45deg,
-    #fdfaf3 0 4px,
-    var(--bg) 4px 8px
-  );
-}
-
-/* ── Landing Page Dark Theme ── */
-.landing.dark {
-  --bg: #121212;
-  --surface: #202124;
-  --surface2: #28292C;
-  --surface3: #323337;
-  --text: #E8EAED;
-  --text2: #D2D4D7;
-  --muted: #9AA0A6;
-  --muted2: #80868B;
-  --border: #3C4043;
-  --border2: #444746;
-
-  background: var(--bg);
-  color: var(--text);
-}
-
-
-/* ── Páginas de segmento (/para/[segmento]) ──
-   Grade de 3 dores. Não reaproveita .l-features-grid porque aquela é de 4 colunas
-   (a home tem 4 cards + variações big/wide) e sobraria uma coluna vazia aqui. */
-.l-pains-grid {
-  max-width: 1120px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}
-
-@media (max-width: 900px) {
-  .l-pains-grid {
+@media (max-width: 480px) {
+  .l-tiles {
     grid-template-columns: 1fr;
   }
-}
 
-/* Lista de links pros outros segmentos: centralizada e quebrando linha. */
-.l-segment-links {
-  max-width: 900px;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px 22px;
-}
+  .l-proof-inner {
+    grid-template-columns: 1fr;
+  }
 
-.l-segment-links a {
-  font-size: 13px;
-  color: var(--muted);
-  text-decoration: none;
-}
+  .l-proof-item {
+    border-right: none;
+    border-bottom: 1px dashed var(--border);
+    padding: 14px 4px;
+  }
 
-.l-segment-links a:hover {
-  color: var(--text);
+  .l-proof-item:last-child {
+    border-bottom: none;
+  }
 }

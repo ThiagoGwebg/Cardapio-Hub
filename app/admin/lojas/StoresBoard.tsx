@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { ArrowUpCircle, CalendarDays, CreditCard, Flame, Package, Star, User, Wallet, X } from 'lucide-react'
 import { PLAN_LIMITS } from '@/lib/stripe/plans'
+import { planLabel, type BillingPlan } from '@/lib/billing/plans'
 import { fmtCents } from '@/lib/format'
 import PlanToggle from './PlanToggle'
 import UpgradeRequest from './UpgradeRequest'
@@ -13,6 +14,8 @@ export type AdminStore = {
   name: string
   slug: string
   email?: string
+  /** Plano ativo da loja. `isPro` continua existindo: e o gate dos recursos Pro. */
+  plan: BillingPlan
   isPro: boolean
   isOpen: boolean
   orders: number
@@ -41,7 +44,7 @@ function fmtMoneyRound(cents: number) {
 export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
   const [q, setQ] = useState('')
   const [sort, setSort] = useState<SortKey>('recent')
-  const [onlyPro, setOnlyPro] = useState<'all' | 'pro' | 'lite'>('all')
+  const [planFilter, setPlanFilter] = useState<'all' | BillingPlan>('all')
   const [onlyRequested, setOnlyRequested] = useState(false)
 
   const totals = useMemo(() => {
@@ -56,8 +59,7 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
     const term = q.trim().toLowerCase()
     let list = stores.filter((s) => {
       if (onlyRequested && !s.upgradeRequest) return false
-      if (onlyPro === 'pro' && !s.isPro) return false
-      if (onlyPro === 'lite' && s.isPro) return false
+      if (planFilter !== 'all' && s.plan !== planFilter) return false
       if (!term) return true
       return s.name.toLowerCase().includes(term) || (s.email || '').toLowerCase().includes(term)
     })
@@ -68,9 +70,8 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
       return +new Date(b.createdAt) - +new Date(a.createdAt)
     })
     return list
-  }, [stores, q, sort, onlyPro, onlyRequested])
+  }, [stores, q, sort, planFilter, onlyRequested])
 
-  const limit = PLAN_LIMITS.free.maxOrdersPerMonth
 
   return (
     <>
@@ -113,9 +114,9 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
         </div>
         <div className="adm-store-filters">
           <div className="adm-seg">
-            {(['all', 'pro', 'lite'] as const).map((f) => (
-              <button key={f} className={onlyPro === f ? 'on' : ''} onClick={() => setOnlyPro(f)}>
-                {f === 'all' ? 'Todas' : f === 'pro' ? 'Pro' : 'Lite'}
+            {(['all', 'free', 'plus', 'pro'] as const).map((f) => (
+              <button key={f} className={planFilter === f ? 'on' : ''} onClick={() => setPlanFilter(f)}>
+                {f === 'all' ? 'Todas' : planLabel(f)}
               </button>
             ))}
           </div>
@@ -141,7 +142,8 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
       <div className="adm-store-list">
         {visible.map((store) => {
           const orders = store.orders
-          const pct = Math.min(100, Math.round((orders / limit) * 100))
+          const limit = PLAN_LIMITS[store.plan].maxOrdersPerMonth
+          const pct = Number.isFinite(limit) ? Math.min(100, Math.round((orders / limit) * 100)) : 0
           const heat = pct >= 80 ? 'hot' : pct >= 50 ? 'warm' : ''
           return (
             <article key={store.id} className="adm-store-card">
@@ -149,7 +151,7 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
                 <div className="adm-store-name">
                   {store.name}
                   <span className={`adm-badge ${store.isPro ? 'pro' : ''}`}>
-                    {store.isPro ? <><Star size={11} strokeWidth={2.6} /> Pro</> : 'Lite'}
+                    {store.isPro && <Star size={11} strokeWidth={2.6} />} {planLabel(store.plan)}
                   </span>
                   {store.upgradeRequest && (
                     <span className="adm-badge wants-pro" title="O lojista pediu o upgrade pelo painel">
@@ -187,13 +189,13 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
                 {store.upgradeRequest && (
                   <UpgradeRequest storeId={store.id} storeName={store.name} request={store.upgradeRequest} />
                 )}
-                {!store.isPro && (
-                  <div className="adm-usage" title={`Limite do plano Lite: ${limit} pedidos/mês`}>
+                {Number.isFinite(limit) && (
+                  <div className="adm-usage" title={`Limite do plano ${planLabel(store.plan)}: ${limit} pedidos/mês`}>
                     <div className="adm-usage-track">
                       <div className={`adm-usage-fill ${heat}`} style={{ width: `${pct}%` }} />
                     </div>
                     <span className={`adm-usage-label ${heat}`}>
-                      {orders}/{limit} do limite Lite
+                      {orders}/{limit} do limite {planLabel(store.plan)}
                       {pct >= 80 && (
                         <>
                           {' · '}
@@ -208,7 +210,7 @@ export default function StoresBoard({ stores }: { stores: AdminStore[] }) {
                 <a className="adm-btn ghost" href={`/loja/${store.slug}`} target="_blank" rel="noopener noreferrer">
                   Ver cardápio ↗
                 </a>
-                <PlanToggle storeId={store.id} isPro={store.isPro} />
+                <PlanToggle storeId={store.id} plan={store.plan} />
                 <BillingControl storeId={store.id} billing={store.billing} />
               </div>
             </article>

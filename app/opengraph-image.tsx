@@ -38,7 +38,7 @@ export default async function Image() {
             letterSpacing: -0.4,
           }}
         >
-          sem taxa por pedido
+          seu link, seus clientes
         </div>
 
         <div

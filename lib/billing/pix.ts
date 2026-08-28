@@ -1,5 +1,6 @@
 import QRCode from 'qrcode'
 import { createAdminClient } from '@/lib/supabase/admin'
+import type { BillingPlan } from '@/lib/billing/plans'
 
 // Pix ESTÁTICO do banco da plataforma: um payload copia-e-cola por plano, guardado
 // em platform_settings (nunca no código — o payload carrega CPF/nome do titular).
@@ -8,12 +9,15 @@ import { createAdminClient } from '@/lib/supabase/admin'
 // serviço externo de QR (api.qrserver.com e similares): isso mandaria a chave Pix
 // e o nome do titular para um terceiro a cada carregamento de página.
 
-export type PlanKey = 'free' | 'pro'
+export type PlanKey = BillingPlan
 
 const SETTING_KEY: Record<PlanKey, string> = {
   free: 'pix_qr_lite',
+  plus: 'pix_qr_plus',
   pro: 'pix_qr_pro',
 }
+
+const ALL_KEYS = Object.keys(SETTING_KEY) as PlanKey[]
 
 /** Payload copia-e-cola configurado para o plano, ou null se ainda não cadastrado. */
 export async function getPixPayloadForPlan(plan: PlanKey): Promise<string | null> {
@@ -33,11 +37,12 @@ export async function getAllPixPayloads(): Promise<Record<PlanKey, string | null
   const { data } = await admin
     .from('platform_settings')
     .select('key, value')
-    .in('key', [SETTING_KEY.free, SETTING_KEY.pro])
+    .in('key', ALL_KEYS.map((k) => SETTING_KEY[k]))
 
   const byKey = new Map((data ?? []).map((r: { key: string; value: string | null }) => [r.key, r.value]))
   return {
     free: byKey.get(SETTING_KEY.free)?.trim() || null,
+    plus: byKey.get(SETTING_KEY.plus)?.trim() || null,
     pro: byKey.get(SETTING_KEY.pro)?.trim() || null,
   }
 }

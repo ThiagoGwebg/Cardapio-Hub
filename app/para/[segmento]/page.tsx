@@ -90,7 +90,7 @@ export default async function SegmentoPage({
       <section className="l-hero">
         <div className="l-hero-grid">
           <div>
-            <span className="l-tag">sem taxa por pedido</span>
+            <span className="l-tag">feito para {seg.label}</span>
             <h1 className="l-h1">{seg.h1}</h1>
             <p className="l-hero-sub">{seg.intro}</p>
             <div className="l-hero-ctas">

@@ -1,4 +1,5 @@
 import { getBaseUrl } from '@/lib/baseUrl'
+import { MARKETING_PLANS } from '@/lib/plansMarketing'
 
 // Fonte única de verdade do SEO institucional (marca, textos padrão e JSON-LD).
 // Metadata de páginas deve importar daqui em vez de repetir strings soltas —
@@ -84,8 +85,10 @@ export const GOOGLE_SITE_VERIFICATION =
 export const BING_SITE_VERIFICATION =
   process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION?.trim() || ''
 
-/** Preço de entrada, usado no schema de oferta e nos textos de marketing. */
-export const ENTRY_PRICE_BRL = 29
+/** Preço de entrada, usado no schema de oferta e nos textos de marketing.
+    Reexportado de `plansMarketing` pra não existir um 29 escrito à mão aqui e
+    outro no card de planos — quem importava daqui continua importando daqui. */
+export { ENTRY_PRICE_BRL } from '@/lib/plansMarketing'
 
 /** Resolve um caminho relativo para URL absoluta (canonical, OG, JSON-LD). */
 export function absoluteUrl(path = '/'): string {
@@ -137,7 +140,7 @@ export function websiteSchema() {
 }
 
 /**
- * SoftwareApplication com as duas ofertas. É o schema que habilita os rich
+ * SoftwareApplication com a grade de planos. É o schema que habilita os rich
  * results de preço em buscas do tipo "quanto custa cardápio digital".
  */
 export function softwareApplicationSchema() {
@@ -154,31 +157,24 @@ export function softwareApplicationSchema() {
     inLanguage: 'pt-BR',
     publisher: { '@id': absoluteUrl('/#organization') },
     featureList: SITE_FEATURES,
+    // Gerado a partir de MARKETING_PLANS: a grade da página e o rich result de
+    // preço saem da mesma lista, então não tem como um mostrar 3 planos e o
+    // outro continuar anunciando 2.
     offers: {
       '@type': 'AggregateOffer',
       priceCurrency: 'BRL',
-      lowPrice: ENTRY_PRICE_BRL,
-      offerCount: 2,
-      offers: [
-        {
-          '@type': 'Offer',
-          name: 'Lite',
-          price: ENTRY_PRICE_BRL,
-          priceCurrency: 'BRL',
-          description: 'Até 30 produtos e 60 pedidos por mês, sem comissão por venda.',
-          url: absoluteUrl('/#pricing'),
-          availability: 'https://schema.org/InStock',
-        },
-        {
-          '@type': 'Offer',
-          name: 'Pro',
-          priceCurrency: 'BRL',
-          description:
-            'Produtos e pedidos ilimitados, marca própria sem selo, CRM, relatórios avançados e notificações por WhatsApp.',
-          url: absoluteUrl('/contato'),
-          availability: 'https://schema.org/InStock',
-        },
-      ],
+      lowPrice: MARKETING_PLANS[0].priceBRL,
+      highPrice: MARKETING_PLANS[MARKETING_PLANS.length - 1].priceBRL,
+      offerCount: MARKETING_PLANS.length,
+      offers: MARKETING_PLANS.map((plan) => ({
+        '@type': 'Offer',
+        name: plan.name,
+        price: plan.priceBRL,
+        priceCurrency: 'BRL',
+        description: plan.schemaDescription,
+        url: absoluteUrl('/#pricing'),
+        availability: 'https://schema.org/InStock',
+      })),
     },
   }
 }

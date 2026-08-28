@@ -2,16 +2,27 @@
 
 import { useState, useTransition } from 'react'
 import { Star } from 'lucide-react'
+import type { BillingPlan } from '@/lib/billing/plans'
 import { setStorePlan } from './actions'
 
-export default function PlanToggle({ storeId, isPro }: { storeId: string; isPro: boolean }) {
+const OPTIONS: { key: BillingPlan; label: string }[] = [
+  { key: 'free', label: 'Lite' },
+  { key: 'plus', label: 'Plus' },
+  { key: 'pro', label: 'Pro' },
+]
+
+/* Seletor de três estados. Deixou de ser um botão de liga/desliga porque com o
+   Plus no meio "Rebaixar/Ativar" não descreve mais o destino — o admin precisa
+   escolher pra QUAL plano vai, não apenas alternar. */
+export default function PlanToggle({ storeId, plan }: { storeId: string; plan: BillingPlan }) {
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
-  function toggle() {
-    const target = isPro ? 'free' : 'pro'
-    const label = isPro ? 'voltar pro plano Lite' : 'ativar o Pro'
-    if (!window.confirm(`Tem certeza que quer ${label} pra essa loja?`)) return
+  function change(target: BillingPlan) {
+    if (target === plan) return
+    const from = OPTIONS.find((o) => o.key === plan)?.label
+    const to = OPTIONS.find((o) => o.key === target)?.label
+    if (!window.confirm(`Mudar essa loja do plano ${from} para ${to}?`)) return
     setError(null)
     startTransition(async () => {
       const res = await setStorePlan(storeId, target)
@@ -21,21 +32,22 @@ export default function PlanToggle({ storeId, isPro }: { storeId: string; isPro:
 
   return (
     <span className="adm-plan-toggle">
-      <button
-        className={`adm-btn ${isPro ? 'ghost' : 'pro'}`}
-        onClick={toggle}
-        disabled={pending}
-      >
-        {pending ? (
-          '…'
-        ) : isPro ? (
-          'Rebaixar p/ Lite'
-        ) : (
-          <>
-            <Star size={13} strokeWidth={2.6} /> Ativar Pro
-          </>
-        )}
-      </button>
+      {OPTIONS.map(({ key, label }) => (
+        <button
+          key={key}
+          className={`adm-btn ${key === plan ? 'pro' : 'ghost'}`}
+          onClick={() => change(key)}
+          disabled={pending || key === plan}
+          aria-pressed={key === plan}
+          title={key === plan ? `Plano atual: ${label}` : `Mudar para ${label}`}
+        >
+          {pending && key !== plan ? '…' : (
+            <>
+              {key === 'pro' && <Star size={13} strokeWidth={2.6} />} {label}
+            </>
+          )}
+        </button>
+      ))}
       {error && <span className="adm-toggle-error">{error}</span>}
     </span>
   )

@@ -31,14 +31,16 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
     .maybeSingle()
 
   const name = store?.name || 'Cardápio'
-  const theme = (store?.theme ?? {}) as { primaryColor?: string; logoUrl?: string }
+  const theme = (store?.theme ?? {}) as { primaryColor?: string; logoUrl?: string; logoShape?: string }
   const color = theme.primaryColor || '#FF5722'
   const dark = darken(color, 45)
   const letter = name.trim().charAt(0).toUpperCase() || 'C'
   const logoUrl = theme.logoUrl?.trim()
+  const roundLogo = theme.logoShape !== 'square'
 
-  // Cache longo no CDN: o ícone só muda quando a loja troca a logo, e aí a URL do
-  // arquivo no Storage também muda — então não há risco de servir ícone velho.
+  // Cache longo no CDN. Quem garante que ninguém recebe ícone velho é o `?v=` que o
+  // layout e o manifest anexam à URL desta rota (ver `storeIconVersion`): a URL daqui
+  // é sempre a mesma, então sem aquela versão o CDN serviria a logo antiga por um dia.
   const headers = { 'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800' }
 
   return new ImageResponse(
@@ -58,10 +60,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
         }}
       >
         {logoUrl ? (
-          // `cover` preenche o quadrado mesmo com logo retangular, mantendo o full-bleed
-          // que o ícone maskable do Android exige (sem borda branca em volta).
+          // Logo recortada em círculo sobre o gradiente (padrão): logos redondas em arquivo
+          // quadrado mostravam os cantos do arquivo como uma moldura estranha no favicon/ícone.
+          // O gradiente atrás mantém o full-bleed que o ícone maskable do Android exige
+          // (a máscara circular do launcher deixa só a logo aparecendo). Com
+          // theme.logoShape = 'square' a logo volta a preencher o quadrado inteiro.
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logoUrl} alt="" width={512} height={512} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img src={logoUrl} alt="" width={512} height={512} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: roundLogo ? 9999 : 0 }} />
         ) : (
           letter
         )}

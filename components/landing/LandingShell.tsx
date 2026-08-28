@@ -4,8 +4,11 @@ import { useEffect, useState } from 'react'
 import '../../app/landing.css'
 import LandingHeader from '@/components/landing/LandingHeader'
 import LandingHero from '@/components/landing/LandingHero'
-import LandingStory from '@/components/landing/LandingStory'
+import LandingProof from '@/components/landing/LandingProof'
+import LandingSpotlights from '@/components/landing/LandingSpotlights'
 import LandingFeatures from '@/components/landing/LandingFeatures'
+import LandingEasy from '@/components/landing/LandingEasy'
+import LandingStory from '@/components/landing/LandingStory'
 import LandingHowItWorks from '@/components/landing/LandingHowItWorks'
 import LandingPricing from '@/components/landing/LandingPricing'
 import LandingFaq from '@/components/landing/LandingFaq'
@@ -33,18 +36,22 @@ export default function LandingShell() {
     localStorage.setItem('landing-theme', next)
   }
 
+  // Ritmo da página: faixa laranja (hero) → conteúdo claro → faixa teal (easy) →
+  // conteúdo claro → faixa laranja (CTA) → rodapé escuro. As faixas é que fazem a
+  // leitura andar; sem elas a home vira uma parede única de cards.
   return (
     <div className={`landing ${themeMode}`}>
       <LandingHeader themeMode={themeMode} toggleThemeMode={toggleThemeMode} />
       <LandingHero />
-      <LandingStory />
-      <div className="l-perforation" />
+      <LandingProof />
+      <LandingSpotlights />
       <LandingFeatures />
-      <div className="l-perforation" />
+      <LandingEasy />
+      <LandingStory />
       <LandingHowItWorks />
       <LandingPricing />
       <LandingFaq />
-      <LandingFinalCta />
+      <LandingFinalCta withForm />
       <LandingFooter />
     </div>
   )

@@ -1,72 +1,59 @@
-import Image from 'next/image'
+import {
+  IconBadgeOff,
+  IconBoard,
+  IconChart,
+  IconChat,
+  IconHeart,
+  IconLink,
+  IconPalette,
+  IconPower,
+  IconQr,
+  IconSearch,
+  IconSheet,
+  IconStores,
+} from '@/components/landing/LandingIcons'
 
-const FEATURES = [
-  {
-    num: '01',
-    title: 'Cardápio com a sua cara',
-    desc: 'Cor, logo e banner personalizados, categorias organizadas e busca de produtos — sem parecer o mesmo template de todo mundo.',
-    size: 'big',
-    photo: true,
-  },
-  {
-    num: '02',
-    title: 'Pedidos em tempo real',
-    desc: 'Kanban ao vivo, do "recebido" ao "entregue", sem precisar dar F5.',
-    size: 'wide',
-  },
-  {
-    num: '03',
-    title: 'Caixa integrado',
-    desc: 'Acompanhe as entradas do dia sem outro sistema separado.',
-  },
-  {
-    num: '04',
-    title: 'Desempenho na palma da mão',
-    desc: 'Faturamento e ticket médio por período.',
-  },
-  {
-    num: '05',
-    title: 'Link exclusivo da loja',
-    desc: 'Um endereço só seu pra divulgar no Instagram e no WhatsApp.',
-  },
-  {
-    num: '06',
-    title: 'Pedido direto pelo WhatsApp',
-    desc: 'Cliente monta o carrinho e o pedido chega pronto no seu WhatsApp — sem digitar nada.',
-  },
-  {
-    num: '07',
-    title: 'Loja aberta ou fechada num clique',
-    desc: 'Desative os pedidos fora do expediente direto pelo painel — sem precisar mexer no cardápio.',
-    size: 'wide',
-  },
-]
+/* Grade de azulejos: um item por recurso, com o menor plano que já o inclui.
+   O selo é o que evita a pergunta "isso é do Lite ou do Pro?" chegar no suporte.
+   `tier` é o piso — 'plus' significa "Plus e Pro", não "só no Plus". */
+const TIERS = {
+  all: { label: 'todos os planos', cls: '' },
+  plus: { label: 'plus e pro', cls: 'plus' },
+  pro: { label: 'pro', cls: 'pro' },
+} as const
+
+const TILES = [
+  { icon: IconPalette, label: 'Cor e logo\npersonalizados', tier: 'all' },
+  { icon: IconSearch, label: 'Categorias e busca\nno cardápio', tier: 'all' },
+  { icon: IconBoard, label: 'Painel de pedidos\nao vivo', tier: 'all' },
+  { icon: IconChart, label: 'Caixa e desempenho\npor período', tier: 'all' },
+  { icon: IconLink, label: 'Link exclusivo\nda loja', tier: 'all' },
+  { icon: IconPower, label: 'Abrir e fechar a loja\nnum clique', tier: 'all' },
+  { icon: IconQr, label: 'QR Code pronto\npra imprimir', tier: 'plus' },
+  { icon: IconChat, label: 'Aviso de pedido\nno WhatsApp', tier: 'pro' },
+  { icon: IconHeart, label: 'Clientes fiéis\n(CRM)', tier: 'pro' },
+  { icon: IconStores, label: 'Mais de uma loja\nna mesma conta', tier: 'pro' },
+  { icon: IconSheet, label: 'Exportação\nem CSV', tier: 'pro' },
+  { icon: IconBadgeOff, label: 'Sem selo\nCardápio Hub', tier: 'pro' },
+] as const
 
 export default function LandingFeatures() {
   return (
-    <section className="l-section" id="features">
+    <section className="l-section tight">
       <div className="l-section-head">
         <div className="l-eyebrow">Funcionalidades</div>
         <h2 className="l-h2">Tudo que sua loja precisa, num só lugar</h2>
-        <p className="l-section-sub">
-          Sem depender de planilha, papel ou três apps diferentes para tocar o dia a dia.
-        </p>
       </div>
-      <div className="l-features-grid">
-        {FEATURES.map((f) => (
-          <div className={`l-feature-card ${f.size ?? ''}`} key={f.title}>
-            <div className="l-feature-num">{f.num}</div>
-            <div className="l-feature-title">{f.title}</div>
-            <div className="l-feature-desc">{f.desc}</div>
-            {f.photo && (
-              <Image
-                src="/marketing/tablet-cutout.png"
-                alt="Cardápio personalizado aberto num tablet"
-                width={896}
-                height={1200}
-                className="l-feature-photo"
-              />
-            )}
+      <div className="l-tiles">
+        {TILES.map(({ icon: Icon, label, tier }) => (
+          <div className="l-tile" key={label}>
+            <span className="l-tile-icon"><Icon /></span>
+            <span className="l-tile-label">
+              {label.split('\n').map((line) => (
+                <span key={line}>{line}</span>
+              ))}
+            </span>
+            <span className={`l-plan-tag ${TIERS[tier].cls}`}>{TIERS[tier].label}</span>
           </div>
         ))}
       </div>

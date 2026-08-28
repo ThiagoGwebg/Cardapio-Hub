@@ -16,6 +16,12 @@ export default function LandingStory() {
             colocar o cardápio no ar, ela foi de 40 pra 210 pedidos por mês — sem contratar
             ninguém e sem pagar comissão em cima de nenhuma venda.
           </p>
+          <div className="l-story-jump">
+            <span className="l-story-jump-from">40</span>
+            <span className="l-story-jump-arrow" aria-hidden="true">→</span>
+            <span className="l-story-jump-to">210</span>
+            <span className="l-story-jump-label">pedidos por mês</span>
+          </div>
         </div>
       </div>
     </section>

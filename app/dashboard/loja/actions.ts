@@ -69,6 +69,9 @@ export async function updateStore(formData: FormData) {
 
   const theme: StoreTheme = {
     logoUrl: String(formData.get('logoUrl') || ''),
+    // Recorte da logo: liberado em todos os planos, como a própria logo.
+    // Checkbox "Logo redonda": desmarcado não envia o campo, o que significa quadrada.
+    logoShape: formData.get('logoShape') === 'round' ? 'round' : 'square',
     bannerUrl: String(formData.get('bannerUrl') || ''),
 
     // Cores: só no Pro. Todo hex passa por sanitização (#rgb/#rrggbb) antes de salvar,

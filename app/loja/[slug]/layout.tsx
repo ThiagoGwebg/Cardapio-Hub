@@ -3,6 +3,7 @@ import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { absoluteUrl, isIndexableStoreSlug } from '@/lib/seo'
 import { serviceLabels, storeDescription, storeKeywords, type SeoStore } from '@/lib/storeSeo'
+import { storeIconVersion, type StoreTheme } from '@/lib/storeTheme'
 
 // Busca só o necessário pro <head> (nome, tema e campos de SEO). Cacheada por request
 // pra generateMetadata e generateViewport não baterem duas vezes no banco.
@@ -50,8 +51,9 @@ export async function generateMetadata({
   const titleSuffix = services.includes('delivery') ? 'Delivery e Cardápio Online' : 'Cardápio Online'
   // Mesma rota do ícone da PWA: entrega a logo da loja já quadrada em PNG 512×512.
   // Usar `theme.logoUrl` direto deixava o favicon torto quando a logo não era quadrada,
-  // e o apple-touch-icon do iPhone exige PNG quadrado.
-  const icon = `/loja/${slug}/app-icon.png`
+  // e o apple-touch-icon do iPhone exige PNG quadrado. O `?v=` muda junto com a logo —
+  // sem ele o CDN serve o ícone antigo por até um dia depois da troca.
+  const icon = `/loja/${slug}/app-icon.png?v=${storeIconVersion(store?.theme as StoreTheme | null)}`
   const hasMenu = store ? (await countActiveProducts(store.id)) > 0 : false
   // Loja interna (teste/demo) nunca entra na busca, mesmo com cardápio montado.
   // Sair do sitemap não basta: sem o noindex a página ainda é indexável por link.

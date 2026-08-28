@@ -600,9 +600,15 @@
 }
 
 .storefront .option-modal-left img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  /* `contain`, não `cover`: a caixa é de tamanho fixo (não muda por produto,
+     senão preço/adicionais/botão "Adicionar" pulam de posição a cada foto
+     aberta), então quem cede é a foto — ela aparece inteira, sem cortar
+     nada, com a sobra de espaço preenchida pelo fundo neutro da caixa. */
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 .storefront .option-modal-right {

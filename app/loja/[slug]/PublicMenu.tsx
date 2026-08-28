@@ -27,7 +27,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents, fmtOrderNumber, STATUS_LABEL, PIX_KEY_TYPE_LABEL, friendlyOrderError } from '@/lib/format'
 import { googleFontHref } from '@/lib/plan'
-import { buildStorefrontVars, sanitizeMenuLayout, type StoreTheme } from '@/lib/storeTheme'
+import { buildStorefrontVars, sanitizeLogoShape, sanitizeMenuLayout, type StoreTheme } from '@/lib/storeTheme'
 import { resolveStoreOpen, type StoreOpenState } from '@/lib/openingHours'
 import { IconPin, IconUtensils, IconClose, IconSun, IconMoon } from '@/components/icons'
 import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } from '@/lib/orderHistory'
@@ -420,6 +420,7 @@ export default function PublicMenu({
   const styleVars = buildStorefrontVars(theme)
   // Layout escolhido no painel Pro (default = 'list', igual ao visual atual).
   const menuLayout = sanitizeMenuLayout(theme.menuLayout)
+  const roundLogo = sanitizeLogoShape(theme.logoShape) === 'round'
 
   // Busca por nome, descrição e categoria: quem procura "sem lactose" ou
   // "porção" está descrevendo o item, não digitando o nome exato dele.
@@ -760,7 +761,7 @@ export default function PublicMenu({
       <div className="storefront-topbar">
         {theme.logoUrl && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={theme.logoUrl} alt="" style={{ width: 24, height: 24, borderRadius: 6, objectFit: 'cover' }} />
+          <img src={theme.logoUrl} alt="" style={{ width: 24, height: 24, borderRadius: roundLogo ? '50%' : 6, objectFit: 'cover' }} />
         )}
         <span className="storefront-topbar-name">{store.name}</span>
         <div className="storefront-topbar-actions">
@@ -837,7 +838,7 @@ export default function PublicMenu({
       <header className="storefront-header">
         {theme.logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={theme.logoUrl} alt={store.name} className="storefront-logo" />
+          <img src={theme.logoUrl} alt={store.name} className={`storefront-logo${roundLogo ? '' : ' is-square'}`} />
         ) : (
           <div className="storefront-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>
             <IconUtensils size={30} />
