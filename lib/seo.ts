@@ -51,7 +51,7 @@ export const SITE_FEATURES = [
  * Lista no código, e não coluna no banco, porque são poucas e conhecidas. Se um dia
  * passar de meia dúzia, vale trocar por uma flag em stores e um toggle no /admin.
  */
-export const INTERNAL_STORE_SLUGS = new Set(['admin', 'sync-services'])
+export const INTERNAL_STORE_SLUGS = new Set(['admin', 'sync-services', 'demo'])
 
 /**
  * Se o cardápio desta loja pode entrar na busca. Precisa ser consultado nos DOIS

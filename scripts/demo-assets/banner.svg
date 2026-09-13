@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" width="1600" height="600" role="img" aria-label="Brasa Burger — smash na chapa e carne na brasa">
+  <defs>
+    <linearGradient id="bbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#171E26"/>
+      <stop offset=".55" stop-color="#20303C"/>
+      <stop offset="1" stop-color="#3A1710"/>
+    </linearGradient>
+    <linearGradient id="bflame" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#E23D28"/>
+      <stop offset=".6" stop-color="#F2711C"/>
+      <stop offset="1" stop-color="#F5A524"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".78" cy=".62" r=".45">
+      <stop offset="0" stop-color="#F2711C" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#F2711C" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grill" width="46" height="46" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)">
+      <line x1="0" y1="0" x2="0" y2="46" stroke="#FFFFFF" stroke-opacity=".045" stroke-width="10"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="600" fill="url(#bbg)"/>
+  <rect width="1600" height="600" fill="url(#grill)"/>
+  <rect width="1600" height="600" fill="url(#glow)"/>
+
+  <!-- Chama grande, fora do foco do texto -->
+  <g transform="translate(1230 300) scale(1.65)" opacity=".92">
+    <path d="M0-150c13 42 40 58 58 91 16 29 13 64-9 87-4-22-15-36-29-45 5 31-6 53-25 69-17-13-26-31-26-53 0-27 15-46 15-71 0-27-13-46-22-58 20 2 33-7 38-20z"
+          fill="url(#bflame)"/>
+    <path d="M0-55c9 18 22 27 22 47 0 22-11 38-25 49-11-11-17-25-17-42 0-22 15-35 20-54z"
+          fill="#FFD37A" fill-opacity=".8"/>
+  </g>
+
+  <g font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+    <text x="110" y="215" font-size="44" font-weight="700" letter-spacing="14" fill="#F5A524">DESDE 2019</text>
+    <text x="106" y="340" font-size="116" font-weight="800" letter-spacing="2" fill="#FFFFFF">Brasa Burger</text>
+    <text x="112" y="412" font-size="42" font-weight="500" fill="#FFFFFF" fill-opacity=".82">Smash na chapa, carne na brasa.</text>
+    <text x="112" y="472" font-size="34" font-weight="600" fill="#F5A524">Entrega · Retirada · Mesa</text>
+  </g>
+</svg>

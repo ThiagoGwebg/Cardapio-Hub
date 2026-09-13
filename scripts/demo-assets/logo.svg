@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Brasa Burger">
+  <defs>
+    <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#E23D28"/>
+      <stop offset=".55" stop-color="#F2711C"/>
+      <stop offset="1" stop-color="#F5A524"/>
+    </linearGradient>
+    <radialGradient id="bg" cx=".5" cy=".38" r=".72">
+      <stop offset="0" stop-color="#2B3440"/>
+      <stop offset="1" stop-color="#141A21"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="256" cy="256" r="256" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#F5A524" stroke-opacity=".55" stroke-width="6"/>
+
+  <!-- Chama -->
+  <path d="M256 92c14 46 44 64 64 100 18 32 14 70-10 96-4-24-16-40-32-50 6 34-6 58-28 76-18-14-28-34-28-58 0-30 16-50 16-78 0-30-14-50-24-64 22 2 36-8 42-22z"
+        fill="url(#flame)"/>
+  <path d="M256 196c10 20 24 30 24 52 0 24-12 42-28 54-12-12-18-28-18-46 0-24 16-38 22-60z"
+        fill="#FFD37A" fill-opacity=".85"/>
+
+  <!-- Grelha -->
+  <g stroke="#F5A524" stroke-width="9" stroke-linecap="round" opacity=".9">
+    <line x1="150" y1="360" x2="362" y2="360"/>
+    <line x1="168" y1="386" x2="344" y2="386"/>
+  </g>
+
+  <text x="256" y="440" text-anchor="middle"
+        font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="46" font-weight="800" letter-spacing="6" fill="#FFFFFF">BRASA</text>
+  <text x="256" y="480" text-anchor="middle"
+        font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="28" font-weight="600" letter-spacing="12" fill="#F5A524">BURGER</text>
+</svg>
