@@ -44,18 +44,23 @@ Conecte com a dor que ele acabou de descrever:
 
 - **Lite (R$ 29/mês):** até 30 produtos, 60 pedidos/mês, cor e logo, painel de pedidos e caixa.
   *"Pra colocar a loja no ar com o essencial e já começar a vender."*
-- **Pro (sob medida — o padrão cadastrado é R$ 89/mês):** produtos e pedidos ilimitados, sua marca
-  sem selo, CRM de clientes fiéis, relatórios, QR Code, exportação.
-  *"Pra quem já vende bem e quer crescer sem limite."*
+- **Plus (R$ 69/mês):** produtos ilimitados, até 300 pedidos/mês, QR Code para imprimir.
+  *"Pra quem já vende todo dia e não quer mais olhar pro limite de pedidos."*
+- **Pro (R$ 149/mês):** produtos e pedidos ilimitados, sua marca sem selo, CRM de clientes fiéis,
+  relatórios, cores e fontes, notificação por WhatsApp, exportação, mais de uma loja.
+  *"Pra quem toca mais de uma operação e quer a marca só sua."*
 
 > **NÃO existe plano gratuito.** O Lite é pago desde o primeiro mês, cobrado antecipado.
 > Nunca prometa "grátis" na ligação — o cliente recebe a cobrança e a relação começa torta.
-> Se o volume for baixo, comece no Lite; a conta migra pro Pro depois.
+> Se o volume for baixo, comece no Lite; a conta migra pro Plus ou pro Pro depois.
 
-> ⚠️ Ao mudar preço ou limite, atualize junto: `components/landing/LandingPricing.tsx`,
-> `LandingFaq.tsx`, `lib/seo.ts`, `app/dashboard/ajuda/page.tsx` e o limite real na RPC
-> `create_order` no Supabase. Este roteiro já ficou desatualizado uma vez e mandava
-> oferecer plano grátis que não existe mais.
+> ⚠️ Ao mudar preço, atualize junto: `lib/plansMarketing.ts` (vitrine: landing, JSON-LD,
+> llms.txt), `lib/billing/plans.ts` (`DEFAULT_PLAN_PRICE_CENTS`), `LandingFaq.tsx`,
+> `lib/seo.ts`, `lib/segments.ts`, `app/dashboard/ajuda/page.tsx`, a função `price_for_plan`
+> no Supabase **e os QR Code estáticos por plano em `/admin/faturas`** — o valor vai embutido
+> no payload Pix e não acompanha o reajuste sozinho. Limite real de pedidos: RPC `create_order`.
+> Este roteiro já ficou desatualizado duas vezes: mandava oferecer plano grátis que não existe
+> e vendia o Pro a R$ 89 depois do reajuste.
 
 ## 5. Fechamento / próximo passo
 

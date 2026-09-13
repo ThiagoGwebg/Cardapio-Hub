@@ -3,6 +3,7 @@ import { fmtCents } from '@/lib/format'
 import InvoicePix from './billing/InvoicePix'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getPixPayloadForPlan, renderPixQrDataUrl } from '@/lib/billing/pix'
+import { planLabel, type BillingPlan } from '@/lib/billing/plans'
 
 /**
  * Tela única exibida no lugar de TODO o painel quando a mensalidade foi suspensa.
@@ -24,7 +25,11 @@ export default async function SuspendedGate({ storeId }: { storeId: string }) {
     .from('subscriptions')
     .select('plan')
     .eq('store_id', storeId)
-    .maybeSingle<{ plan: 'free' | 'pro' }>()
+    .maybeSingle<{ plan: BillingPlan }>()
+
+  // O Plus tem QR e preço próprios: tratá-lo como "não é pro" mandaria o lojista
+  // pagar o Pix do Lite (R$ 29) numa mensalidade de R$ 69.
+  const plan: BillingPlan = sub?.plan === 'pro' ? 'pro' : sub?.plan === 'plus' ? 'plus' : 'free'
 
   // Loja que nunca pagou está na ATIVAÇÃO, não em atraso — o texto de cobrança
   // vencida assustaria um cliente novo que acabou de criar a conta.
@@ -35,7 +40,7 @@ export default async function SuspendedGate({ storeId }: { storeId: string }) {
     .eq('status', 'paid')
   const firstPayment = (paidCount ?? 0) === 0
 
-  const pixPayload = invoice ? await getPixPayloadForPlan(sub?.plan === 'pro' ? 'pro' : 'free') : null
+  const pixPayload = invoice ? await getPixPayloadForPlan(plan) : null
   const qrDataUrl = pixPayload ? await renderPixQrDataUrl(pixPayload) : null
 
   return (
@@ -62,7 +67,7 @@ export default async function SuspendedGate({ storeId }: { storeId: string }) {
           dueLabel={new Date(`${invoice.due_date}T12:00:00Z`).toLocaleDateString('pt-BR')}
           overdue={!firstPayment}
           firstPayment={firstPayment}
-          planLabel={sub?.plan === 'pro' ? 'Pro' : 'Lite'}
+          planLabel={planLabel(plan)}
           pixPayload={pixPayload}
           qrDataUrl={qrDataUrl}
           awaitingConfirmation={invoice.status === 'awaiting_confirmation'}

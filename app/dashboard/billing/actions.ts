@@ -79,7 +79,9 @@ export async function requestProUpgrade(formData: FormData) {
   const { error } = await admin.from('plan_upgrade_requests').insert({
     store_id: store.id,
     requested_by: user.id,
-    from_plan: sub?.plan === 'pro' ? 'pro' : 'free',
+    // Registra o plano de origem real: gravar 'free' para quem já é Plus faria o
+    // admin ler "Lite → Pro" e cobrar a diferença errada.
+    from_plan: sub?.plan === 'pro' ? 'pro' : sub?.plan === 'plus' ? 'plus' : 'free',
     to_plan: 'pro',
     contact_phone: phone,
     note: note || null,

@@ -10,7 +10,8 @@ export const PLAN_LIMITS = {
   pro: { maxProducts: Infinity, maxOrdersPerMonth: Infinity },
 } as const
 
-/** Preço mensal exibido do plano Lite (apenas vitrine; cobrança real é à parte). */
-export const LITE_PRICE_LABEL = 'R$ 29'
+// Preço não mora aqui: vitrine em `lib/plansMarketing.ts`, cobrança em
+// `DEFAULT_PLAN_PRICE_CENTS` (lib/billing/plans.ts). Havia um LITE_PRICE_LABEL
+// solto neste arquivo, sem nenhum uso — só mais um número pra envelhecer sozinho.
 
 export const STRIPE_PRO_PRICE_ID = process.env.STRIPE_PRO_PRICE_ID || ''
