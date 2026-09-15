@@ -1,31 +1,23 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Banknote,
-  Bike,
-  CalendarClock,
   Check,
-  ChefHat,
   ChevronLeft,
   Clock,
   Copy,
   CreditCard,
-  Hourglass,
   Megaphone,
-  Package,
-  PartyPopper,
   QrCode,
-  ReceiptText,
   ShoppingBag,
   ShoppingCart,
   Wallet,
-  XCircle,
   type LucideIcon,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { fmtCents, fmtOrderNumber, STATUS_LABEL, PIX_KEY_TYPE_LABEL, friendlyOrderError } from '@/lib/format'
+import { fmtCents, PIX_KEY_TYPE_LABEL, friendlyOrderError } from '@/lib/format'
 import { googleFontHref } from '@/lib/plan'
 import { buildStorefrontVars, sanitizeLogoShape, sanitizeMenuLayout, type StoreTheme } from '@/lib/storeTheme'
 import { resolveStoreOpen, type StoreOpenState } from '@/lib/openingHours'
@@ -33,6 +25,7 @@ import { IconPin, IconUtensils, IconClose, IconSun, IconMoon } from '@/component
 import { saveOrderToHistory, getOrderHistoryForStore, type OrderHistoryEntry } from '@/lib/orderHistory'
 import { loadCart, saveCart, clearCart, loadCustomer, saveCustomer } from '@/lib/cartStorage'
 import InstallPwaButton from '@/components/InstallPwaButton'
+import MyOrdersModal from './MyOrdersModal'
 import './loja.css'
 
 type Option = { id: string; name: string; price_delta_cents: number; image_url?: string | null; description?: string | null }
@@ -170,18 +163,6 @@ function minForcedExtraCents(p: Product) {
   }, 0)
 }
 
-type OrderSummary = { status: string; payment_status?: string | null; order_number: number | null; total_cents: number; item_count: number }
-
-const ORDER_STATUS_META: Record<string, { Icon: LucideIcon; cls: string }> = {
-  agendado: { Icon: CalendarClock, cls: 'is-pending' },
-  novo: { Icon: ReceiptText, cls: 'is-pending' },
-  preparando: { Icon: ChefHat, cls: 'is-active' },
-  pronto: { Icon: Package, cls: 'is-active' },
-  a_caminho: { Icon: Bike, cls: 'is-active' },
-  concluido: { Icon: PartyPopper, cls: 'is-done' },
-  cancelado: { Icon: XCircle, cls: 'is-canceled' },
-}
-
 export default function PublicMenu({
   store,
   menu,
@@ -239,7 +220,6 @@ export default function PublicMenu({
   const [activeCategory, setActiveCategory] = useState(menu[0]?.id ?? '')
   const [myOrders, setMyOrders] = useState<OrderHistoryEntry[]>([])
   const [myOrdersOpen, setMyOrdersOpen] = useState(false)
-  const [orderSummaries, setOrderSummaries] = useState<Record<string, OrderSummary>>({})
 
   // Relógio do cliente. Fica null no 1º render (servidor e cliente usam o mesmo
   // `initialOpen`, então não há mismatch de hidratação) e depois passa a bater a
@@ -266,38 +246,7 @@ export default function PublicMenu({
     return () => cancelAnimationFrame(raf)
   }, [store.slug])
 
-  // Busca status/total atualizados de cada pedido pra enriquecer a lista "Meus pedidos".
-  useEffect(() => {
-    if (!myOrdersOpen || myOrders.length === 0) return
-    let cancelled = false
-    const supabase = createClient()
-    Promise.all(
-      myOrders.map((o) =>
-        supabase
-          .rpc('get_order', { p_id: o.id })
-          .then(({ data }: { data: { status: string; payment_status?: string | null; order_number: number | null; total_cents: number; items?: { quantity: number }[] } | null }) => ({ id: o.id, data }))
-      )
-    ).then((results) => {
-      if (cancelled) return
-      setOrderSummaries((prev) => {
-        const next = { ...prev }
-        for (const r of results) {
-          if (!r.data) continue
-          next[r.id] = {
-            status: r.data.status,
-            payment_status: r.data.payment_status,
-            order_number: r.data.order_number,
-            total_cents: r.data.total_cents,
-            item_count: (r.data.items ?? []).reduce((s, it) => s + it.quantity, 0),
-          }
-        }
-        return next
-      })
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [myOrdersOpen, myOrders])
+  const closeMyOrders = useCallback(() => setMyOrdersOpen(false), [])
 
   // Recupera o carrinho salvo localmente pra não perder o pedido ao recarregar a página.
   useEffect(() => {
@@ -776,51 +725,7 @@ export default function PublicMenu({
         </div>
       </div>
 
-      {myOrdersOpen && (
-        <div className="option-modal-overlay" onClick={() => setMyOrdersOpen(false)}>
-          <div className="option-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 380 }}>
-            <div className="option-modal-header">
-              <div className="option-modal-title">Meus pedidos</div>
-              <button className="cart-close" onClick={() => setMyOrdersOpen(false)}><IconClose /></button>
-            </div>
-            <div className="option-modal-body">
-              {myOrders.map((o) => {
-                const summary = orderSummaries[o.id]
-                const isAwaitingPayment = summary?.payment_status === 'pending'
-                const meta = summary ? ORDER_STATUS_META[summary.status] ?? ORDER_STATUS_META.novo : null
-                const StatusIcon = isAwaitingPayment ? Hourglass : meta?.Icon ?? ReceiptText
-                const statusLabel = isAwaitingPayment
-                  ? 'Aguardando pagamento'
-                  : summary
-                    ? STATUS_LABEL[summary.status] ?? summary.status
-                    : 'Carregando…'
-                return (
-                  <a key={o.id} href={`/pedido/${o.id}`} className="my-order-card">
-                    <span className={`my-order-icon ${isAwaitingPayment ? 'is-pending' : meta?.cls ?? ''}`}>
-                      <StatusIcon size={18} strokeWidth={2} />
-                    </span>
-                    <span className="my-order-main">
-                      <span className="my-order-title">
-                        Pedido {summary ? fmtOrderNumber(summary.order_number, o.id) : `#${o.id.slice(0, 8)}`}
-                      </span>
-                      <span className="my-order-sub">
-                        {new Date(o.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                        {summary ? ` · ${summary.item_count} ${summary.item_count === 1 ? 'item' : 'itens'}` : ''}
-                      </span>
-                    </span>
-                    <span className="my-order-right">
-                      <span className={`my-order-status ${isAwaitingPayment ? 'is-pending' : meta?.cls ?? ''}`}>
-                        {statusLabel}
-                      </span>
-                      {summary && <span className="my-order-total">{fmtCents(summary.total_cents)}</span>}
-                    </span>
-                  </a>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      )}
+      {myOrdersOpen && <MyOrdersModal orders={myOrders} onClose={closeMyOrders} />}
 
       <div
         className="cart-overlay"

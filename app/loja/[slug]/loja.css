@@ -813,40 +813,193 @@ body:has(.storefront-dark) {
   box-shadow: none !important;
 }
 
-/* Lista "Meus pedidos" */
-.my-order-card {
+/* ── Modal "Meus pedidos" ──
+   Classe própria (não reaproveita .option-modal): no desktop o modal de produto
+   vira 2 colunas com altura fixa, o que espremia a lista de pedidos. */
+.my-orders-overlay {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: my-orders-fade 0.2s ease-out;
+}
+.my-orders-modal {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: my-orders-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@media (min-width: 640px) {
+  .my-orders-modal { border-radius: 20px; max-height: min(680px, 86vh); }
+  .my-orders-grabber { display: none; }
+}
+@keyframes my-orders-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes my-orders-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.my-orders-grabber {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+  margin: 8px auto 0;
+  flex-shrink: 0;
+}
+
+.my-orders-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 4px;
+  padding: 16px 16px 14px 20px;
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.my-orders-header-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--primary-l);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.my-orders-header-text { flex: 1; min-width: 0; }
+.my-orders-header-text h2 { margin: 0; font-size: 19px; font-weight: 800; line-height: 1.2; color: var(--text); }
+.my-orders-header-text p { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+
+.my-orders-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+.my-orders-icon-btn:hover { color: var(--text); transform: scale(1.05); }
+.my-orders-icon-btn:active { transform: scale(0.95); }
+.my-orders-icon-btn svg { width: 16px; height: 16px; }
+.my-orders-icon-btn .is-spinning { animation: my-orders-spin 0.8s linear infinite; }
+@keyframes my-orders-spin { to { transform: rotate(360deg); } }
+@keyframes my-orders-ring-spin { from { transform: rotate(-90deg); } to { transform: rotate(270deg); } }
+
+.my-orders-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px 16px 16px;
+}
+.my-orders-section { display: flex; flex-direction: column; gap: 10px; }
+.my-orders-section + .my-orders-section { margin-top: 18px; }
+.my-orders-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 4px 0;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.my-orders-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 0 var(--primary);
+  animation: my-orders-pulse 1.8s ease-out infinite;
+}
+@keyframes my-orders-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 55%, transparent); }
+  100% { box-shadow: 0 0 0 8px transparent; }
+}
+
+.my-orders-footer {
+  flex-shrink: 0;
+  padding: 12px 20px 14px;
+  border-top: 1px solid var(--border);
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Card de pedido — a cor do status vem de --tone/--tone-l */
+.my-order-card {
+  --tone: var(--muted);
+  --tone-l: var(--surface2);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 40px 12px 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
   text-decoration: none;
   color: inherit;
-  transition: background 0.15s;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
 }
-.my-order-card:last-child { border-bottom: none; }
-.my-order-card:hover { background: var(--surface2); }
+.my-order-card:hover { background: var(--surface2); border-color: color-mix(in srgb, var(--tone) 45%, var(--border)); }
+.my-order-card:active { transform: scale(0.99); }
+.my-order-card.tone-pending { --tone: var(--yellow); --tone-l: var(--yellow-l); }
+.my-order-card.tone-active { --tone: var(--primary); --tone-l: var(--primary-l); }
+.my-order-card.tone-done { --tone: var(--green); --tone-l: var(--green-l); }
+.my-order-card.tone-canceled { --tone: var(--red); --tone-l: var(--red-l); }
+
+.my-order-card.is-featured {
+  padding: 14px;
+  border-color: color-mix(in srgb, var(--tone) 35%, var(--border));
+  background: linear-gradient(180deg, var(--tone-l), transparent 70%), var(--surface);
+}
+
+.my-order-row { display: flex; align-items: center; gap: 12px; min-width: 0; }
 
 .my-order-icon {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background: var(--surface2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--tone-l);
+  color: var(--tone);
   flex-shrink: 0;
 }
-.my-order-icon.is-active { background: var(--primary-l); }
-.my-order-icon.is-done { background: var(--green-l); }
-.my-order-icon.is-canceled { background: var(--red-l); }
+.is-featured .my-order-icon { width: 46px; height: 46px; }
 
 .my-order-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.my-order-title { font-size: 14px; font-weight: 700; color: var(--text); }
-.my-order-sub { font-size: 12px; color: var(--muted); }
+.my-order-title { font-size: 15px; font-weight: 800; color: var(--text); white-space: nowrap; }
+.my-order-sub {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.my-order-sub svg { flex-shrink: 0; }
+@media (max-width: 420px) {
+  .my-order-type-label { display: none; }
+}
+.my-order-dot { opacity: 0.6; margin: 0 2px; }
 
-.my-order-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+.my-order-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.my-order-total { font-size: 15px; font-weight: 800; color: var(--text); white-space: nowrap; }
 .my-order-status {
   font-size: 10.5px;
   font-weight: 800;
@@ -854,14 +1007,93 @@ body:has(.storefront-dark) {
   letter-spacing: 0.4px;
   padding: 3px 9px;
   border-radius: 999px;
-  background: var(--surface2);
-  color: var(--muted);
+  background: var(--tone-l);
+  color: var(--tone);
   white-space: nowrap;
 }
-.my-order-status.is-active { background: var(--primary-l); color: var(--primary); }
-.my-order-status.is-done { background: var(--green-l); color: var(--green); }
-.my-order-status.is-canceled { background: var(--red-l); color: var(--red); }
-.my-order-total { font-size: 13.5px; font-weight: 800; color: var(--text); }
+
+.my-order-items {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Anel de progresso do pedido */
+.my-order-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--tone);
+}
+.my-order-ring > svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.my-order-ring-track { fill: var(--tone-l); stroke: var(--border); }
+.my-order-ring-bar {
+  fill: none;
+  stroke: var(--tone);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.my-order-ring.is-finished .my-order-ring-track { stroke: transparent; }
+.my-order-ring.is-waiting > svg { animation: my-orders-ring-spin 2.4s linear infinite; }
+.my-order-ring-center { position: relative; display: grid; place-items: center; }
+.my-order-ring-step {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  line-height: 1;
+  color: var(--text);
+}
+.my-order-ring-step small { font-size: 10px; font-weight: 700; color: var(--muted); }
+.is-featured .my-order-ring-step { font-size: 17px; }
+
+.my-order-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+.my-order-card:hover .my-order-cta { filter: brightness(1.06); }
+
+.my-order-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  transition: transform 0.15s, color 0.15s;
+}
+.my-order-card:hover .my-order-chevron { color: var(--text); transform: translate(3px, -50%); }
+
+/* Esqueleto enquanto o status carrega */
+.my-order-card.is-loading { flex-direction: row; align-items: center; gap: 12px; pointer-events: none; }
+.skeleton {
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+  background-size: 200% 100%;
+  animation: my-orders-shimmer 1.2s linear infinite;
+}
+.skeleton-line { display: block; height: 11px; border-radius: 6px; }
+@keyframes my-orders-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+@media (max-width: 380px) {
+  .my-order-card { padding-right: 34px; }
+  .my-order-status { font-size: 9.5px; padding: 3px 7px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .my-orders-overlay, .my-orders-modal, .my-orders-live-dot,
+  .my-order-ring.is-waiting > svg, .skeleton, .my-orders-icon-btn .is-spinning { animation: none; }
+  .my-order-ring-bar { transition: none; }
+}
 
 /* Toast de feedback do carrinho (adicionar/remover item) */
 .storefront-toast {
