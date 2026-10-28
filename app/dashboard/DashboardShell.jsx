@@ -1,0 +1,304 @@
+'use client'
+
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Bell, HardDrive, X, Zap } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import { playNewOrderBeep } from '@/lib/sound'
+import { autoPrintOrder } from '@/lib/print/autoPrint'
+import InstallPwaButton from '@/components/InstallPwaButton'
+import PushNotificationPrompt from '@/components/PushNotificationPrompt'
+import { resolveStoreOpen } from '@/lib/openingHours'
+import LogoutButton from './LogoutButton'
+import ThemeToggle from './ThemeToggle'
+import './dashboard.css'
+
+const DASHBOARD_INSTALL_BENEFITS = [
+  { Icon: Bell, text: 'Alertas de pedido novo, mesmo com o app fechado' },
+  { Icon: Zap, text: 'Abre direto nos pedidos, sem precisar buscar o link' },
+  { Icon: HardDrive, text: 'Leve — não ocupa espaço como um app de loja' },
+]
+
+const THEME_INIT_SCRIPT = `
+(function () {
+  try {
+    var t = localStorage.getItem('cardapio-dash-theme') || 'light';
+    document.documentElement.setAttribute('data-dash-theme', t);
+  } catch (e) {}
+})();
+`
+
+const NAV_PRINCIPAL = [
+  { href: '/dashboard', label: 'Início' },
+  { href: '/dashboard/pedidos', label: 'Pedidos' },
+  { href: '/dashboard/cardapio', label: 'Cardápio' },
+  { href: '/dashboard/desempenho', label: 'Desempenho' },
+  { href: '/dashboard/clientes', label: 'Clientes' },
+  { href: '/dashboard/caixa', label: 'Caixa' },
+]
+
+const NAV_CONFIG = [
+  { href: '/dashboard/loja', label: 'Minha Loja' },
+  { href: '/dashboard/notificacoes', label: 'Notificações' },
+  { href: '/dashboard/links', label: 'Meus Links' },
+  { href: '/dashboard/billing', label: 'Assinatura' },
+  { href: '/dashboard/ajuda', label: 'Ajuda' },
+]
+
+
+export default function DashboardShell({
+  store,
+  initialOpen,
+  children,
+}
+) {
+  const [open, setOpen] = useState(false)
+  const [novoCount, setNovoCount] = useState(0)
+  const [pulse, setPulse] = useState(false)
+  const [newOrderSignal, setNewOrderSignal] = useState(0)
+  const prevCountRef = useRef(0)
+  const initedRef = useRef(false)
+  const alertsRef = useRef(false)
+  const pathname = usePathname()
+
+  // Estado dos alertas (ligado na página de Notificações) — lido por ref pra o
+  // callback do realtime sempre pegar o valor atual sem re-inscrever o canal.
+  useEffect(() => {
+    const read = () => {
+      alertsRef.current = localStorage.getItem('cardapio-order-alerts') === '1'
+    }
+    read()
+    window.addEventListener('order-alerts-changed', read)
+    window.addEventListener('storage', read)
+    return () => {
+      window.removeEventListener('order-alerts-changed', read)
+      window.removeEventListener('storage', read)
+    }
+  }, [])
+
+  // Contador de pedidos NOVOS em tempo real + alertas — de qualquer tela do painel.
+  useEffect(() => {
+    const supabase = createClient()
+    let active = true
+
+    async function refreshCount() {
+      const { count } = await supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('store_id', store.id)
+        .eq('status', 'novo')
+      if (!active) return
+      const c = count ?? 0
+
+      // No primeiro carregamento só firma a linha de base (não alerta pedidos já existentes).
+      if (!initedRef.current) {
+        initedRef.current = true
+        prevCountRef.current = c
+        setNovoCount(c)
+        return
+      }
+
+      if (c > prevCountRef.current) {
+        setPulse(true)
+        setTimeout(() => setPulse(false), 1500)
+        if (alertsRef.current) fireOrderAlert(c)
+        // Alertas ainda não ligados: é o momento certo pra sugerir ativar (o valor
+        // acabou de ficar óbvio — chegou um pedido e o lojista não foi avisado).
+        else setNewOrderSignal((s) => s + 1)
+      }
+      prevCountRef.current = c
+      setNovoCount(c)
+    }
+
+    // Comanda automática: o gatilho fica aqui, e não na tela de Pedidos, pra
+    // imprimir de qualquer página do painel. `autoPrintOrder` decide sozinho se
+    // este aparelho imprime e garante uma via só por pedido.
+    function onOrderChange(payload) {
+      refreshCount()
+      const row = payload.new;
+      if (!row?.id) return
+      // Pedido comum entra já visível; o de pagamento online nasce 'pending' e
+      // só vira comanda quando o webhook confirma o pagamento.
+      const chegou =
+        (payload.eventType === 'INSERT' && row.payment_status !== 'pending') ||
+        (payload.eventType === 'UPDATE' && row.payment_status === 'paid')
+      if (chegou) autoPrintOrder(row.id)
+    }
+
+    refreshCount()
+    const channel = supabase
+      .channel(`shell-orders-${store.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders', filter: `store_id=eq.${store.id}` },
+        onOrderChange
+      )
+      .subscribe()
+
+    return () => {
+      active = false
+      supabase.removeChannel(channel)
+    }
+  }, [store.id])
+
+  // Contador no título da aba (chama atenção quando a aba está em segundo plano).
+  useEffect(() => {
+    document.title = novoCount > 0 ? `🔔 (${novoCount}) Pedidos novos` : 'Cardápio Hub'
+  }, [novoCount])
+
+  // Dispara os alertas de um pedido novo (som + notificação do sistema + vibração).
+  function fireOrderAlert(count) {
+    playNewOrderBeep()
+    try {
+      navigator.vibrate?.([200, 100, 200])
+    } catch {
+      /* sem suporte a vibração */
+    }
+    try {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        const n = new Notification('🔔 Novo pedido!', {
+          body: count > 1 ? `Você tem ${count} pedidos novos aguardando.` : 'Um novo pedido acabou de chegar.',
+          tag: 'novo-pedido',
+        })
+        n.onclick = () => {
+          window.focus()
+          window.location.href = '/dashboard/pedidos'
+        }
+      }
+    } catch {
+      /* Notification indisponível */
+    }
+  }
+
+  // Relógio do lojista. Null no 1º render (servidor e cliente partem do mesmo
+  // `initialOpen`, sem mismatch de hidratação) e depois bate a cada minuto — o
+  // painel costuma ficar aberto atravessando a hora de fechar.
+  const [nowTs, setNowTs] = useState(null)
+  useEffect(() => {
+    const init = setTimeout(() => setNowTs(Date.now()), 0)
+    const tick = setInterval(() => setNowTs(Date.now()), 60_000)
+    return () => {
+      clearTimeout(init)
+      clearInterval(tick)
+    }
+  }, [])
+
+  // Mesmo estado que o cardápio público mostra: interruptor manual + grade.
+  const storeOpen = useMemo(
+    () => (nowTs === null ? initialOpen : resolveStoreOpen(store, new Date(nowTs))),
+    [store, nowTs, initialOpen]
+  )
+  const badgeLabel = storeOpen.open ? '● Aberto' : '● Fechado'
+  const badgeClass = `open-badge ${storeOpen.open ? '' : 'is-closed-badge'}`
+  // Fechada pela grade: explica o porquê, senão parece que o painel travou.
+  const badgeTitle = storeOpen.reason === 'schedule'
+    ? `Fora do horário de funcionamento${storeOpen.nextLabel ? ` — abre ${storeOpen.nextLabel}` : ''}`
+    : undefined
+
+  // Destaca "Início" quando está exatamente em /dashboard
+  function isActive(href) {
+    if (href === '/dashboard') return pathname === '/dashboard'
+    return pathname.startsWith(href)
+  }
+
+  function NavLinks() {
+    return (
+      <>
+        <div className="nav-section-title">Principal</div>
+        {NAV_PRINCIPAL.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`nav-item ${isActive(item.href) ? 'active' : ''}`}
+            onClick={() => setOpen(false)}
+          >
+            {item.label}
+            {item.href === '/dashboard/pedidos' && novoCount > 0 && (
+              <span className={`nav-badge ${pulse ? 'pulse' : ''}`}>{novoCount}</span>
+            )}
+          </Link>
+        ))}
+
+        <div className="nav-section-title">Configurações</div>
+        {NAV_CONFIG.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`nav-item ${pathname.startsWith(item.href) ? 'active' : ''}`}
+            onClick={() => setOpen(false)}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </>
+    )
+  }
+
+  return (
+    <div className="dashboard">
+      <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      <div className="mobile-topbar">
+        <button className="mobile-menu-btn" onClick={() => setOpen(true)} aria-label="Abrir menu">
+          <span /><span /><span />
+          {novoCount > 0 && <span className={`mobile-menu-badge ${pulse ? 'pulse' : ''}`}>{novoCount}</span>}
+        </button>
+        <div className="mobile-topbar-title">
+          cardápio<span>ágil</span>
+        </div>
+        <span className={badgeClass} title={badgeTitle}>{badgeLabel}</span>
+      </div>
+
+      {open && <div className="sidebar-overlay" onClick={() => setOpen(false)} />}
+
+      <aside className={`sidebar ${open ? 'open' : ''}`}>
+        <button className="sidebar-close" onClick={() => setOpen(false)} aria-label="Fechar menu">
+          <X size={18} strokeWidth={2.4} />
+        </button>
+        <div className="sidebar-logo">
+          cardápio<span>ágil</span>
+        </div>
+        <div className="sidebar-store">
+          <div className="sidebar-store-name">{store.name}</div>
+          <div className="sidebar-store-loc">{store.address || 'Endereço não definido'}</div>
+          <div className={badgeClass} title={badgeTitle}>{badgeLabel}</div>
+          {storeOpen.reason === 'schedule' && storeOpen.nextLabel && (
+            <div className="sidebar-store-loc">Abre {storeOpen.nextLabel}</div>
+          )}
+        </div>
+
+        <NavLinks />
+
+        <div style={{ marginTop: 'auto', padding: '18px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {/* Instalação do app desligada por enquanto no painel do lojista — o componente
+              fica montado só pra registrar o service worker (offline + push). */}
+          <InstallPwaButton
+            hideButton
+            storeName={store.name}
+            appIconSrc="/dashboard/app-icon.svg"
+            scope="/dashboard"
+            title="Painel Cardápio Hub"
+            subtitle="Acesse seus pedidos em um toque, sem precisar buscar o link"
+            benefits={DASHBOARD_INSTALL_BENEFITS}
+          />
+          <ThemeToggle />
+          <LogoutButton />
+        </div>
+      </aside>
+      <main className="dash-content">{children}</main>
+      <PushNotificationPrompt
+        scope="dashboard"
+        tags={{ store_id: store.id, role: 'lojista' }}
+        storageKey={store.id}
+        title="Quer ser avisado dos pedidos?"
+        subtitle="Ative as notificações e saiba na hora — mesmo com o painel fechado."
+        triggerSignal={newOrderSignal}
+        triggerTitle="Chegou um pedido novo!"
+        onActivated={() => {
+          localStorage.setItem('cardapio-order-alerts', '1')
+          window.dispatchEvent(new Event('order-alerts-changed'))
+        }}
+      />
+    </div>
+  )
+}
