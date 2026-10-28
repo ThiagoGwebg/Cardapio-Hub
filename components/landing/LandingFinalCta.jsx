@@ -3,7 +3,7 @@ import LandingLeadForm from '@/components/landing/LandingLeadForm'
 
 /* `withForm` só na home: nas landings de segmento a faixa continua sendo só o
    convite, pra não repetir o mesmo formulário em 10 páginas indexadas. */
-export default function LandingFinalCta({ withForm = false }: { withForm?: boolean }) {
+export default function LandingFinalCta({ withForm = false }) {
   return (
     <section className={`l-final-cta ${withForm ? 'with-form' : ''}`} id="comecar">
       <div className="l-final-cta-inner">

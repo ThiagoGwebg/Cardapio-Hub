@@ -2,29 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { Bell, X } from 'lucide-react'
-import { activatePush, initOneSignal, type OneSignalScope } from '@/lib/onesignal'
+import { activatePush, initOneSignal } from '@/lib/onesignal'
 
 const SEEN_PREFIX = 'cardapio-push-prompt-seen:'
 const SNOOZE_PREFIX = 'cardapio-push-prompt-snooze-until:'
 const SNOOZE_DAYS = 7
 const FIRST_VISIT_DELAY_MS = 4000
 
-type Props = {
-  /** Qual seção do site — decide o escopo do service worker/OneSignal (loja, dashboard, pedido). */
-  scope: OneSignalScope
-  /** Tags do OneSignal pra esse usuário (ex.: { store_id } no Admin, { order_id } na Loja). */
-  tags: Record<string, string>
-  /** Namespace do localStorage (ex.: id da loja ou do pedido) — evita um contexto "esconder"
-      o prompt do outro quando os dois usam o mesmo navegador. */
-  storageKey: string
-  title: string
-  subtitle: string
-  /** Incrementa esse número (a partir de 1) pra forçar o prompt a aparecer agora — ex.: pedido novo. */
-  triggerSignal?: number
-  triggerTitle?: string
-  /** Chamado depois que o usuário concede a permissão (opcional — ex.: sincronizar outro flag). */
-  onActivated?: () => void
-}
 
 /**
  * Banner contextual pra pedir permissão de notificação (via OneSignal) sem depender só
@@ -41,7 +25,7 @@ export default function PushNotificationPrompt({
   triggerSignal = 0,
   triggerTitle,
   onActivated,
-}: Props) {
+}) {
   const [visible, setVisible] = useState(false)
   const [busy, setBusy] = useState(false)
   const [urgent, setUrgent] = useState(false)

@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react'
 import Link from 'next/link'
-import { submitCourier, type CourierFormState } from '@/app/actions/couriers'
+import { submitCourier } from '@/app/actions/couriers'
 
 const VEHICLE_OPTIONS = [
   'Moto / Motocicleta',
@@ -25,7 +25,7 @@ const AVAILABILITY_OPTIONS = [
   'Apenas finais de semana',
 ]
 
-const initialState: CourierFormState = { ok: false }
+const initialState = { ok: false }
 
 export default function LandingCourierForm() {
   const [state, formAction, pending] = useActionState(submitCourier, initialState)

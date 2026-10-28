@@ -4,27 +4,12 @@ import { useState } from 'react'
 import { Check, PartyPopper, X } from 'lucide-react'
 import Link from 'next/link'
 
-type Props = {
-  hasProducts: boolean
-  hasOrders: boolean
-  hasLogo: boolean
-  hasAddress: boolean
-  storeName: string
-  isPro: boolean
-}
 
-type Step = {
-  key: string
-  label: string
-  done: boolean
-  href: string
-  desc: string
-}
 
-export default function OnboardingChecklist({ hasProducts, hasOrders, hasLogo, hasAddress, storeName, isPro }: Props) {
+export default function OnboardingChecklist({ hasProducts, hasOrders, hasLogo, hasAddress, storeName, isPro }) {
   const [dismissed, setDismissed] = useState(false)
 
-  const steps: Step[] = [
+  const steps = [
     {
       key: 'products',
       label: 'Adicionar produtos',

@@ -1,4 +1,4 @@
-export function IconPin({ size = 14 }: { size?: number }) {
+export function IconPin({ size = 14 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
@@ -7,7 +7,7 @@ export function IconPin({ size = 14 }: { size?: number }) {
   )
 }
 
-export function IconUtensils({ size = 22 }: { size?: number }) {
+export function IconUtensils({ size = 22 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
@@ -17,7 +17,7 @@ export function IconUtensils({ size = 22 }: { size?: number }) {
   )
 }
 
-export function IconCheck({ size = 14 }: { size?: number }) {
+export function IconCheck({ size = 14 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
       <path d="M20 6 9 17l-5-5" />
@@ -25,7 +25,7 @@ export function IconCheck({ size = 14 }: { size?: number }) {
   )
 }
 
-export function IconClose({ size = 13 }: { size?: number }) {
+export function IconClose({ size = 13 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M18 6 6 18" />
@@ -34,7 +34,7 @@ export function IconClose({ size = 13 }: { size?: number }) {
   )
 }
 
-export function IconMenu({ size = 20 }: { size?: number }) {
+export function IconMenu({ size = 20 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M4 6h16" />
@@ -44,7 +44,7 @@ export function IconMenu({ size = 20 }: { size?: number }) {
   )
 }
 
-export function IconStore({ size = 18 }: { size?: number }) {
+export function IconStore({ size = 18 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
@@ -54,7 +54,7 @@ export function IconStore({ size = 18 }: { size?: number }) {
   )
 }
 
-export function IconSun({ size = 18 }: { size?: number }) {
+export function IconSun({ size = 18 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="4" />
@@ -70,7 +70,7 @@ export function IconSun({ size = 18 }: { size?: number }) {
   )
 }
 
-export function IconMoon({ size = 18 }: { size?: number }) {
+export function IconMoon({ size = 18 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />

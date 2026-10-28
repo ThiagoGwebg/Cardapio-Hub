@@ -20,7 +20,7 @@ const TIERS = {
   all: { label: 'todos os planos', cls: '' },
   plus: { label: 'plus e pro', cls: 'plus' },
   pro: { label: 'pro', cls: 'pro' },
-} as const
+};
 
 const TILES = [
   { icon: IconPalette, label: 'Cor e logo\npersonalizados', tier: 'all' },
@@ -35,7 +35,7 @@ const TILES = [
   { icon: IconStores, label: 'Mais de uma loja\nna mesma conta', tier: 'pro' },
   { icon: IconSheet, label: 'Exportação\nem CSV', tier: 'pro' },
   { icon: IconBadgeOff, label: 'Sem selo\nCardápio Hub', tier: 'pro' },
-] as const
+];
 
 export default function LandingFeatures() {
   return (

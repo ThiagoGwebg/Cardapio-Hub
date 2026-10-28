@@ -8,23 +8,24 @@ import {
   CalendarClock,
   MapPin,
   MessageCircle,
+  Printer,
   ReceiptText,
   ShoppingBag,
   Utensils,
   X,
-  type LucideIcon,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { fmtCents, fmtElapsed, fmtOrderNumber, fmtScheduledFor, fmtUntil, ORDER_TYPE_LABEL, PAYMENT_LABEL, STATUS_LABEL } from '@/lib/format'
 import { advanceOrder, cancelOrder } from '@/app/dashboard/pedidos/actions'
+import { loadPrintSettings, printReceiptNow } from '@/lib/print/autoPrint'
 
 const SOUND_KEY = 'cardapiohub_kanban_sound'
 
 function playNewOrderBeep() {
   try {
-    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    const Ctx = window.AudioContext || (window).webkitAudioContext
     const ctx = new Ctx()
     const now = ctx.currentTime
     ;[0, 0.18].forEach((delay) => {
@@ -46,30 +47,8 @@ function playNewOrderBeep() {
   }
 }
 
-type OptSnap = { name_snapshot: string }
-type OrderItem = { id: string; product_name_snapshot: string; quantity: number; order_item_options: OptSnap[] }
-type Order = {
-  id: string
-  order_number: number | null
-  status: string
-  order_type: string
-  payment_method: string | null
-  customer_name: string
-  customer_phone: string | null
-  subtotal_cents: number
-  delivery_fee_cents: number
-  total_cents: number
-  table_number: string | null
-  address_cep: string | null
-  address_street: string | null
-  address_number: string | null
-  address_neighborhood: string | null
-  created_at: string
-  scheduled_for: string | null
-  order_items: OrderItem[]
-}
 
-const TYPE_ICON: Record<string, LucideIcon> = {
+const TYPE_ICON = {
   delivery: Bike,
   pickup: ShoppingBag,
   dine_in: Utensils,
@@ -87,7 +66,7 @@ const FILTERS = [
   { id: 'cancelado', label: 'Cancelados' },
 ]
 
-const PILL_CLASS: Record<string, string> = {
+const PILL_CLASS = {
   agendado: 'ol-pill-sched',
   novo: 'ol-pill-new',
   preparando: 'ol-pill-prep',
@@ -97,7 +76,7 @@ const PILL_CLASS: Record<string, string> = {
   cancelado: 'ol-pill-cancel',
 }
 
-function nextActionLabel(order: Order): string | null {
+function nextActionLabel(order) {
   switch (order.status) {
     case 'agendado':
     case 'novo':
@@ -113,14 +92,14 @@ function nextActionLabel(order: Order): string | null {
   }
 }
 
-function waPhone(raw: string) {
+function waPhone(raw) {
   const d = raw.replace(/\D/g, '')
   if (d.startsWith('55')) return d
   if (d.length === 10 || d.length === 11) return '55' + d
   return d
 }
 
-function statusMessage(order: Order, storeName: string) {
+function statusMessage(order, storeName) {
   const num = fmtOrderNumber(order.order_number, order.id)
   const hi = `Oi ${order.customer_name.split(' ')[0]}! `
   switch (order.status) {
@@ -145,15 +124,15 @@ function statusMessage(order: Order, storeName: string) {
   }
 }
 
-export default function OrdersList({ storeId, storeName, orders }: { storeId: string; storeName: string; orders: Order[] }) {
+export default function OrdersList({ storeId, storeName, orders }) {
   const router = useRouter()
   const [soundOn, setSoundOn] = useState(true)
   const [flash, setFlash] = useState(false)
   const [filter, setFilter] = useState('todos')
   const [search, setSearch] = useState('')
-  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState(null)
   // Relógio só no cliente (evita mismatch de hidratação); atualiza a cada 30s.
-  const [now, setNow] = useState<number | null>(null)
+  const [now, setNow] = useState(null)
   const unlockedRef = useRef(false)
   // Lido por ref pra o callback do realtime sempre pegar o valor atual sem
   // precisar re-inscrever o canal (evita destruir/recriar a conexão no meio
@@ -165,7 +144,7 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
 
   // Ids já visíveis (pedidos pagos/sem pagamento). Usado pra tocar o alerta de
   // "pedido novo" quando um pagamento é confirmado e o pedido aparece pela 1ª vez.
-  const knownIdsRef = useRef<Set<string>>(new Set(orders.map((o) => o.id)))
+  const knownIdsRef = useRef(new Set(orders.map((o) => o.id)))
   useEffect(() => {
     knownIdsRef.current = new Set(orders.map((o) => o.id))
   }, [orders])
@@ -201,7 +180,7 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
         { event: 'INSERT', schema: 'public', table: 'orders', filter: `store_id=eq.${storeId}` },
         (payload) => {
           // Pedido aguardando pagamento online ainda não é visível — não alerta.
-          if ((payload.new as { payment_status?: string })?.payment_status === 'pending') return
+          if ((payload.new)?.payment_status === 'pending') return
           if (soundOnRef.current && unlockedRef.current) playNewOrderBeep()
           setFlash(true)
           setTimeout(() => setFlash(false), 2000)
@@ -212,7 +191,7 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'orders', filter: `store_id=eq.${storeId}` },
         (payload) => {
-          const row = payload.new as { id?: string; payment_status?: string }
+          const row = payload.new;
           // Pagamento confirmado agora: o pedido "aparece" pela 1ª vez → trata como novo.
           if (row?.payment_status === 'paid' && row.id && !knownIdsRef.current.has(row.id)) {
             if (soundOnRef.current && unlockedRef.current) playNewOrderBeep()
@@ -238,7 +217,7 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
   }
 
   const counts = useMemo(() => {
-    const c: Record<string, number> = { todos: orders.length }
+    const c = { todos: orders.length }
     for (const o of orders) c[o.status] = (c[o.status] ?? 0) + 1
     return c
   }, [orders])
@@ -265,7 +244,7 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
     return [...scheduled, ...list.filter((o) => o.status !== 'agendado')]
   }, [orders, filter, search])
 
-  async function cancel(order: Order) {
+  async function cancel(order) {
     const num = fmtOrderNumber(order.order_number, order.id)
     if (!window.confirm(`Cancelar o pedido ${num} de ${order.customer_name}?`)) return
     await cancelOrder(order.id)
@@ -403,7 +382,7 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
                         className="notify-btn ol-notify"
                         onClick={() =>
                           window.open(
-                            `https://wa.me/${waPhone(order.customer_phone!)}?text=${encodeURIComponent(statusMessage(order, storeName))}`,
+                            `https://wa.me/${waPhone(order.customer_phone)}?text=${encodeURIComponent(statusMessage(order, storeName))}`,
                             '_blank'
                           )
                         }
@@ -413,7 +392,15 @@ export default function OrdersList({ storeId, storeName, orders }: { storeId: st
                         Avisar
                       </button>
                     )}
-                    <Link href={`/dashboard/pedidos/${order.id}`} className="ol-detail-link" title="Ver ficha / imprimir">
+                    <button
+                      className="notify-btn ol-notify"
+                      onClick={() => printReceiptNow(order.id, loadPrintSettings())}
+                      title="Imprimir a comanda deste pedido"
+                    >
+                      <Printer size={14} strokeWidth={2.2} />
+                      Comanda
+                    </button>
+                    <Link href={`/dashboard/pedidos/${order.id}`} className="ol-detail-link" title="Ver ficha do pedido">
                       Ficha →
                     </Link>
                     {action && (

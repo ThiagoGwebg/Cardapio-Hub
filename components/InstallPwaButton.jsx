@@ -1,16 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ClipboardList, HardDrive, Share, Zap, type LucideIcon } from 'lucide-react'
+import { ClipboardList, HardDrive, Share, Zap } from 'lucide-react'
 
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
-}
 
-type Benefit = { Icon: LucideIcon; text: string }
 
-const DEFAULT_BENEFITS: Benefit[] = [
+const DEFAULT_BENEFITS = [
   { Icon: Zap, text: 'Abre na hora, sem precisar buscar o site' },
   { Icon: ClipboardList, text: 'Seus pedidos ficam salvos e fáceis de acompanhar' },
   { Icon: HardDrive, text: 'Leve — não ocupa espaço como um app de loja' },
@@ -25,7 +20,7 @@ function isStandalone() {
   if (typeof window === 'undefined') return false
   return (
     window.matchMedia?.('(display-mode: standalone)').matches ||
-    (window.navigator as unknown as { standalone?: boolean }).standalone === true
+    (window.navigator).standalone === true
   )
 }
 
@@ -37,22 +32,10 @@ export default function InstallPwaButton({
   subtitle = 'Peça em segundos, direto da tela inicial',
   benefits = DEFAULT_BENEFITS,
   hideButton = false,
-}: {
-  storeName: string
-  appIconSrc: string
-  /** Escopo do service worker (cada seção do site — loja, painel — regista o próprio). */
-  scope?: string
-  title?: string
-  subtitle?: string
-  benefits?: Benefit[]
-  /**
-   * Esconde o botão mas mantém o registro do service worker (cache offline + push).
-   * Usado enquanto a instalação do app está desligada na loja e no painel do lojista.
-   */
-  hideButton?: boolean
-}) {
+}
+) {
   const [mounted, setMounted] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const [deferredPrompt, setDeferredPrompt] = useState(null)
   // Fica true assim que o navegador oferecer instalação nesta sessão — mesmo depois do
   // evento já ter sido consumido (não dá pra chamar .prompt() duas vezes no mesmo evento),
   // o botão continua disponível e cai pras instruções manuais em vez de sumir.
@@ -75,7 +58,7 @@ export default function InstallPwaButton({
 
     // Sinal extra (Chrome/Android) pra pegar o caso de já instalado mas aberto fora do
     // modo standalone (ex.: abriu um link e caiu na aba normal do navegador).
-    const nav = navigator as Navigator & { getInstalledRelatedApps?: () => Promise<unknown[]> }
+    const nav = navigator;
     nav.getInstalledRelatedApps
       ?.()
       .then((apps) => {
@@ -88,7 +71,7 @@ export default function InstallPwaButton({
     // termos chamado preventDefault() tarde demais). Se já capturou, usa direto;
     // senão fica ouvindo tanto o evento "bip-captured" quanto o próprio evento nativo
     // (fallback, caso o script do <head> não tenha rodado por algum motivo).
-    const w = window as unknown as { __bipEvent?: BeforeInstallPromptEvent }
+    const w = window;
     if (w.__bipEvent) {
       setDeferredPrompt(w.__bipEvent)
       setCanInstall(true)
@@ -102,9 +85,9 @@ export default function InstallPwaButton({
     }
     window.addEventListener('bip-captured', onCaptured)
 
-    const handler = (e: Event) => {
+    const handler = (e) => {
       e.preventDefault()
-      setDeferredPrompt(e as BeforeInstallPromptEvent)
+      setDeferredPrompt(e)
       setCanInstall(true)
     }
     window.addEventListener('beforeinstallprompt', handler)

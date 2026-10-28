@@ -1,15 +1,7 @@
 'use client'
 
 import { useFormStatus } from 'react-dom'
-import type { CSSProperties, ReactNode } from 'react'
 
-type Props = {
-  children: ReactNode
-  /** Texto/spinner exibido enquanto a Server Action do form roda. */
-  pendingLabel?: string
-  className?: string
-  style?: CSSProperties
-}
 
 /**
  * Botão de submit que reage automaticamente ao estado pendente do <form>
@@ -22,7 +14,7 @@ export default function SubmitButton({
   pendingLabel = 'Salvando…',
   className = 'save-btn',
   style,
-}: Props) {
+}) {
   const { pending } = useFormStatus()
   return (
     <button type="submit" className={className} style={style} disabled={pending}>

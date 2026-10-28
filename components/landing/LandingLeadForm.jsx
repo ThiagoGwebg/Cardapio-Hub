@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect } from 'react'
 import Link from 'next/link'
-import { submitLead, type LeadFormState } from '@/app/actions/leads'
+import { submitLead } from '@/app/actions/leads'
 import { trackLead } from '@/lib/analytics'
 
 const REVENUE_OPTIONS = [
@@ -31,7 +31,7 @@ const SEGMENT_OPTIONS = [
   'Outro',
 ]
 
-const initialState: LeadFormState = { ok: false }
+const initialState = { ok: false }
 
 export default function LandingLeadForm() {
   const [state, formAction, pending] = useActionState(submitLead, initialState)

@@ -2,23 +2,16 @@
 
 import { useRef, useState } from 'react'
 
-type Props = {
-  kind: 'logo' | 'banner' | 'product'
-  name: string
-  label: string
-  hint?: string
-  defaultUrl?: string
-}
 
 const ALLOWED = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif', 'image/svg+xml']
 
-export default function ImageUploadField({ kind, name, label, hint, defaultUrl }: Props) {
+export default function ImageUploadField({ kind, name, label, hint, defaultUrl }) {
   const [url, setUrl] = useState(defaultUrl || '')
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [error, setError] = useState(null)
+  const inputRef = useRef(null)
 
-  async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onPick(e) {
     const file = e.target.files?.[0]
     if (!file) return
     setError(null)

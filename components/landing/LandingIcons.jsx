@@ -2,20 +2,19 @@
    Ficam aqui e não em components/icons.tsx porque só a landing usa — o bundle
    do dashboard não precisa carregar nenhum deles. */
 
-type P = { size?: number }
 
-const base = (size: number) => ({
+const base = (size) => ({
   width: size,
   height: size,
   viewBox: '0 0 24 24',
   fill: 'none',
   stroke: 'currentColor',
   strokeWidth: 1.6,
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
+  strokeLinecap: 'round',
+  strokeLinejoin: 'round',
 })
 
-export function IconPalette({ size = 22 }: P) {
+export function IconPalette({ size = 22 }) {
   return (
     <svg {...base(size)}>
       <path d="M12 3a9 9 0 1 0 0 18c.8 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1-.3-.3-.4-.6-.4-1 0-.9.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-8-9-8Z" />
@@ -26,7 +25,7 @@ export function IconPalette({ size = 22 }: P) {
   )
 }
 
-export function IconSearch({ size = 22 }: P) {
+export function IconSearch({ size = 22 }) {
   return (
     <svg {...base(size)}>
       <circle cx="11" cy="11" r="6.5" />
@@ -35,7 +34,7 @@ export function IconSearch({ size = 22 }: P) {
   )
 }
 
-export function IconBoard({ size = 22 }: P) {
+export function IconBoard({ size = 22 }) {
   return (
     <svg {...base(size)}>
       <rect x="3" y="4" width="5.5" height="16" rx="1.5" />
@@ -45,7 +44,7 @@ export function IconBoard({ size = 22 }: P) {
   )
 }
 
-export function IconChart({ size = 22 }: P) {
+export function IconChart({ size = 22 }) {
   return (
     <svg {...base(size)}>
       <path d="M4 20V4" />
@@ -55,7 +54,7 @@ export function IconChart({ size = 22 }: P) {
   )
 }
 
-export function IconLink({ size = 22 }: P) {
+export function IconLink({ size = 22 }) {
   return (
     <svg {...base(size)}>
       <path d="M10 13.5a3.5 3.5 0 0 0 5 0l3-3a3.5 3.5 0 0 0-5-5l-1.2 1.2" />
@@ -64,7 +63,7 @@ export function IconLink({ size = 22 }: P) {
   )
 }
 
-export function IconPower({ size = 22 }: P) {
+export function IconPower({ size = 22 }) {
   return (
     <svg {...base(size)}>
       <path d="M12 3v8" />
@@ -73,7 +72,7 @@ export function IconPower({ size = 22 }: P) {
   )
 }
 
-export function IconQr({ size = 22 }: P) {
+export function IconQr({ size = 22 }) {
   return (
     <svg {...base(size)}>
       <rect x="3.5" y="3.5" width="6" height="6" rx="1" />
@@ -84,7 +83,7 @@ export function IconQr({ size = 22 }: P) {
   )
 }
 
-export function IconChat({ size = 22 }: P) {
+export function IconChat({ size = 22 }) {
   return (
     <svg {...base(size)}>
       <path d="M20 12a7.5 7.5 0 0 1-10.9 6.7L4 20l1.4-4.8A7.5 7.5 0 1 1 20 12Z" />
@@ -92,7 +91,7 @@ export function IconChat({ size = 22 }: P) {
   )
 }
 
-export function IconHeart({ size = 22 }: P) {
+export function IconHeart({ size = 22 }) {
   return (
     <svg {...base(size)}>
       <path d="M12 19.5S4.5 15 4.5 9.8A3.8 3.8 0 0 1 12 8a3.8 3.8 0 0 1 7.5 1.8c0 5.2-7.5 9.7-7.5 9.7Z" />
@@ -100,7 +99,7 @@ export function IconHeart({ size = 22 }: P) {
   )
 }
 
-export function IconStores({ size = 22 }: P) {
+export function IconStores({ size = 22 }) {
   return (
     <svg {...base(size)}>
       <path d="M4 9.5V19a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9.5" />
@@ -109,7 +108,7 @@ export function IconStores({ size = 22 }: P) {
   )
 }
 
-export function IconSheet({ size = 22 }: P) {
+export function IconSheet({ size = 22 }) {
   return (
     <svg {...base(size)}>
       <path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8Z" />
@@ -119,7 +118,7 @@ export function IconSheet({ size = 22 }: P) {
   )
 }
 
-export function IconBadgeOff({ size = 22 }: P) {
+export function IconBadgeOff({ size = 22 }) {
   return (
     <svg {...base(size)}>
       <path d="M12 3.5 14.3 6l3.4-.3.4 3.4 2.4 2.4-2.4 2.4-.4 3.4-3.4-.3L12 19.5 9.7 17l-3.4.3-.4-3.4L3.5 11.5l2.4-2.4.4-3.4L9.7 6Z" />

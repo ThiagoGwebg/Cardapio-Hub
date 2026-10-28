@@ -2,19 +2,11 @@
 
 import { useRef, useState } from 'react'
 import { Star } from 'lucide-react'
-import type { CSSProperties } from 'react'
 
-type Props = {
-  name: string
-  label: string
-  hint?: string
-  defaultUrls?: string[]
-  max?: number
-}
 
 const ALLOWED = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif', 'image/svg+xml']
 
-const thumbStyle: CSSProperties = {
+const thumbStyle = {
   position: 'relative',
   width: 92,
   height: 92,
@@ -25,15 +17,15 @@ const thumbStyle: CSSProperties = {
   flexShrink: 0,
 }
 
-export default function ProductImagesField({ name, label, hint, defaultUrls = [], max = 6 }: Props) {
-  const [urls, setUrls] = useState<string[]>(defaultUrls.filter(Boolean))
+export default function ProductImagesField({ name, label, hint, defaultUrls = [], max = 6 }) {
+  const [urls, setUrls] = useState(defaultUrls.filter(Boolean))
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [error, setError] = useState(null)
+  const inputRef = useRef(null)
 
   const remaining = max - urls.length
 
-  async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onPick(e) {
     const files = Array.from(e.target.files || [])
     if (inputRef.current) inputRef.current.value = ''
     if (!files.length) return
@@ -45,7 +37,7 @@ export default function ProductImagesField({ name, label, hint, defaultUrls = []
     }
 
     setBusy(true)
-    const uploaded: string[] = []
+    const uploaded = []
     try {
       for (const file of toUpload) {
         if (!ALLOWED.includes(file.type)) {
@@ -73,10 +65,10 @@ export default function ProductImagesField({ name, label, hint, defaultUrls = []
     }
   }
 
-  function removeAt(i: number) {
+  function removeAt(i) {
     setUrls((prev) => prev.filter((_, idx) => idx !== i))
   }
-  function makeCover(i: number) {
+  function makeCover(i) {
     setUrls((prev) => {
       if (i <= 0 || i >= prev.length) return prev
       const copy = [...prev]

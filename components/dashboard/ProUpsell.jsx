@@ -5,7 +5,7 @@ import Link from 'next/link'
  * medidor de uso do plano Free, banner de upgrade e seção bloqueada com prévia.
  */
 
-export function UsageMeter({ label, used, limit }: { label: string; used: number; limit: number }) {
+export function UsageMeter({ label, used, limit }) {
   if (!Number.isFinite(limit)) return null
   const pct = Math.min(100, Math.round((used / limit) * 100))
   const level = pct >= 100 ? 'full' : pct >= 80 ? 'warn' : 'ok'
@@ -24,7 +24,7 @@ export function UsageMeter({ label, used, limit }: { label: string; used: number
   )
 }
 
-export function ProUpsellBanner({ title, text }: { title: string; text: string }) {
+export function ProUpsellBanner({ title, text }) {
   return (
     <div className="upsell-banner">
       <div className="upsell-banner-info">
@@ -48,11 +48,8 @@ export function ProLockedSection({
   title,
   text,
   children,
-}: {
-  title: string
-  text: string
-  children: React.ReactNode
-}) {
+}
+) {
   return (
     <div className="settings-card pro-locked-card">
       <div className="settings-section-title">

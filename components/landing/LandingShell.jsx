@@ -18,7 +18,7 @@ import LandingFooter from '@/components/landing/LandingFooter'
 // Todo o interativo da home vive aqui para que `app/page.tsx` possa ser um server
 // component — só assim a home consegue exportar `metadata` e injetar o JSON-LD.
 export default function LandingShell() {
-  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark')
+  const [themeMode, setThemeMode] = useState('dark')
 
   useEffect(() => {
     const saved = localStorage.getItem('landing-theme')

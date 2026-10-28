@@ -1,4 +1,4 @@
-export default function Tooltip({ text, children }: { text: string; children?: React.ReactNode }) {
+export default function Tooltip({ text, children }) {
   return (
     <span className="tooltip-wrap">
       {children || <span className="tooltip-trigger">?</span>}

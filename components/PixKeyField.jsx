@@ -2,14 +2,14 @@
 
 import { useState } from 'react'
 
-const TYPE_LABEL: Record<string, string> = {
+const TYPE_LABEL = {
   cpf_cnpj: 'CPF/CNPJ',
   email: 'E-mail',
   phone: 'Telefone',
   random: 'Chave aleatória',
 }
 
-const TYPE_PLACEHOLDER: Record<string, string> = {
+const TYPE_PLACEHOLDER = {
   cpf_cnpj: '000.000.000-00',
   email: 'sualoja@email.com',
   phone: '(11) 91234-5678',
@@ -19,10 +19,8 @@ const TYPE_PLACEHOLDER: Record<string, string> = {
 export default function PixKeyField({
   defaultType,
   defaultValue,
-}: {
-  defaultType: string | null
-  defaultValue: string | null
-}) {
+}
+) {
   const [type, setType] = useState(defaultType || 'email')
 
   return (

@@ -1,12 +1,8 @@
 import Link from 'next/link'
 import { IconMenu, IconSun, IconMoon } from '@/components/icons'
 
-interface LandingHeaderProps {
-  themeMode: 'light' | 'dark'
-  toggleThemeMode: () => void
-}
 
-export default function LandingHeader({ themeMode, toggleThemeMode }: LandingHeaderProps) {
+export default function LandingHeader({ themeMode, toggleThemeMode }) {
   return (
     <header className="l-nav">
       <Link href="/" className="l-logo">
