@@ -1,4 +1,3 @@
-import type { NextConfig } from "next";
 import withPWAInit from "@ducanh2912/next-pwa";
 
 // Gera o service worker (precache de assets essenciais + fallback offline) via Workbox.
@@ -18,7 +17,7 @@ const withPWA = withPWAInit({
   },
 });
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   // Config Turbopack explícita (mesmo vazia) para o Next 16 não tratar o
   // `webpack` injetado pelo next-pwa como erro fatal ao rodar `next dev`.
   // Em dev o PWA está desligado, então não há nada de Workbox a migrar.

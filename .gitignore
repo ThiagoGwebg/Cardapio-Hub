@@ -36,10 +36,6 @@ yarn-error.log*
 # vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
 .vercel
 
 # service worker gerado pelo next-pwa (build) — não editar à mão
