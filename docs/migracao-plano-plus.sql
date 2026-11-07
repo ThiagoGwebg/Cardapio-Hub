@@ -47,22 +47,26 @@ $function$;
 
 
 -- ------------------------------------------------------------
--- NÃO APLICADO — reajuste da base existente
+-- [APLICADO em 2026-09-13] Migração 3 — reajuste da base existente
 --
 -- No momento da migração havia 4 lojas Lite (R$ 29) e 3 lojas Pro (R$ 89).
 --
 -- O trigger `subscriptions_sync_price_to_plan` é BEFORE UPDATE **OF plan**:
--- ele só recalcula price_cents quando o plano muda. Logo as 3 lojas Pro
--- continuam em 8900 — grandfathering, proposital.
+-- ele só recalcula price_cents quando o plano muda. Por isso as lojas Pro
+-- ficaram paradas em 8900 e precisaram deste update explícito — o trigger não
+-- reescreve price_cents num UPDATE que não toca na coluna `plan`.
 --
--- Rodar o update abaixo reajusta cliente ativo de R$ 89 para R$ 149 (+67%)
--- sem aviso prévio. É decisão comercial, não passo de migração.
+-- Ficou de fora na época por ser decisão comercial (+67% em cliente ativo, sem
+-- aviso prévio), não passo de migração. Decisão tomada depois: reajustar.
+-- Afetou 2 assinaturas (`admin` e `bom-sabor-mini-salgados`); a terceira loja
+-- Pro (`demo`) já estava em 14900.
 -- ------------------------------------------------------------
--- select store_id, plan, price_cents from subscriptions
--- where plan = 'pro' and price_cents = 8900;
+update subscriptions set price_cents = 14900
+where plan = 'pro' and price_cents = 8900;
 
--- update subscriptions set price_cents = 14900
--- where plan = 'pro' and price_cents = 8900;
+-- Verificado: as 8 assinaturas batem com price_for_plan(plan).
+-- Atenção: `bom-sabor-mini-salgados` está com billing_enabled = false, então o
+-- reajuste só aparece em fatura quando a cobrança automática for ligada.
 
 
 -- ------------------------------------------------------------
