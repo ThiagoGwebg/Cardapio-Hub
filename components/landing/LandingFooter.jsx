@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { SEGMENTS } from '@/lib/segments'
+import { CADASTRO_ENTREGADOR_ABERTO } from '@/lib/flags'
 
 export default function LandingFooter() {
   return (
@@ -25,7 +26,7 @@ export default function LandingFooter() {
         <div className="l-footer-col">
           <span className="l-footer-col-title">Empresa</span>
           <Link href="/contato">Fale com a gente</Link>
-          <Link href="/entregadores">Seja entregador</Link>
+          {CADASTRO_ENTREGADOR_ABERTO && <Link href="/entregadores">Seja entregador</Link>}
           <Link href="/privacidade">Privacidade</Link>
         </div>
 

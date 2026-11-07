@@ -3,9 +3,16 @@
 import { createServerClient } from '@supabase/ssr'
 import { notifyNewLead } from '@/lib/notify'
 import { checarEnvio } from '@/lib/antispam'
+import { CADASTRO_ENTREGADOR_ABERTO } from '@/lib/flags'
 
 
 export async function submitCourier(_prev, formData) {
+  // A action continua exportada mesmo com a página em 404, então ela precisa
+  // recusar por conta própria — é o caminho que de fato grava no banco.
+  if (!CADASTRO_ENTREGADOR_ABERTO) {
+    return { ok: false, error: 'O cadastro de entregadores está fechado no momento.' }
+  }
+
   const name = String(formData.get('name') || '').trim()
   const email = String(formData.get('email') || '').trim()
   const whatsapp = String(formData.get('whatsapp') || '').trim()

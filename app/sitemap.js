@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { absoluteUrl, isIndexableStoreSlug } from '@/lib/seo'
 import { SEGMENTS } from '@/lib/segments'
+import { CADASTRO_ENTREGADOR_ABERTO } from '@/lib/flags'
 
 // Sitemap dinâmico: páginas institucionais + o cardápio público de cada loja.
 // Revalida a cada 6h para novas lojas entrarem no índice sem precisar de deploy.
@@ -59,7 +60,9 @@ export default async function sitemap() {
       changeFrequency: 'monthly',
       priority: 0.9,
     })),
-    { url: absoluteUrl('/entregadores'), lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
+    ...(CADASTRO_ENTREGADOR_ABERTO
+      ? [{ url: absoluteUrl('/entregadores'), lastModified: now, changeFrequency: 'monthly', priority: 0.6 }]
+      : []),
     { url: absoluteUrl('/privacidade'), lastModified: now, changeFrequency: 'yearly', priority: 0.2 },
   ]
 

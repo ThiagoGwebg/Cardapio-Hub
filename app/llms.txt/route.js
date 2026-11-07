@@ -1,5 +1,6 @@
 import { FAQS } from '@/components/landing/LandingFaq'
 import { SEGMENTS } from '@/lib/segments'
+import { CADASTRO_ENTREGADOR_ABERTO } from '@/lib/flags'
 import { MARKETING_PLANS } from '@/lib/plansMarketing'
 import {
   absoluteUrl,
@@ -43,6 +44,15 @@ function faqLines() {
   return FAQS.map((f) => `### ${f.q}\n\n${f.a}`).join('\n\n')
 }
 
+/**
+ * O cadastro de entregador só é anunciado aos modelos quando está aberto —
+ * apontar para uma rota em 404 é pior do que não citar.
+ */
+function linhaEntregadores() {
+  if (!CADASTRO_ENTREGADOR_ABERTO) return ''
+  return `- [Para entregadores](${absoluteUrl('/entregadores')}): como funciona a entrega para quem faz as corridas.\n`
+}
+
 function buildLlmsTxt() {
   return `# ${SITE_NAME}
 
@@ -71,8 +81,7 @@ Sem comissão por venda em nenhum dos planos. Não é preciso cartão de crédit
 
 - [${SITE_NAME} — ${SITE_TITLE}](${absoluteUrl('/')}): página inicial, com recursos, planos e perguntas frequentes.
 - [Falar com o time](${absoluteUrl('/contato')}): contato comercial e contratação dos planos.
-- [Para entregadores](${absoluteUrl('/entregadores')}): como funciona a entrega para quem faz as corridas.
-- [Política de privacidade](${absoluteUrl('/privacidade')}): tratamento de dados pessoais.
+${linhaEntregadores()}- [Política de privacidade](${absoluteUrl('/privacidade')}): tratamento de dados pessoais.
 
 ## Por tipo de negócio
 
