@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { timingSafeEqual } from 'node:crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export const runtime = 'nodejs'
@@ -7,12 +8,39 @@ function fmt(cents) {
   return 'R$ ' + ((cents || 0) / 100).toFixed(2).replace('.', ',')
 }
 
+/**
+ * Confere o header contra os segredos aceitos.
+ *
+ * PUSH_HOOK_SECRET aceita mais de um valor separado por vírgula só por causa da
+ * janela de rotação: o gatilho do banco e a variável da Vercel não trocam no
+ * mesmo instante, e com um valor só qualquer ordem derruba a notificação de
+ * pedido no intervalo. Com os dois aceitos, troca-se um lado de cada vez e
+ * depois remove-se o antigo. Um valor sem vírgula se comporta como antes.
+ *
+ * Comparação em tempo constante porque `!==` sai no primeiro byte diferente, o
+ * que vaza o prefixo correto para quem medir o tempo de resposta.
+ */
+function segredoConfere(recebido) {
+  const aceitos = (process.env.PUSH_HOOK_SECRET || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+  if (!aceitos.length || !recebido) return false
+
+  const enviado = Buffer.from(recebido)
+  return aceitos.some((aceito) => {
+    const esperado = Buffer.from(aceito)
+    // timingSafeEqual exige o mesmo tamanho; o tamanho em si não é segredo.
+    return esperado.length === enviado.length && timingSafeEqual(esperado, enviado)
+  })
+}
+
 // Chamado pelo gatilho do banco (pg_net) a cada pedido novo — mesmo contrato de sempre
 // (URL, header x-push-secret e body), só a entrega que agora é via OneSignal em vez de
 // web-push. O aparelho do lojista se marca com a tag store_id ao ativar os alertas
 // (lib/onesignal.js), então mandamos filtrando por essa tag.
 export async function POST(req) {
-  if (req.headers.get('x-push-secret') !== process.env.PUSH_HOOK_SECRET) {
+  if (!segredoConfere(req.headers.get('x-push-secret'))) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   }
 
