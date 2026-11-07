@@ -54,9 +54,9 @@ Conecte com a dor que ele acabou de descrever:
 > Nunca prometa "grátis" na ligação — o cliente recebe a cobrança e a relação começa torta.
 > Se o volume for baixo, comece no Lite; a conta migra pro Plus ou pro Pro depois.
 
-> ⚠️ Ao mudar preço, atualize junto: `lib/plansMarketing.ts` (vitrine: landing, JSON-LD,
-> llms.txt), `lib/billing/plans.ts` (`DEFAULT_PLAN_PRICE_CENTS`), `LandingFaq.tsx`,
-> `lib/seo.ts`, `lib/segments.ts`, `app/dashboard/ajuda/page.tsx`, a função `price_for_plan`
+> ⚠️ Ao mudar preço, atualize junto: `lib/plansMarketing.js` (vitrine: landing, JSON-LD,
+> llms.txt), `lib/billing/plans.js` (`DEFAULT_PLAN_PRICE_CENTS`), `LandingFaq.jsx`,
+> `lib/seo.js`, `lib/segments.js`, `app/dashboard/ajuda/page.jsx`, a função `price_for_plan`
 > no Supabase **e os QR Code estáticos por plano em `/admin/faturas`** — o valor vai embutido
 > no payload Pix e não acompanha o reajuste sozinho. Limite real de pedidos: RPC `create_order`.
 > Este roteiro já ficou desatualizado duas vezes: mandava oferecer plano grátis que não existe

@@ -4,18 +4,18 @@ O resumo detalhado da arquitetura e das mudanças realizadas está disponível n
 
 ### Resumo do que foi feito:
 
-1. **Nova Rota Pública (`/entregadores`)**: Criada em `page.tsx`, contendo a explicação dos benefícios e a chamada para o formulário.
-2. **Formulário de Cadastro**: Criado o componente `LandingCourierForm.tsx` que coleta nome, e-mail, WhatsApp, cidade/estado, tipo de veículo (moto, carro, bike, etc.), chave Pix e disponibilidade de horário.
-3. **Server Action de Submissão**: Criado em `couriers.ts` para persistir o entregador como um lead (marcado com `segment: 'Entregador'`).
-4. **Painel do Administrador**: Adaptado o componente `LeadsBoard.tsx` para diferenciar visualmente os entregadores (mostrando o ícone 🛵/🚲/🚗 correspondente ao veículo e ocultando a opção de criar uma loja comercial).
-5. **Rodapé**: Adicionado o link para a nova página no `LandingFooter.tsx`.
+1. **Nova Rota Pública (`/entregadores`)**: Criada em `page.jsx`, contendo a explicação dos benefícios e a chamada para o formulário.
+2. **Formulário de Cadastro**: Criado o componente `LandingCourierForm.jsx` que coleta nome, e-mail, WhatsApp, cidade/estado, tipo de veículo (moto, carro, bike, etc.), chave Pix e disponibilidade de horário.
+3. **Server Action de Submissão**: Criado em `couriers.js` para persistir o entregador como um lead (marcado com `segment: 'Entregador'`).
+4. **Painel do Administrador**: Adaptado o componente `LeadsBoard.jsx` para diferenciar visualmente os entregadores (mostrando o ícone 🛵/🚲/🚗 correspondente ao veículo e ocultando a opção de criar uma loja comercial).
+5. **Rodapé**: Adicionado o link para a nova página no `LandingFooter.jsx`.
 
 ---
 
 ### Decisões / Próximos Passos que necessitam da sua validação:
 
 1. **Mapeamento na tabela `leads`**: Atualmente, as candidaturas dos entregadores estão sendo armazenadas na mesma tabela de `leads` com o campo `segment: 'Entregador'`. Isso foi feito para evitar migrações de banco e permitir que você veja os cadastros imediatamente no dashboard administrativo atual. Deseja que no futuro criemos uma tabela dedicada `couriers` se o fluxo crescer?
-2. **Notificações**: Por padrão, a ação de cadastro dispara a função `notifyNewLead` existente (que atualmente apenas faz `console.log` no servidor). Se quiser plugar disparos reais de WhatsApp ou e-mail para o seu time de vendas quando um entregador se cadastrar, podemos configurar isso na `notify.ts`.
+2. **Notificações**: Por padrão, a ação de cadastro dispara a função `notifyNewLead` existente (que atualmente apenas faz `console.log` no servidor). Se quiser plugar disparos reais de WhatsApp ou e-mail para o seu time de vendas quando um entregador se cadastrar, podemos configurar isso na `notify.js`.
 
 ---
 

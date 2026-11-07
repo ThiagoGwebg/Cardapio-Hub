@@ -14,7 +14,7 @@ A loja é **Brasa Burger**, uma hamburgueria fictícia com 5 categorias, 20 prod
 4 bairros de entrega, 3 cupons e 105 pedidos espalhados pelos últimos 35 dias — é esse
 histórico que faz Desempenho, Caixa e Clientes terem gráfico em vez de tela vazia.
 
-O slug `demo` está em `INTERNAL_STORE_SLUGS` (`lib/seo.ts`): o cardápio sai do sitemap e
+O slug `demo` está em `INTERNAL_STORE_SLUGS` (`lib/seo.js`): o cardápio sai do sitemap e
 vai com `noindex`, então não concorre no Google com as lojas de verdade.
 
 ## O que dá para mostrar em cada tela
@@ -63,7 +63,7 @@ node scripts/seed-demo-assets.mjs && node scripts/seed-demo.mjs
   atribuição obrigatória); logo e banner são arte própria em SVG. A procedência de cada
   imagem está em `scripts/demo-assets/CREDITOS.md`.
 - **O `noindex` do slug `demo` só vale depois do deploy.** A loja já está no ar em produção,
-  mas a exclusão do sitemap vive em `lib/seo.ts` — enquanto essa mudança não subir, o
+  mas a exclusão do sitemap vive em `lib/seo.js` — enquanto essa mudança não subir, o
   cardápio da demo é indexável.
 - **A demo entra nas contas do `/admin`.** Ela aparece na lista de lojas e soma nas
   estatísticas da plataforma — desconte-a ao olhar os números do negócio.
