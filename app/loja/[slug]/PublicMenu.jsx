@@ -625,7 +625,7 @@ export default function PublicMenu({
 
   return (
     <div className={`storefront storefront-${themeMode} menu-layout-${menuLayout}`} style={styleVars}>
-      {/* manifest, theme-color e apple-touch-icon agora vêm do layout.tsx (head real, com as tags de iOS). */}
+      {/* manifest, theme-color e apple-touch-icon agora vêm do layout.jsx (head real, com as tags de iOS). */}
       {storeFont && <link rel="stylesheet" href={googleFontHref(storeFont)} />}
 
       <div className="storefront-topbar">

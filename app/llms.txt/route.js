@@ -19,7 +19,7 @@ import {
  * Cardápio Hub é, quanto custa e para quem serve.
  *
  * Gerado por rota, não como arquivo estático em /public, pelo mesmo motivo do
- * sitemap: os dados vivem em lib/seo.ts e lib/segments.ts. Um .txt na mão vira
+ * sitemap: os dados vivem em lib/seo.js e lib/segments.js. Um .txt na mão vira
  * mentira no dia em que o preço mudar e ninguém lembrar de editar os dois lugares.
  *
  * Ressalva honesta: llms.txt é uma proposta de padrão, não um padrão adotado —
@@ -27,7 +27,7 @@ import {
  * mas não é daqui que vem tráfego. O que traz é o JSON-LD e o sitemap.
  */
 
-// Um dia. O conteúdo só muda quando alguém edita seo.ts/segments.ts — ou seja,
+// Um dia. O conteúdo só muda quando alguém edita seo.js/segments.js — ou seja,
 // em deploy, que já invalida o cache sozinho.
 export const revalidate = 86400
 

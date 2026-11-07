@@ -54,7 +54,7 @@ export const metadata = {
       'max-video-preview': -1,
     },
   },
-  // Emitido só quando há código configurado (ver lib/seo.ts pra onde colar).
+  // Emitido só quando há código configurado (ver lib/seo.js pra onde colar).
   verification: {
     google: GOOGLE_SITE_VERIFICATION || undefined,
     other: BING_SITE_VERIFICATION ? { 'msvalidate.01': BING_SITE_VERIFICATION } : undefined,

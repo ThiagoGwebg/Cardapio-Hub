@@ -1,5 +1,5 @@
 /* Ícones da home: traço fino, 24×24, herdando currentColor.
-   Ficam aqui e não em components/icons.tsx porque só a landing usa — o bundle
+   Ficam aqui e não em components/icons.jsx porque só a landing usa — o bundle
    do dashboard não precisa carregar nenhum deles. */
 
 

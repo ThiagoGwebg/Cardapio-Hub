@@ -2,9 +2,9 @@ import Link from 'next/link'
 import { IconUtensils } from '@/components/icons'
 
 /**
- * 404 do cardápio público — cai aqui quando `notFound()` roda em page.tsx por slug
- * inexistente (ver app/loja/[slug]/page.tsx). not-found.tsx não recebe `params`, então
- * não dá pra citar o slug/nome da loja aqui; ver StoreUnavailable.tsx pro caso irmão
+ * 404 do cardápio público — cai aqui quando `notFound()` roda em page.jsx por slug
+ * inexistente (ver app/loja/[slug]/page.jsx). not-found.jsx não recebe `params`, então
+ * não dá pra citar o slug/nome da loja aqui; ver StoreUnavailable.jsx pro caso irmão
  * (loja existe mas está com mensalidade suspensa).
  */
 export default function StoreNotFound() {

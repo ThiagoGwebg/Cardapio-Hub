@@ -10,7 +10,7 @@ export const metadata = {
 }
 
 // Cobre qualquer rota não encontrada no site (marketing, painel, auth). O cardápio
-// público (/loja/[slug]) tem sua própria versão em app/loja/[slug]/not-found.tsx —
+// público (/loja/[slug]) tem sua própria versão em app/loja/[slug]/not-found.jsx —
 // essa aqui nunca deve aparecer pro cliente final de uma loja.
 export default function NotFound() {
   return (

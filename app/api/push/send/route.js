@@ -10,7 +10,7 @@ function fmt(cents) {
 // Chamado pelo gatilho do banco (pg_net) a cada pedido novo — mesmo contrato de sempre
 // (URL, header x-push-secret e body), só a entrega que agora é via OneSignal em vez de
 // web-push. O aparelho do lojista se marca com a tag store_id ao ativar os alertas
-// (lib/onesignal.ts), então mandamos filtrando por essa tag.
+// (lib/onesignal.js), então mandamos filtrando por essa tag.
 export async function POST(req) {
   if (req.headers.get('x-push-secret') !== process.env.PUSH_HOOK_SECRET) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 })
