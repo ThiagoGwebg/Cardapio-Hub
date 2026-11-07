@@ -1231,3 +1231,53 @@ html[data-dash-theme="black"] .dashboard .ol-sched-line { color: #b6a3f8; }
 .ol-row.ol-due { border-left-color: var(--primary); }
 .ol-row.ol-due .ol-sched-line,
 .ol-row.ol-due .ol-elapsed { color: var(--primary); font-weight: 700; }
+
+/* ── Impressão automática da comanda ─────────────────────────────
+   Seletor de modo em cartões: o lojista escolhe onde a comanda sai. */
+.print-modes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+.print-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  text-align: left;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface2);
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.print-mode:hover { border-color: var(--muted2); }
+.print-mode.active { border-color: var(--primary); background: var(--primary-l); }
+.print-mode-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+.print-mode.active .print-mode-head { color: var(--primary); }
+.print-mode-desc { font-size: 11.5px; line-height: 1.45; color: var(--muted); }
+
+.print-tip {
+  margin-top: 14px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  background: var(--surface3);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text2);
+}
+.print-tip code {
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 11.5px;
+}
