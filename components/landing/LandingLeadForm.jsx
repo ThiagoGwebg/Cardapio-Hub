@@ -1,9 +1,10 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useActionState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { submitLead } from '@/app/actions/leads'
 import { trackLead } from '@/lib/analytics'
+import { CAMPO_ISCA, CAMPO_MONTADO_EM } from '@/lib/antispamCampos'
 
 const REVENUE_OPTIONS = [
   'Não sei',
@@ -35,6 +36,14 @@ const initialState = { ok: false }
 
 export default function LandingLeadForm() {
   const [state, formAction, pending] = useActionState(submitLead, initialState)
+  const montadoEm = useRef(null)
+
+  // Marca quando o formulário apareceu na tela, pro servidor medir o tempo de
+  // preenchimento. Escrito direto no input (não-controlado) em vez de state:
+  // não re-renderiza e não cai na regra set-state-in-effect do eslint.
+  useEffect(() => {
+    if (montadoEm.current) montadoEm.current.value = String(Date.now())
+  }, [])
 
   // Dispara a conversão de Lead nos pixels quando o envio dá certo.
   useEffect(() => {
@@ -63,6 +72,12 @@ export default function LandingLeadForm() {
   return (
     <div className="l-lead-frame">
       <form className="l-lead-card" action={formAction}>
+        {/* Antispam: isca invisível + instante de montagem. Ver lib/antispam.js. */}
+        <div className="l-hp" aria-hidden="true">
+          <label htmlFor="lead-assunto">Assunto</label>
+          <input id="lead-assunto" name={CAMPO_ISCA} type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
+        </div>
+        <input ref={montadoEm} type="hidden" name={CAMPO_MONTADO_EM} defaultValue="0" />
         <label className="l-lead-label" htmlFor="lead-name">Nome</label>
         <input className="l-lead-input" id="lead-name" name="name" placeholder="Nome" required />
 

@@ -2,6 +2,7 @@
 
 import { createServerClient } from '@supabase/ssr'
 import { notifyNewLead } from '@/lib/notify'
+import { checarEnvio } from '@/lib/antispam'
 
 
 export async function submitLead(_prev, formData) {
@@ -18,6 +19,16 @@ export async function submitLead(_prev, formData) {
   }
   if (!consent) {
     return { ok: false, error: 'Por favor, marque a caixa para continuar.' }
+  }
+
+  // Antispam antes de encostar no banco ou disparar e-mail: a isca e o tempo de
+  // preenchimento barram o robô, o resto pega lixo que passou. Ver lib/antispam.js.
+  const bloqueio = await checarEnvio(formData, {
+    name, company, email, whatsapp, monthlyRevenue, segment,
+  })
+  if (bloqueio) {
+    console.warn(`[antispam] lead barrado — ${bloqueio.motivo}`)
+    return bloqueio.resposta
   }
 
   // Cliente anônimo simples — RPC/insert público, sem sessão de usuário

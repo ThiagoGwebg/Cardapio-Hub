@@ -1,8 +1,9 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { submitCourier } from '@/app/actions/couriers'
+import { CAMPO_ISCA, CAMPO_MONTADO_EM } from '@/lib/antispamCampos'
 
 const VEHICLE_OPTIONS = [
   'Moto / Motocicleta',
@@ -29,6 +30,14 @@ const initialState = { ok: false }
 
 export default function LandingCourierForm() {
   const [state, formAction, pending] = useActionState(submitCourier, initialState)
+  const montadoEm = useRef(null)
+
+  // Marca quando o formulário apareceu na tela, pro servidor medir o tempo de
+  // preenchimento. Escrito direto no input (não-controlado) em vez de state:
+  // não re-renderiza e não cai na regra set-state-in-effect do eslint.
+  useEffect(() => {
+    if (montadoEm.current) montadoEm.current.value = String(Date.now())
+  }, [])
 
   if (state.ok) {
     return (
@@ -51,6 +60,12 @@ export default function LandingCourierForm() {
   return (
     <div className="l-lead-frame">
       <form className="l-lead-card" action={formAction}>
+        {/* Antispam: isca invisível + instante de montagem. Ver lib/antispam.js. */}
+        <div className="l-hp" aria-hidden="true">
+          <label htmlFor="courier-assunto">Assunto</label>
+          <input id="courier-assunto" name={CAMPO_ISCA} type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
+        </div>
+        <input ref={montadoEm} type="hidden" name={CAMPO_MONTADO_EM} defaultValue="0" />
         <label className="l-lead-label" htmlFor="courier-name">Nome Completo</label>
         <input className="l-lead-input" id="courier-name" name="name" placeholder="Ex: João Silva" required />
 

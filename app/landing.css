@@ -2079,3 +2079,17 @@
     border-bottom: none;
   }
 }
+
+/* Campo-isca do antispam (ver lib/antispam.js): fora da tela, sem leitura por
+   leitor de tela e fora da tabulação. Robô que preenche todo input cai nela;
+   humano nunca vê. Não usa display:none de propósito — robô que interpreta
+   CSS costuma pular o que está oculto assim. */
+.l-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
