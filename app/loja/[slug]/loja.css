@@ -1,30 +1,36 @@
 /* ══════════════════════════════════════════
    TEMA CLARO (STOREFRONT LIGHT)
 ══════════════════════════════════════════ */
+/*
+ * Neutros QUENTES, não cinza de template: fundo "porcelana" no claro e
+ * "brasa" no escuro. Fundo levemente âmbar valoriza foto de comida (fundo
+ * azulado/cinza deixa prato com cara de geladeira). As cores de MARCA
+ * (--primary/--secondary/--accent) continuam vindo do tema de cada loja.
+ */
 .storefront {
-  --bg: #F8F9FA;
+  --bg: #F6F3EE;
   --surface: #FFFFFF;
-  --surface2: #F1F3F5;
-  --surface3: #E9ECEF;
-  --text: #212529;
-  --text2: #495057;
-  --muted: #6C757D;
-  --muted2: #ADB5BD;
-  --border: #DEE2E6;
-  --border2: #E9ECEF;
-  
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.15);
+  --surface2: #F1EDE6;
+  --surface3: #E9E4DB;
+  --text: #27211C;
+  --text2: #574F47;
+  --muted: #8A8178;
+  --muted2: #B3AAA0;
+  --border: #E7E0D6;
+  --border2: #EFEAE2;
 
-  --radius: 12px;
-  --radius-sm: 8px;
-  --radius-xs: 6px;
+  --shadow-sm: 0 1px 3px rgba(62, 50, 40, 0.07);
+  --shadow: 0 6px 16px rgba(62, 50, 40, 0.1);
+  --shadow-lg: 0 16px 36px rgba(62, 50, 40, 0.16);
+
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 7px;
 
   /* Desconto/aviso do cupom: os --green/--yellow globais são pastéis pensados
      para fundo escuro e somem no branco do cardápio. */
-  --discount: #16A34A;
-  --warn: #B45309;
+  --discount: #157F3C;
+  --warn: #A3570A;
 
   background: var(--bg);
   color: var(--text);
@@ -32,27 +38,27 @@
 }
 
 .storefront-dark {
-  --bg: #121212;
-  --surface: #1A1A1A;
-  --surface2: #242424;
-  --surface3: #2D2D2D;
-  --text: #F8F9FA;
-  --text2: #E9ECEF;
-  --muted: #A0A0A0;
-  --muted2: #6C757D;
-  --border: #2D2D2D;
-  --border2: #242424;
-  
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
-  --shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.6);
+  --bg: #16130F;
+  --surface: #201C17;
+  --surface2: #2A251F;
+  --surface3: #342E27;
+  --text: #F6F1EA;
+  --text2: #DED7CD;
+  --muted: #A39A8F;
+  --muted2: #6E665C;
+  --border: #332D26;
+  --border2: #2A251F;
 
-  --radius: 12px;
-  --radius-sm: 8px;
-  --radius-xs: 6px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.55);
 
-  --discount: #81C995;
-  --warn: #FDD663;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 7px;
+
+  --discount: #86CF9B;
+  --warn: #F3C06B;
 
   background: var(--bg);
   color: var(--text);
@@ -792,11 +798,11 @@ html:has(.storefront-dark) {
 }
 
 body:has(.storefront-dark) {
-  background: #121212 !important;
+  background: #16130F !important;
 }
 
 .storefront-dark .storefront-topbar {
-  background: rgba(18, 18, 18, 0.9) !important;
+  background: rgba(22, 19, 15, 0.82) !important;
 }
 
 .storefront-dark .storefront-banner {
@@ -1187,4 +1193,522 @@ body:has(.storefront-dark) {
 }
 .storefront .storefront-status.is-open .storefront-status-dot {
   box-shadow: 0 0 0 3px rgba(var(--secondary-rgb, 14, 165, 233), 0.18);
+}
+
+/* ══════════════════════════════════════════
+   REALIDADE AUMENTADA (produto em 3D na mesa)
+══════════════════════════════════════════ */
+
+/* Selo "3D" no cartão do produto */
+.storefront .product-img { position: relative; }
+.storefront .ar-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.78);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+/* O alternador Foto/3D ancora no painel da foto — sem isto o absolute dele
+   sobe até o body e o botão aparece fora do modal. */
+.storefront .option-modal-left { position: relative; }
+
+/* Painel do modal em modo 3D: mais alto no mobile pra dar espaço ao visor */
+.storefront .option-modal-left.is-3d { height: 300px; }
+@media (min-width: 768px) {
+  .storefront .option-modal-left.is-3d { height: 100%; }
+}
+
+.storefront .ar-viewer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.storefront .ar-viewer model-viewer {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  --poster-color: transparent;
+  --progress-bar-color: var(--primary);
+}
+
+.storefront .ar-viewer-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom) * 0);
+}
+.storefront .ar-viewer-size,
+.storefront .ar-viewer-hint {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.storefront .ar-table-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(var(--primary-rgb, 255, 87, 34), 0.35);
+  transition: transform 0.15s, filter 0.15s;
+}
+.storefront .ar-table-btn:hover { filter: brightness(1.06); }
+.storefront .ar-table-btn:active { transform: scale(0.97); }
+
+/* Alternador Foto / 3D */
+.storefront .ar-view-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(17, 17, 17, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 2;
+}
+.storefront .ar-view-toggle button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.storefront .ar-view-toggle button.active {
+  background: #fff;
+  color: #111;
+}
+
+/* QR para desktop/tablet sem câmera de RA */
+.storefront .ar-qr-box {
+  position: absolute;
+  inset: auto 10px 52px auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 320px;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+}
+.storefront .ar-qr-box img {
+  width: 92px;
+  height: 92px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.storefront .ar-qr-box p {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--text2);
+}
+
+/* Folhas de instrução (dicas / sem AR / navegador de app) */
+.storefront .ar-folha-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: my-orders-fade 0.2s ease-out;
+}
+.storefront .ar-folha {
+  width: 100%;
+  max-width: 440px;
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 20px 20px 0 0;
+  padding: 20px 20px calc(16px + env(safe-area-inset-bottom));
+  animation: my-orders-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (min-width: 640px) {
+  .storefront .ar-folha-fundo { align-items: center; }
+  .storefront .ar-folha { border-radius: 20px; }
+}
+.storefront .ar-folha h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 800;
+}
+.storefront .ar-folha > div > p,
+.storefront .ar-folha p {
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  color: var(--text2);
+}
+.storefront .ar-folha ol {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  counter-reset: passo;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.storefront .ar-folha ol li {
+  counter-increment: passo;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: start;
+}
+.storefront .ar-folha ol li::before {
+  content: counter(passo);
+  grid-row: 1 / span 2;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(var(--primary-rgb, 255, 87, 34), 0.12);
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 14px;
+}
+.storefront .ar-folha ol strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+.storefront .ar-folha ol span {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.storefront .ar-folha ol span a { color: var(--primary); font-weight: 700; }
+.storefront .ar-folha-cta {
+  width: 100%;
+  padding: 13px;
+  font-size: 15px;
+}
+.storefront .ar-folha-fechar {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storefront .ar-folha-fundo, .storefront .ar-folha { animation: none; }
+}
+
+/* ══════════════════════════════════════════
+   REDESIGN "MOLDURA DE BISTRÔ" (2026)
+   A moldura é quente e quieta; a marca de CADA LOJA entra pelas variáveis
+   do tema. Regra de ouro: a cor primária pertence só ao que é clicável
+   (adicionar, FAB, aba ativa, RA). Preço é tinta, foto é o gráfico.
+══════════════════════════════════════════ */
+
+/* ── Topbar translúcida ── */
+.storefront .storefront-topbar {
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+/* ── Banner imersivo + logo sobreposta ── */
+.storefront .storefront-banner {
+  position: relative;
+  max-height: none;
+}
+.storefront .storefront-banner img {
+  width: 100%;
+  max-height: 240px;
+  min-height: 150px;
+  object-fit: cover;
+  display: block;
+}
+.storefront .storefront-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--bg) 88%, transparent));
+  pointer-events: none;
+}
+/* Com banner, a logo sobe sobre a borda dele — âncora visual do cabeçalho. */
+.storefront .storefront-banner + .storefront-header {
+  margin-top: -40px;
+  position: relative;
+  z-index: 2;
+  align-items: flex-end;
+}
+.storefront .storefront-banner + .storefront-header .storefront-logo {
+  box-shadow: var(--shadow);
+}
+
+.storefront .storefront-header {
+  background: transparent;
+  border-bottom: none;
+  padding-top: 24px;
+  padding-bottom: 10px;
+  gap: 16px;
+}
+.storefront .storefront-logo {
+  width: 84px;
+  height: 84px;
+  border: 3px solid var(--surface);
+  background: var(--surface);
+}
+.storefront .storefront-name {
+  font-size: clamp(26px, 6vw, 38px);
+  font-weight: 900;
+  letter-spacing: -0.8px;
+  line-height: 1.05;
+}
+.storefront .storefront-meta-row {
+  font-size: 12.5px;
+  gap: 12px;
+}
+/* Status como chip de verdade — é a informação nº 1 de quem abre o cardápio. */
+.storefront .storefront-status {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+}
+.storefront .storefront-status.is-open {
+  background: color-mix(in srgb, var(--discount) 14%, transparent);
+  color: var(--discount);
+}
+.storefront .storefront-status.is-closed {
+  background: color-mix(in srgb, #C0392B 12%, transparent);
+}
+.storefront .storefront-status.is-open .storefront-status-dot {
+  box-shadow: none;
+  animation: storefront-open-pulse 2.2s ease-out infinite;
+}
+@keyframes storefront-open-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--discount) 45%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 6px transparent; }
+}
+
+/* ── Busca em pílula ── */
+.storefront .storefront-search-row { padding-top: 8px; }
+.storefront .storefront-search-row input {
+  border-radius: 999px;
+  padding: 12px 20px;
+  box-shadow: var(--shadow-sm);
+  border-color: color-mix(in srgb, var(--border) 70%, transparent);
+}
+.storefront .storefront-search-row input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 255, 87, 34), 0.15);
+}
+
+/* ── Navegação de categorias: pills grudadas no topo ── */
+.storefront .menu-nav {
+  position: sticky;
+  top: 45px;
+  z-index: 250;
+  border-top: none;
+  border-bottom: none;
+  gap: 8px;
+  padding: 10px 2px;
+  margin: 0 -2px 12px;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.storefront .menu-nav-item {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-bottom: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.storefront .menu-nav-item:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+.storefront .menu-nav-item.active {
+  background: rgba(var(--primary-rgb, 255, 87, 34), 0.12);
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: none;
+}
+
+/* ── Rótulo de seção: título de verdade, não eyebrow ── */
+.storefront .section-label {
+  font-family: var(--store-font, 'Nunito'), sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  text-transform: none;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+.storefront .section-label::after {
+  height: 1px;
+  background: var(--border);
+  opacity: 0.8;
+}
+
+/* ── Cartão de produto: foto inset, sem moldura dura ── */
+.storefront .product-card {
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  height: 148px;
+}
+.storefront .product-card:not(.out-of-stock):hover {
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+.storefront .product-img {
+  width: 124px;
+  height: 124px;
+  margin: 12px;
+  border: none;
+  border-left: none;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface2);
+  align-self: center;
+}
+.storefront .product-info { padding: 14px 4px 14px 16px; }
+.storefront .product-name { font-size: 15.5px; font-weight: 800; }
+.storefront .product-desc { color: var(--muted); font-size: 12.5px; }
+/* Preço é tinta forte, não cor de marca: legível nos dois temas, e deixa a
+   cor primária exclusiva para ações. */
+.storefront .product-price {
+  color: var(--text);
+  font-size: 16.5px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+.storefront .add-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 3px 10px rgba(var(--primary-rgb, 255, 87, 34), 0.35);
+}
+.storefront .add-btn:hover:not(:disabled) {
+  background: var(--primary);
+  filter: brightness(1.08);
+  box-shadow: 0 5px 16px rgba(var(--primary-rgb, 255, 87, 34), 0.45);
+}
+@media (max-width: 600px) {
+  .storefront .product-card { height: auto; min-height: 124px; }
+  .storefront .product-img { width: 104px; height: 104px; margin: 10px; }
+}
+
+/* Selo 3D acompanha o raio novo da foto */
+.storefront .ar-badge { top: 6px; left: 6px; }
+
+/* ── Grade (layout Pro): mesma linguagem, foto inset no topo ── */
+.storefront.menu-layout-grid .product-card { height: auto; }
+.storefront.menu-layout-grid .product-img {
+  width: calc(100% - 20px);
+  height: 150px;
+  margin: 10px 10px 0;
+  border-radius: 12px;
+  border-bottom: none;
+  align-self: stretch;
+}
+.storefront.menu-layout-grid .product-info { padding: 12px 14px 14px; }
+
+/* ── FAB do carrinho: pílula com sombra da marca ── */
+.storefront .cart-fab {
+  border-radius: 999px;
+  padding: 13px 22px;
+  box-shadow: 0 10px 28px rgba(var(--primary-rgb, 255, 87, 34), 0.4);
+}
+.storefront .cart-fab:hover {
+  background: var(--primary);
+  filter: brightness(1.06);
+  box-shadow: 0 14px 32px rgba(var(--primary-rgb, 255, 87, 34), 0.5);
+}
+.storefront .cart-fab .cart-count {
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 999px;
+}
+
+/* ── Selo da plataforma no rodapé ── */
+.storefront .storefront-branding {
+  padding-bottom: calc(18px + env(safe-area-inset-bottom));
+}
+
+/* ── Movimento: respeita quem pediu menos ── */
+@media (prefers-reduced-motion: reduce) {
+  .storefront .storefront-status.is-open .storefront-status-dot { animation: none; }
+  .storefront .product-card,
+  .storefront .product-card:hover { transform: none; }
+  .storefront .product-img img,
+  .storefront .product-card:hover .product-img img { transform: none; transition: none; }
+}
+
+/* Blur só em telas grandes: a topbar/nav com backdrop-filter re-rasteriza a
+   cada frame de rolagem e trava o toque em Android modesto (mesma razão do
+   bloco equivalente no globals.css). No celular, fundo quase opaco. */
+@media (max-width: 899px) {
+  .storefront .storefront-topbar,
+  .storefront .menu-nav {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .storefront .storefront-topbar {
+    background: color-mix(in srgb, var(--surface) 97%, transparent);
+  }
+  .storefront .menu-nav {
+    background: color-mix(in srgb, var(--bg) 97%, transparent);
+  }
+}
+
+/* Loja fechada: o + desabilitado não pode ficar com sombra de botão vivo. */
+.storefront .add-btn:disabled {
+  background: var(--surface3);
+  color: var(--muted2);
+  box-shadow: none;
 }

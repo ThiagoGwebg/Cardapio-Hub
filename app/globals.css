@@ -3097,7 +3097,7 @@ tr:hover td {
 }
 
 html:has(.storefront) { color-scheme: light; }
-body:has(.storefront) { background: #FFF8F3; }
+body:has(.storefront) { background: #F6F3EE; }
 
 /* ── Topbar / cabeçalho ── */
 .storefront .storefront-topbar {
