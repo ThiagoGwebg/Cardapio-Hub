@@ -12,7 +12,10 @@ const EXT = {
   'image/gif': 'gif',
   'image/svg+xml': 'svg',
 }
-const KINDS = new Set(['logo', 'banner', 'product'])
+// 'ar' = foto de vista do prato (frente/lado/trás) usada na geração do
+// modelo 3D. A Tripo só aceita JPEG/PNG, mas o filtro fica no formulário —
+// aqui o upload é igual aos outros.
+const KINDS = new Set(['logo', 'banner', 'product', 'ar'])
 const MAX_BYTES = 5 * 1024 * 1024
 
 export async function POST(req) {

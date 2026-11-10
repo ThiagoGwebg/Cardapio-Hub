@@ -25,6 +25,7 @@ import { saveOrderToHistory, getOrderHistoryForStore } from '@/lib/orderHistory'
 import { loadCart, saveCart, clearCart, loadCustomer, saveCustomer } from '@/lib/cartStorage'
 import InstallPwaButton from '@/components/InstallPwaButton'
 import MyOrdersModal from './MyOrdersModal'
+import ArProductViewer from './ArProductViewer'
 import './loja.css'
 
 
@@ -71,6 +72,17 @@ const STEP_TITLE = {
 
 function unitOf(item) {
   return item.base_cents + item.options.reduce((s, o) => s + o.price_delta_cents, 0)
+}
+
+/** Cubo do selo 3D — traço fino, no tom do texto do selo. */
+function ArCubeIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+      <path d="M3.3 7 12 12l8.7-5" />
+      <path d="M12 22V12" />
+    </svg>
+  )
 }
 
 /**
@@ -363,10 +375,11 @@ export default function PublicMenu({
   )
 
   // ---- Product modal ----
+  const [modalView, setModalView] = useState('foto') // 'foto' | '3d'
   function openProduct(p) {
-    // Sem complementos e no máximo 1 foto: adiciona direto (1 clique).
-    // Com complementos OU com galeria (2+ fotos): abre o modal.
-    if (p.groups.length === 0 && p.images.length <= 1) {
+    // Sem complementos, no máximo 1 foto e sem 3D: adiciona direto (1 clique).
+    // Com complementos, galeria (2+ fotos) OU modelo 3D: abre o modal.
+    if (p.groups.length === 0 && p.images.length <= 1 && !p.ar_model_url) {
       addToCart(p, [], '')
       return
     }
@@ -374,7 +387,30 @@ export default function PublicMenu({
     setModalProduct(p)
     setModalSel({})
     setModalNote('')
+    // O 3D é o diferencial — quando existe, abre direto nele.
+    setModalView(p.ar_model_url ? '3d' : 'foto')
   }
+
+  // Link profundo #p=<id> (vem do QR da versão desktop): abre o produto já
+  // no modal, pronto para "Ver na sua mesa".
+  useEffect(() => {
+    const m = location.hash.match(/^#p=([0-9a-f-]+)$/i)
+    if (!m) return
+    const p = menu.flatMap((c) => c.products).find((x) => x.id === m[1])
+    if (!p) return
+    // Fora do corpo do efeito (timeout 0): abrir modal na carga é side effect
+    // de navegação, não sincronização de estado.
+    const t = setTimeout(() => {
+      setGalleryIdx(0)
+      setModalProduct(p)
+      setModalSel({})
+      setModalNote('')
+      setModalView(p.ar_model_url ? '3d' : 'foto')
+    }, 0)
+    return () => clearTimeout(t)
+    // Só na carga inicial — o hash não muda durante a navegação do cardápio.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function toggleOption(group, option) {
     setModalSel((prev) => {
@@ -755,6 +791,11 @@ export default function PublicMenu({
                         ) : (
                           <span className="p-emoji" style={{ color: 'var(--muted)' }}>
                             <IconUtensils size={36} />
+                          </span>
+                        )}
+                        {p.ar_model_url && (
+                          <span className="ar-badge" title="Veja este prato em 3D na sua mesa">
+                            <ArCubeIcon /> 3D
                           </span>
                         )}
                       </div>
@@ -1144,8 +1185,15 @@ export default function PublicMenu({
       {modalProduct && (
         <div className="option-modal-overlay" onClick={() => setModalProduct(null)}>
           <div className="option-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="option-modal-left">
-              {modalProduct.images.length > 0 ? (
+            <div className={`option-modal-left ${modalProduct.ar_model_url && modalView === '3d' ? 'is-3d' : ''}`}>
+              {modalProduct.ar_model_url && modalView === '3d' ? (
+                <ArProductViewer
+                  src={modalProduct.ar_model_url}
+                  alt={modalProduct.name}
+                  sizeCm={modalProduct.ar_size_cm}
+                  productId={modalProduct.id}
+                />
+              ) : modalProduct.images.length > 0 ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={modalProduct.images[galleryIdx] ?? modalProduct.images[0]} alt={modalProduct.name} />
               ) : modalProduct.image_url ? (
@@ -1153,6 +1201,28 @@ export default function PublicMenu({
                 <img src={modalProduct.image_url} alt={modalProduct.name} />
               ) : (
                 <div style={{ padding: 40, color: 'var(--muted)' }}><IconUtensils size={60} /></div>
+              )}
+              {modalProduct.ar_model_url && (modalProduct.images.length > 0 || modalProduct.image_url) && (
+                <div className="ar-view-toggle" role="tablist" aria-label="Foto ou 3D">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={modalView === '3d'}
+                    className={modalView === '3d' ? 'active' : ''}
+                    onClick={() => setModalView('3d')}
+                  >
+                    <ArCubeIcon /> 3D
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={modalView === 'foto'}
+                    className={modalView === 'foto' ? 'active' : ''}
+                    onClick={() => setModalView('foto')}
+                  >
+                    Foto
+                  </button>
+                </div>
               )}
             </div>
             <div className="option-modal-right">

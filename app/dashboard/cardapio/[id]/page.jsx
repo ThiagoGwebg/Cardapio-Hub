@@ -14,6 +14,9 @@ import GroupPresetFields from '../GroupPresetFields'
 import ProductImagesField from '@/components/ProductImagesField'
 import DeleteProductButton from '../DeleteProductButton'
 import SubmitButton from '@/components/ui/SubmitButton'
+import ArSection from './ArSection'
+import { getStorePlan } from '@/lib/plan'
+import { arEnabled, getArUsage } from '@/lib/ar/config'
 
 export default async function ProductEditPage({ params }) {
   const { id } = await params
@@ -21,7 +24,7 @@ export default async function ProductEditPage({ params }) {
 
   const { data: product } = await supabase
     .from('products')
-    .select('id, name, description, price_cents, image_url, images, store_id, categories(name)')
+    .select('id, name, description, price_cents, image_url, images, store_id, ar_model_url, ar_size_cm, categories(name)')
     .eq('id', id)
     .eq('store_id', store.id)
     .maybeSingle()
@@ -36,6 +39,22 @@ export default async function ProductEditPage({ params }) {
     .select('id, name, required, min_select, max_select, sort_order, product_options(id, name, price_delta_cents, is_active, sort_order, image_url, description)')
     .eq('product_id', id)
     .order('sort_order', { ascending: true })
+
+  // Realidade aumentada: plano, cota do mês e a última geração do produto.
+  const [plan, usage, { data: lastGens }] = await Promise.all([
+    getStorePlan(supabase, store.id),
+    getArUsage(supabase, store.id),
+    supabase
+      .from('ar_generations')
+      .select('id, status, model_url, size_cm, error')
+      .eq('product_id', id)
+      .order('created_at', { ascending: false })
+      .limit(1),
+  ])
+  // Descartada/publicada não precisa reaparecer na revisão.
+  const lastGen = lastGens?.[0] && ['processing', 'ready', 'failed'].includes(lastGens[0].status)
+    ? lastGens[0]
+    : null
 
   return (
     <>
@@ -80,6 +99,16 @@ export default async function ProductEditPage({ params }) {
           <SubmitButton className="save-btn" style={{ alignSelf: 'flex-start' }}>Salvar alterações</SubmitButton>
         </form>
       </div>
+
+      <ArSection
+        productId={product.id}
+        plan={plan}
+        enabled={arEnabled()}
+        usage={usage}
+        latestGen={lastGen}
+        publishedUrl={product.ar_model_url ?? null}
+        publishedSizeCm={product.ar_size_cm ?? null}
+      />
 
       <div className="settings-section-title" style={{ marginTop: 8 }}>Complementos</div>
       <p style={{ fontSize: 13, color: 'var(--muted)', marginBottom: 16 }}>

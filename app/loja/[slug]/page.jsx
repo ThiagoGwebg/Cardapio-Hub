@@ -31,7 +31,7 @@ export default async function LojaPage({ params }) {
   const { data: categories } = await supabase
     .from('categories')
     .select(
-      'id, name, emoji, sort_order, products(id, name, description, price_cents, image_url, images, is_active, sort_order, product_option_groups(id, name, min_select, max_select, required, sort_order, product_options(id, name, price_delta_cents, is_active, sort_order, image_url, description)))'
+      'id, name, emoji, sort_order, products(id, name, description, price_cents, image_url, images, is_active, sort_order, ar_model_url, ar_size_cm, product_option_groups(id, name, min_select, max_select, required, sort_order, product_options(id, name, price_delta_cents, is_active, sort_order, image_url, description)))'
     )
     .eq('store_id', store.id)
     .order('sort_order', { ascending: true })
@@ -64,6 +64,8 @@ export default async function LojaPage({ params }) {
               ? [p.image_url]
               : [],
           is_active: p.is_active,
+          ar_model_url: p.ar_model_url ?? null,
+          ar_size_cm: p.ar_size_cm ?? null,
           groups: (p.product_option_groups ?? [])
             .sort((a, b) => a.sort_order - b.sort_order)
             .map((g) => ({

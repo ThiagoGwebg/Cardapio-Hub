@@ -1281,3 +1281,100 @@ html[data-dash-theme="black"] .dashboard .ol-sched-line { color: #b6a3f8; }
   border: 1px solid var(--border);
   font-size: 11.5px;
 }
+
+/* ══════════════════════════════════════════
+   REALIDADE AUMENTADA (edição do produto)
+══════════════════════════════════════════ */
+.ar-pro-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #FF8A50, #E64A19);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.ar-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+.ar-photo-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ar-photo-slot img,
+.ar-photo-slot .ar-photo-add {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+}
+.ar-photo-add {
+  display: grid;
+  place-items: center;
+  border-style: dashed;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.ar-photo-add:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.ar-photo-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: center;
+}
+.ar-photo-clear {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ar-processing {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px dashed var(--primary);
+  background: var(--primary-l);
+  margin-bottom: 12px;
+  font-size: 13.5px;
+}
+.ar-processing-spinner {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 3px solid var(--primary-l);
+  border-top-color: var(--primary);
+  animation: ar-spin 0.9s linear infinite;
+}
+@keyframes ar-spin { to { transform: rotate(360deg); } }
+
+.ar-preview-block { margin-bottom: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ar-processing-spinner { animation: none; }
+}
