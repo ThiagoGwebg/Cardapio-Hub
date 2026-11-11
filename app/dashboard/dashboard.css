@@ -1,13 +1,12 @@
 /* ================================================================
-   TEMA DO PAINEL — light (padrão) / dark / black
+   TEMA DO PAINEL — light (padrão) / dark
    Sobrescreve as variáveis de cor só dentro de .dashboard, sem
    afetar o cardápio público (/loja) que usa o tema global escuro.
    ================================================================ */
 /*
- * Neutros QUENTES nos três temas — a mesma família do cardápio público,
+ * Neutros QUENTES nos dois temas — a mesma família do cardápio público,
  * para o painel e a loja parecerem o mesmo produto. Claro é "porcelana",
- * escuro é "carvão em brasa" (marrons profundos, não cinza de DevTools),
- * black é OLED com acentos quentes.
+ * escuro é "carvão em brasa" (marrons profundos, não cinza de DevTools).
  */
 .dashboard {
   /* padrão / fallback antes do script de tema rodar = light */
@@ -92,50 +91,6 @@ html[data-dash-theme="dark"] .dashboard {
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
   --shadow: 0 5px 16px rgba(0, 0, 0, 0.45);
   --shadow-lg: 0 16px 34px rgba(0, 0, 0, 0.55);
-
-  --radius: 14px;
-  --radius-sm: 10px;
-  --radius-xs: 8px;
-}
-
-html[data-dash-theme="black"] .dashboard {
-  --bg: #000000;
-  --surface: #0E0C09;
-  --surface2: #181410;
-  --surface3: #221D17;
-
-  --primary: #FF6E40;
-  --primary-d: #FF5722;
-  --primary-l: rgba(255, 110, 64, 0.14);
-
-  --teal: #2DD4E8;
-  --teal-d: #22B8CC;
-  --teal-l: rgba(45, 212, 232, 0.14);
-
-  --green: #8FE0A3;
-  --green-d: #6ED184;
-  --green-l: rgba(143, 224, 163, 0.14);
-
-  --red: #FF8A80;
-  --red-l: rgba(255, 138, 128, 0.14);
-
-  --yellow: #FFCF86;
-  --yellow-l: rgba(255, 207, 134, 0.14);
-
-  --blue: #90CAF9;
-  --blue-l: rgba(144, 202, 249, 0.14);
-
-  --text: #F4F0EA;
-  --text2: #D8D2C9;
-  --muted: #9C948A;
-  --muted2: #6F675D;
-
-  --border: #262019;
-  --border2: #2E271F;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.7);
-  --shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
-  --shadow-lg: 0 14px 28px rgba(0, 0, 0, 0.8);
 
   --radius: 14px;
   --radius-sm: 10px;
@@ -1231,8 +1186,7 @@ html[data-dash-theme="black"] .dashboard {
 /* Pedidos agendados (encomendas) */
 .ol-status-agendado { border-left-color: #8b5cf6; }
 .ol-pill-sched { background: rgba(139, 92, 246, .14); color: #8b5cf6; }
-html[data-dash-theme="dark"] .dashboard .ol-pill-sched,
-html[data-dash-theme="black"] .dashboard .ol-pill-sched {
+html[data-dash-theme="dark"] .dashboard .ol-pill-sched {
   background: rgba(167, 139, 250, .18);
   color: #b6a3f8;
 }

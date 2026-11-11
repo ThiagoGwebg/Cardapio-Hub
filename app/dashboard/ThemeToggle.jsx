@@ -1,13 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Circle, Moon, Sun } from 'lucide-react'
+import { Moon, Sun } from 'lucide-react'
 
 
 const THEMES = [
   { value: 'light', label: 'Claro', Icon: Sun },
   { value: 'dark', label: 'Escuro', Icon: Moon },
-  { value: 'black', label: 'Black', Icon: Circle },
 ]
 
 const STORAGE_KEY = 'cardapio-dash-theme'
@@ -36,7 +35,9 @@ export default function ThemeToggle() {
     // verdade: localStorage primeiro, atributo atual como reserva.
     let saved = null
     try { saved = localStorage.getItem(STORAGE_KEY) } catch { /* sem storage */ }
-    const current = saved || document.documentElement.getAttribute('data-dash-theme') || 'light'
+    let current = saved || document.documentElement.getAttribute('data-dash-theme') || 'light'
+    // O tema "black" foi aposentado — quem o tinha salvo cai no escuro.
+    if (current === 'black') current = 'dark'
     setTheme(current)
     if (document.documentElement.getAttribute('data-dash-theme') !== current) {
       document.documentElement.setAttribute('data-dash-theme', current)
@@ -62,7 +63,7 @@ export default function ThemeToggle() {
           aria-label={t.label}
           title={t.label}
         >
-          <t.Icon size={15} strokeWidth={2.2} fill={t.value === 'black' ? 'currentColor' : 'none'} />
+          <t.Icon size={15} strokeWidth={2.2} />
         </button>
       ))}
     </div>

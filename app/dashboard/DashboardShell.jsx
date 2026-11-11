@@ -40,6 +40,7 @@ const THEME_INIT_SCRIPT = `
 (function () {
   try {
     var t = localStorage.getItem('cardapio-dash-theme') || 'light';
+    if (t === 'black') t = 'dark';
     document.documentElement.setAttribute('data-dash-theme', t);
   } catch (e) {}
 })();
