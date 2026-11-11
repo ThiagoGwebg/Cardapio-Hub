@@ -1623,3 +1623,7 @@ html[data-dash-theme="black"] .dashboard .ol-sched-line { color: #b6a3f8; }
 @media (prefers-reduced-motion: reduce) {
   .dashboard .quick-action-card:hover { transform: none; }
 }
+
+/* A linha de pedido é um <a>: sem cor explícita, o navegador aplica o azul
+   padrão de link em qualquer texto sem cor própria dentro dela. */
+.dashboard .recent-order-row { color: var(--text); }

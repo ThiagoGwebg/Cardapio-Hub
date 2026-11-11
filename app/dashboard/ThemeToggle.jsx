@@ -12,18 +12,43 @@ const THEMES = [
 
 const STORAGE_KEY = 'cardapio-dash-theme'
 
+/*
+ * Trocar o tema depois da página pintada deixa o Chromium com camadas já
+ * rasterizadas nas cores antigas (aparecia uma faixa "clara" no rodapé do
+ * painel escuro). Este empurrão força a recomposição da página inteira.
+ */
+function forceRepaint() {
+  requestAnimationFrame(() => {
+    document.body.style.transform = 'translateZ(0)'
+    requestAnimationFrame(() => {
+      document.body.style.transform = ''
+    })
+  })
+}
+
 export default function ThemeToggle() {
   const [theme, setTheme] = useState('light')
 
   useEffect(() => {
-    const current = document.documentElement.getAttribute('data-dash-theme');
-    if (current) setTheme(current)
+    // O script inline do shell só roda em carga completa — numa navegação
+    // client-side (ex.: logo após o login) o React não executa <script>
+    // injetado, e o tema salvo ficava ignorado até um F5. Aqui é a fonte de
+    // verdade: localStorage primeiro, atributo atual como reserva.
+    let saved = null
+    try { saved = localStorage.getItem(STORAGE_KEY) } catch { /* sem storage */ }
+    const current = saved || document.documentElement.getAttribute('data-dash-theme') || 'light'
+    setTheme(current)
+    if (document.documentElement.getAttribute('data-dash-theme') !== current) {
+      document.documentElement.setAttribute('data-dash-theme', current)
+      forceRepaint()
+    }
   }, [])
 
   function applyTheme(value) {
     setTheme(value)
     document.documentElement.setAttribute('data-dash-theme', value)
-    localStorage.setItem(STORAGE_KEY, value)
+    try { localStorage.setItem(STORAGE_KEY, value) } catch { /* sem storage */ }
+    forceRepaint()
   }
 
   return (
