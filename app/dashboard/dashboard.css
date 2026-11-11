@@ -3,92 +3,106 @@
    Sobrescreve as variáveis de cor só dentro de .dashboard, sem
    afetar o cardápio público (/loja) que usa o tema global escuro.
    ================================================================ */
+/*
+ * Neutros QUENTES nos três temas — a mesma família do cardápio público,
+ * para o painel e a loja parecerem o mesmo produto. Claro é "porcelana",
+ * escuro é "carvão em brasa" (marrons profundos, não cinza de DevTools),
+ * black é OLED com acentos quentes.
+ */
 .dashboard {
   /* padrão / fallback antes do script de tema rodar = light */
-  --bg: #F6F6F8;
+  --bg: #F6F3EE;
   --surface: #FFFFFF;
-  --surface2: #F7F7F9;
-  --surface3: #EDEDF1;
+  --surface2: #F4F0E9;
+  --surface3: #EBE5DC;
 
   --primary: #FF5722;
   --primary-d: #E64A19;
-  --primary-l: rgba(255, 87, 34, 0.10);
+  --primary-l: rgba(255, 87, 34, 0.09);
 
   --teal: #0891B2;
   --teal-d: #0E7490;
   --teal-l: rgba(8, 145, 178, 0.10);
 
-  --green: #15803D;
-  --green-d: #166534;
+  --green: #157F3C;
+  --green-d: #0F6630;
   --green-l: rgba(21, 128, 61, 0.10);
 
-  --red: #DC2626;
-  --red-l: rgba(220, 38, 38, 0.10);
+  --red: #D92D20;
+  --red-l: rgba(217, 45, 32, 0.10);
 
-  --yellow: #B45309;
-  --yellow-l: rgba(180, 83, 9, 0.10);
+  --yellow: #A3570A;
+  --yellow-l: rgba(163, 87, 10, 0.12);
 
   --blue: #2563EB;
   --blue-l: rgba(37, 99, 235, 0.10);
 
-  --text: #18181B;
-  --text2: #3F3F46;
-  --muted: #71717A;
-  --muted2: #A1A1AA;
+  --text: #27211C;
+  --text2: #574F47;
+  --muted: #8A8178;
+  --muted2: #B3AAA0;
 
-  --border: #E4E4E7;
-  --border2: #ECECEF;
+  --border: #E8E1D6;
+  --border2: #F0EAE1;
 
-  --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.05);
-  --shadow: 0 4px 16px rgba(24, 24, 27, 0.07);
-  --shadow-lg: 0 16px 32px rgba(24, 24, 27, 0.09);
+  --shadow-sm: 0 1px 2px rgba(62, 50, 40, 0.06);
+  --shadow: 0 5px 18px rgba(62, 50, 40, 0.09);
+  --shadow-lg: 0 16px 34px rgba(62, 50, 40, 0.14);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
 }
 
 html[data-dash-theme="dark"] .dashboard {
-  --bg: #121212;
-  --surface: #202124;
-  --surface2: #28292C;
-  --surface3: #323337;
+  --bg: #171310;
+  --surface: #201B16;
+  --surface2: #2A241D;
+  --surface3: #342D24;
 
   --primary: #FF5722;
   --primary-d: #E64A19;
-  --primary-l: rgba(255, 87, 34, 0.12);
+  --primary-l: rgba(255, 87, 34, 0.14);
 
-  --teal: #26C6DA;
-  --teal-d: #009688;
-  --teal-l: rgba(38, 198, 218, 0.15);
+  --teal: #4DD6E6;
+  --teal-d: #22B8CC;
+  --teal-l: rgba(77, 214, 230, 0.14);
 
-  --green: #81C995;
+  --green: #86CF9B;
   --green-d: #5BB974;
-  --green-l: rgba(129, 201, 149, 0.15);
+  --green-l: rgba(134, 207, 155, 0.14);
 
-  --red: #F28B82;
-  --red-l: rgba(242, 139, 130, 0.15);
+  --red: #F49C92;
+  --red-l: rgba(244, 156, 146, 0.14);
 
-  --yellow: #FDD663;
-  --yellow-l: rgba(253, 214, 99, 0.15);
+  --yellow: #F3C06B;
+  --yellow-l: rgba(243, 192, 107, 0.14);
 
-  --blue: #8AB4F8;
-  --blue-l: rgba(138, 180, 248, 0.15);
+  --blue: #9BB8E8;
+  --blue-l: rgba(155, 184, 232, 0.14);
 
-  --text: #E8EAED;
-  --text2: #D2D4D7;
-  --muted: #9AA0A6;
-  --muted2: #80868B;
+  --text: #F3EEE7;
+  --text2: #DCD4C9;
+  --muted: #A39A8D;
+  --muted2: #776E62;
 
-  --border: #3C4043;
-  --border2: #444746;
+  --border: #352E25;
+  --border2: #2B251E;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
-  --shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow: 0 5px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 16px 34px rgba(0, 0, 0, 0.55);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
 }
 
 html[data-dash-theme="black"] .dashboard {
   --bg: #000000;
-  --surface: #0A0A0A;
-  --surface2: #141414;
-  --surface3: #1E1E1E;
+  --surface: #0E0C09;
+  --surface2: #181410;
+  --surface3: #221D17;
 
   --primary: #FF6E40;
   --primary-d: #FF5722;
@@ -105,23 +119,27 @@ html[data-dash-theme="black"] .dashboard {
   --red: #FF8A80;
   --red-l: rgba(255, 138, 128, 0.14);
 
-  --yellow: #FFE082;
-  --yellow-l: rgba(255, 224, 130, 0.14);
+  --yellow: #FFCF86;
+  --yellow-l: rgba(255, 207, 134, 0.14);
 
   --blue: #90CAF9;
   --blue-l: rgba(144, 202, 249, 0.14);
 
-  --text: #F2F2F2;
-  --text2: #D6D6D6;
-  --muted: #9E9E9E;
-  --muted2: #7A7A7A;
+  --text: #F4F0EA;
+  --text2: #D8D2C9;
+  --muted: #9C948A;
+  --muted2: #6F675D;
 
-  --border: #262626;
-  --border2: #2E2E2E;
+  --border: #262019;
+  --border2: #2E271F;
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.7);
   --shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
   --shadow-lg: 0 14px 28px rgba(0, 0, 0, 0.8);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
 }
 
 /* ── Toggle de tema (sidebar) ── */
@@ -1377,4 +1395,231 @@ html[data-dash-theme="black"] .dashboard .ol-sched-line { color: #b6a3f8; }
 
 @media (prefers-reduced-motion: reduce) {
   .ar-processing-spinner { animation: none; }
+}
+
+/* ================================================================
+   REDESIGN "BALCÃO DE BRASA" (2026)
+   Console de operação quente e com hierarquia: rótulos de verdade
+   no lugar de ALL-CAPS espaçado, laranja só no que é acionável,
+   faturamento como cartão-herói. Sobrepõe a base do globals.css.
+   ================================================================ */
+
+/* ── Sidebar ── */
+.dashboard .sidebar {
+  width: 244px;
+  padding: 22px 0 0;
+}
+.dashboard .dash-content { margin-left: 244px; }
+
+.dashboard .sidebar-logo {
+  font-size: 19px;
+  letter-spacing: -0.5px;
+  padding: 0 20px 18px;
+}
+
+.dashboard .sidebar-store {
+  margin: 0 12px 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface2);
+}
+.dashboard .sidebar-store-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.dashboard .sidebar-store-avatar {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.dashboard .sidebar-store-avatar.is-letter {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #FF8A50, #E64A19);
+  border: none;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 17px;
+  font-weight: 900;
+}
+.dashboard .sidebar-store-id { min-width: 0; }
+.dashboard .sidebar-store-name {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 1px;
+}
+.dashboard .sidebar-store-loc {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dashboard .open-badge { border-radius: 999px; }
+
+/* Navegação: pílulas com ícone, sem régua lateral */
+.dashboard .nav-section-title {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-transform: none;
+  color: var(--muted2);
+  padding: 16px 22px 6px;
+}
+.dashboard .nav-item {
+  margin: 1px 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius-xs);
+  border-left: none;
+  font-size: 13.5px;
+  gap: 10px;
+}
+.dashboard .nav-item:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+.dashboard .nav-item.active {
+  background: var(--primary-l);
+  color: var(--primary);
+  font-weight: 700;
+}
+.dashboard .nav-ico {
+  display: inline-flex;
+  width: 18px;
+  justify-content: center;
+  color: var(--muted2);
+  transition: color 0.13s;
+}
+.dashboard .nav-item:hover .nav-ico,
+.dashboard .nav-item.active .nav-ico { color: inherit; }
+
+/* ── Cabeçalho das páginas ── */
+.dashboard .dash-title {
+  font-size: 24px;
+  letter-spacing: -0.5px;
+}
+.dashboard .new-order-btn {
+  box-shadow: 0 3px 10px rgba(255, 87, 34, 0.3);
+  border-radius: var(--radius-xs);
+}
+
+/* ── Cartões de resumo ── */
+.dashboard .stat-card {
+  padding: 18px 20px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.dashboard .stat-card:hover {
+  border-color: var(--muted2);
+  box-shadow: var(--shadow);
+}
+.dashboard .stat-label {
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.dashboard .stat-value {
+  font-size: 28px;
+  letter-spacing: -0.6px;
+  font-variant-numeric: tabular-nums;
+}
+.dashboard .stat-sub { font-size: 12px; color: var(--muted); }
+.dashboard .stat-value--pro { color: var(--primary); }
+
+/* Faturamento: o único cartão em brasa — o número que importa no dia. */
+.dashboard .stat-card--hero {
+  background: linear-gradient(135deg, #FF7A45 0%, #F4511E 55%, #D84315 100%);
+  border-color: transparent;
+  box-shadow: 0 10px 26px rgba(230, 74, 25, 0.32);
+}
+.dashboard .stat-card--hero:hover {
+  border-color: transparent;
+  box-shadow: 0 12px 30px rgba(230, 74, 25, 0.4);
+}
+.dashboard .stat-card--hero .stat-label { color: rgba(255, 255, 255, 0.85); }
+.dashboard .stat-card--hero .stat-value { color: #fff; }
+.dashboard .stat-card--hero .stat-sub { color: rgba(255, 255, 255, 0.75); }
+
+/* ── Títulos de seção: títulos, não etiquetas ── */
+.dashboard .dash-section-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  text-transform: none;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.dashboard .dash-section-link {
+  margin-left: auto;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+}
+.dashboard .dash-section-link:hover { text-decoration: underline; }
+
+/* ── Ações rápidas: chip de ícone na cor da marca ── */
+.dashboard .quick-action-card {
+  padding: 16px 18px;
+  gap: 8px;
+}
+.dashboard .quick-action-card:hover {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+}
+.dashboard .qa-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--primary-l);
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+.dashboard .qa-label { font-size: 13.5px; }
+.dashboard .qa-desc { font-size: 11.5px; }
+
+/* ── Últimos pedidos ── */
+.dashboard .recent-order-row { padding: 15px 18px; }
+.dashboard .ro-price { color: var(--text); font-size: 14.5px; }
+.dashboard .ro-num { font-size: 13.5px; }
+
+/* ── Onboarding ── */
+.dashboard .onboarding-title { font-size: 18px; }
+.dashboard .onboarding-progress { height: 6px; border-radius: 3px; }
+.dashboard .onboarding-bar {
+  background: linear-gradient(90deg, #FF8A50, #E64A19);
+  border-radius: 3px;
+}
+
+/* ── Vazio: convite, não moldura ── */
+.dashboard .empty-state { border-style: dashed; }
+
+/* ── Toggle de tema em pílula ── */
+.dashboard .theme-toggle { border-radius: 999px; }
+.dashboard .theme-toggle-btn { border-radius: 999px; }
+
+/* ── Foco visível para teclado ── */
+.dashboard .nav-item:focus-visible,
+.dashboard .quick-action-card:focus-visible,
+.dashboard .recent-order-row:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard .quick-action-card:hover { transform: none; }
 }

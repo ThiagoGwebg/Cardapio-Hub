@@ -39,6 +39,8 @@ export default async function DashboardLayout({ children }) {
     is_open: store.is_open,
     opening_hours: store.opening_hours,
     auto_hours: store.auto_hours,
+    // Só a logo: o avatar da sidebar precisa dela, e o resto do tema é do cardápio.
+    theme: { logoUrl: store.theme?.logoUrl ?? null },
   }
   // Mesmo cálculo do cardápio público: o badge do painel precisa dizer a mesma
   // coisa que o cliente vê, incluindo a grade de dias/horários.

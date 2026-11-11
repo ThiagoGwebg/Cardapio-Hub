@@ -69,7 +69,7 @@ export default async function DashboardHomePage() {
           <div className="stat-value">{todayCount}</div>
           <div className="stat-sub">{storeOpen.open ? 'Loja aberta' : 'Loja fechada'}</div>
         </div>
-        <div className="stat-card">
+        <div className="stat-card stat-card--hero">
           <div className="stat-label">Faturamento hoje</div>
           <div className="stat-value">{fmtCents(todayRevenue)}</div>
           <div className="stat-sub">pedidos concluídos e em andamento</div>
@@ -89,8 +89,8 @@ export default async function DashboardHomePage() {
         {usage.isPro && (
           <div className="stat-card">
             <div className="stat-label">Plano</div>
-            <div className="stat-value" style={{ color: 'var(--teal)' }}>Pro</div>
-            <div className="stat-sub">ilimitado</div>
+            <div className="stat-value stat-value--pro">Pro</div>
+            <div className="stat-sub">pedidos e produtos ilimitados</div>
           </div>
         )}
       </div>
@@ -126,8 +126,8 @@ export default async function DashboardHomePage() {
       <div className="dash-section">
         <div className="dash-section-title">
           Últimos pedidos
-          <Link href="/dashboard/pedidos" style={{ fontSize: 12, color: 'var(--primary)', fontWeight: 600, textDecoration: 'none', marginLeft: 'auto' }}>
-            Ver todos →
+          <Link href="/dashboard/pedidos" className="dash-section-link">
+            Ver todos
           </Link>
         </div>
         {allOrders && allOrders.length > 0 ? (

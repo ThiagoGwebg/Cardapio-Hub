@@ -1,7 +1,23 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Bell, HardDrive, X, Zap } from 'lucide-react'
+import {
+  Bell,
+  BellRing,
+  ChartNoAxesCombined,
+  ClipboardList,
+  CreditCard,
+  HardDrive,
+  House,
+  LifeBuoy,
+  Link2,
+  Store,
+  Users,
+  UtensilsCrossed,
+  Wallet,
+  X,
+  Zap,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -30,20 +46,20 @@ const THEME_INIT_SCRIPT = `
 `
 
 const NAV_PRINCIPAL = [
-  { href: '/dashboard', label: 'Início' },
-  { href: '/dashboard/pedidos', label: 'Pedidos' },
-  { href: '/dashboard/cardapio', label: 'Cardápio' },
-  { href: '/dashboard/desempenho', label: 'Desempenho' },
-  { href: '/dashboard/clientes', label: 'Clientes' },
-  { href: '/dashboard/caixa', label: 'Caixa' },
+  { href: '/dashboard', label: 'Início', Icon: House },
+  { href: '/dashboard/pedidos', label: 'Pedidos', Icon: ClipboardList },
+  { href: '/dashboard/cardapio', label: 'Cardápio', Icon: UtensilsCrossed },
+  { href: '/dashboard/desempenho', label: 'Desempenho', Icon: ChartNoAxesCombined },
+  { href: '/dashboard/clientes', label: 'Clientes', Icon: Users },
+  { href: '/dashboard/caixa', label: 'Caixa', Icon: Wallet },
 ]
 
 const NAV_CONFIG = [
-  { href: '/dashboard/loja', label: 'Minha Loja' },
-  { href: '/dashboard/notificacoes', label: 'Notificações' },
-  { href: '/dashboard/links', label: 'Meus Links' },
-  { href: '/dashboard/billing', label: 'Assinatura' },
-  { href: '/dashboard/ajuda', label: 'Ajuda' },
+  { href: '/dashboard/loja', label: 'Minha Loja', Icon: Store },
+  { href: '/dashboard/notificacoes', label: 'Notificações', Icon: BellRing },
+  { href: '/dashboard/links', label: 'Meus Links', Icon: Link2 },
+  { href: '/dashboard/billing', label: 'Assinatura', Icon: CreditCard },
+  { href: '/dashboard/ajuda', label: 'Ajuda', Icon: LifeBuoy },
 ]
 
 
@@ -213,6 +229,7 @@ export default function DashboardShell({
             className={`nav-item ${isActive(item.href) ? 'active' : ''}`}
             onClick={() => setOpen(false)}
           >
+            <span className="nav-ico"><item.Icon size={17} strokeWidth={2.1} /></span>
             {item.label}
             {item.href === '/dashboard/pedidos' && novoCount > 0 && (
               <span className={`nav-badge ${pulse ? 'pulse' : ''}`}>{novoCount}</span>
@@ -228,6 +245,7 @@ export default function DashboardShell({
             className={`nav-item ${pathname.startsWith(item.href) ? 'active' : ''}`}
             onClick={() => setOpen(false)}
           >
+            <span className="nav-ico"><item.Icon size={17} strokeWidth={2.1} /></span>
             {item.label}
           </Link>
         ))}
@@ -259,8 +277,20 @@ export default function DashboardShell({
           cardápio<span>ágil</span>
         </div>
         <div className="sidebar-store">
-          <div className="sidebar-store-name">{store.name}</div>
-          <div className="sidebar-store-loc">{store.address || 'Endereço não definido'}</div>
+          <div className="sidebar-store-row">
+            {store.theme?.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img className="sidebar-store-avatar" src={store.theme.logoUrl} alt="" />
+            ) : (
+              <span className="sidebar-store-avatar is-letter" aria-hidden>
+                {(store.name || '?').trim().charAt(0).toUpperCase()}
+              </span>
+            )}
+            <div className="sidebar-store-id">
+              <div className="sidebar-store-name">{store.name}</div>
+              <div className="sidebar-store-loc">{store.address || 'Endereço não definido'}</div>
+            </div>
+          </div>
           <div className={badgeClass} title={badgeTitle}>{badgeLabel}</div>
           {storeOpen.reason === 'schedule' && storeOpen.nextLabel && (
             <div className="sidebar-store-loc">Abre {storeOpen.nextLabel}</div>
