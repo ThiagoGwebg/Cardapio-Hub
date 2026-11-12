@@ -1,0 +1,68 @@
+/* Integrações — cartões por serviço, agrupados por assunto. */
+.dashboard .int-section {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 8px 0 12px;
+}
+.dashboard .int-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
+}
+.dashboard .int-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.dashboard .int-card.is-featured { grid-column: span 2; }
+.dashboard .int-card.is-soon { background: var(--surface2); border-style: dashed; }
+.dashboard .int-card.is-soon .int-logo { color: var(--muted); }
+.dashboard .int-card-head { display: flex; align-items: center; gap: 12px; }
+.dashboard .int-card-head > div { flex: 1; min-width: 0; }
+.dashboard .int-logo {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+}
+.dashboard .int-name { font-size: 14.5px; font-weight: 800; }
+.dashboard .int-by { font-size: 12px; color: var(--muted); }
+.dashboard .int-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+.dashboard .int-note {
+  font-size: 12.5px;
+  color: var(--text2);
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  background: var(--yellow-l);
+}
+.dashboard .int-card-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+.dashboard .int-form { padding-top: 4px; border-top: 1px solid var(--border2); }
+.dashboard .int-reqs {
+  margin: 8px 0 0 18px;
+  font-size: 12.5px;
+  color: var(--text2);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+@media (max-width: 760px) {
+  .dashboard .int-card.is-featured { grid-column: auto; }
+}
