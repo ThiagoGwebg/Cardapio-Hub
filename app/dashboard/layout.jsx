@@ -18,7 +18,7 @@ export const viewport = {
 }
 
 export default async function DashboardLayout({ children }) {
-  const { supabase, store } = await getCurrentStore()
+  const { supabase, user, store } = await getCurrentStore()
 
   // Montagem assistida: o time libera o painel antes do 1º pagamento para montar o
   // cardápio junto com o cliente. O cardápio público e os pedidos seguem bloqueados.
@@ -41,6 +41,14 @@ export default async function DashboardLayout({ children }) {
     auto_hours: store.auto_hours,
     // Só a logo: o avatar da sidebar precisa dela, e o resto do tema é do cardápio.
     theme: { logoUrl: store.theme?.logoUrl ?? null },
+    // Atalho "Ver meu cardápio" da sidebar.
+    slug: store.slug,
+  }
+  // Conta no rodapé da sidebar. O cadastro não pede nome, então o e-mail é a
+  // identificação garantida; o nome só aparece se existir no metadata.
+  const account = {
+    email: user.email ?? '',
+    name: user.user_metadata?.full_name || user.user_metadata?.name || null,
   }
   // Mesmo cálculo do cardápio público: o badge do painel precisa dizer a mesma
   // coisa que o cliente vê, incluindo a grade de dias/horários.
@@ -50,14 +58,14 @@ export default async function DashboardLayout({ children }) {
   // `stores.billing_suspended` é mantida por trigger a partir de subscriptions.billing_status.
   if (store.billing_suspended && !setupUnlocked) {
     return (
-      <DashboardShell store={shellStore} initialOpen={initialOpen}>
+      <DashboardShell store={shellStore} account={account} initialOpen={initialOpen}>
         <SuspendedGate storeId={store.id} />
       </DashboardShell>
     )
   }
 
   return (
-    <DashboardShell store={shellStore} initialOpen={initialOpen}>
+    <DashboardShell store={shellStore} account={account} initialOpen={initialOpen}>
       {store.billing_suspended ? <SetupModeBanner /> : <BillingBanner storeId={store.id} />}
       {children}
     </DashboardShell>

@@ -5,12 +5,17 @@ import {
   Bell,
   BellRing,
   ChartNoAxesCombined,
+  ChevronsUpDown,
   ClipboardList,
   CreditCard,
+  ExternalLink,
   HardDrive,
-  House,
+  LayoutDashboard,
   LifeBuoy,
   Link2,
+  Package,
+  Plug,
+  Settings,
   Store,
   Users,
   UtensilsCrossed,
@@ -46,31 +51,48 @@ const THEME_INIT_SCRIPT = `
 })();
 `
 
-const NAV_PRINCIPAL = [
-  { href: '/dashboard', label: 'Início', Icon: House },
-  { href: '/dashboard/pedidos', label: 'Pedidos', Icon: ClipboardList },
-  { href: '/dashboard/cardapio', label: 'Cardápio', Icon: UtensilsCrossed },
-  { href: '/dashboard/desempenho', label: 'Desempenho', Icon: ChartNoAxesCombined },
-  { href: '/dashboard/clientes', label: 'Clientes', Icon: Users },
-  { href: '/dashboard/caixa', label: 'Caixa', Icon: Wallet },
+// Menu organizado pelo ritmo do restaurante: o que se usa com a loja aberta
+// (Operação), o que se olha depois (Gestão) e o que se ajusta de vez em
+// quando (Configurações, uma entrada só com sub-abas na própria página).
+const NAV_GROUPS = [
+  {
+    title: 'Operação',
+    items: [
+      { href: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
+      { href: '/dashboard/pedidos', label: 'Pedidos', Icon: ClipboardList },
+      { href: '/dashboard/cardapio', label: 'Cardápio', Icon: UtensilsCrossed },
+      { href: '/dashboard/estoque', label: 'Estoque', Icon: Package },
+      { href: '/dashboard/caixa', label: 'Caixa', Icon: Wallet },
+    ],
+  },
+  {
+    title: 'Gestão',
+    items: [
+      { href: '/dashboard/clientes', label: 'Clientes', Icon: Users },
+      { href: '/dashboard/desempenho', label: 'Desempenho', Icon: ChartNoAxesCombined },
+    ],
+  },
 ]
 
-const NAV_CONFIG = [
+// Sub-abas de Configurações. As URLs são as de sempre — só a navegação mudou.
+const SETTINGS_TABS = [
   { href: '/dashboard/loja', label: 'Minha Loja', Icon: Store },
+  { href: '/dashboard/links', label: 'Links', Icon: Link2 },
   { href: '/dashboard/notificacoes', label: 'Notificações', Icon: BellRing },
-  { href: '/dashboard/links', label: 'Meus Links', Icon: Link2 },
   { href: '/dashboard/billing', label: 'Assinatura', Icon: CreditCard },
-  { href: '/dashboard/ajuda', label: 'Ajuda', Icon: LifeBuoy },
 ]
+const isSettingsPath = (p) => SETTINGS_TABS.some((t) => p === t.href || p.startsWith(t.href + '/'))
 
 
 export default function DashboardShell({
   store,
+  account,
   initialOpen,
   children,
 }
 ) {
   const [open, setOpen] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
   const [novoCount, setNovoCount] = useState(0)
   const [pulse, setPulse] = useState(false)
   const [newOrderSignal, setNewOrderSignal] = useState(0)
@@ -213,44 +235,92 @@ export default function DashboardShell({
     ? `Fora do horário de funcionamento${storeOpen.nextLabel ? ` — abre ${storeOpen.nextLabel}` : ''}`
     : undefined
 
-  // Destaca "Início" quando está exatamente em /dashboard
+  // Destaca "Dashboard" só quando está exatamente em /dashboard
   function isActive(href) {
     if (href === '/dashboard') return pathname === '/dashboard'
     return pathname.startsWith(href)
   }
+  const inSettings = isSettingsPath(pathname)
+  // Na raiz de uma sub-aba o título da página repete o nome da aba — o
+  // cabeçalho "Configurações" já cumpre esse papel, então o CSS esconde o dela.
+  const onSettingsTabRoot = SETTINGS_TABS.some((t) => t.href === pathname)
 
+  function closeMenus() {
+    setOpen(false)
+    setAccountOpen(false)
+  }
+
+  // Sem nome cadastrado, a parte antes do @ cabe na sidebar; o e-mail completo
+  // fica no title do botão.
+  const accountLabel = account?.name || account?.email?.split('@')[0] || 'Minha conta'
+  const accountInitial = (accountLabel.trim().charAt(0) || '?').toUpperCase()
+
+  // No desktop a sidebar é um trilho só de ícones que se expande ao passar o
+  // mouse (ou ao focar com Tab). O rótulo continua no DOM o tempo todo — só
+  // fica invisível no trilho —, então leitor de tela e busca da página o veem.
   function NavLinks() {
     return (
-      <>
-        <div className="nav-section-title">Principal</div>
-        {NAV_PRINCIPAL.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`nav-item ${isActive(item.href) ? 'active' : ''}`}
-            onClick={() => setOpen(false)}
-          >
-            <span className="nav-ico"><item.Icon size={17} strokeWidth={2.1} /></span>
-            {item.label}
-            {item.href === '/dashboard/pedidos' && novoCount > 0 && (
-              <span className={`nav-badge ${pulse ? 'pulse' : ''}`}>{novoCount}</span>
-            )}
-          </Link>
+      <nav className="sidebar-nav" aria-label="Menu do painel">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.title} className="nav-group">
+            <div className="nav-section-title"><span>{group.title}</span></div>
+            {group.items.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`nav-item ${isActive(item.href) ? 'active' : ''}`}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                onClick={closeMenus}
+              >
+                <span className="nav-ico"><item.Icon size={19} strokeWidth={2} /></span>
+                <span className="nav-label">{item.label}</span>
+                {item.href === '/dashboard/pedidos' && novoCount > 0 && (
+                  <span
+                    className={`nav-badge ${pulse ? 'pulse' : ''}`}
+                    aria-label={`${novoCount} ${novoCount === 1 ? 'pedido novo' : 'pedidos novos'}`}
+                  >
+                    {novoCount}
+                  </span>
+                )}
+              </Link>
+            ))}
+          </div>
         ))}
 
-        <div className="nav-section-title">Configurações</div>
-        {NAV_CONFIG.map((item) => (
+        <div className="nav-group">
+          <div className="nav-section-title"><span>Loja</span></div>
           <Link
-            key={item.href}
-            href={item.href}
-            className={`nav-item ${pathname.startsWith(item.href) ? 'active' : ''}`}
-            onClick={() => setOpen(false)}
+            href={SETTINGS_TABS[0].href}
+            className={`nav-item ${inSettings ? 'active' : ''}`}
+            aria-current={inSettings ? 'page' : undefined}
+            onClick={closeMenus}
           >
-            <span className="nav-ico"><item.Icon size={17} strokeWidth={2.1} /></span>
-            {item.label}
+            <span className="nav-ico"><Settings size={19} strokeWidth={2} /></span>
+            <span className="nav-label">Configurações</span>
           </Link>
-        ))}
-      </>
+          <Link
+            href="/dashboard/integracoes"
+            className={`nav-item ${isActive('/dashboard/integracoes') ? 'active' : ''}`}
+            aria-current={isActive('/dashboard/integracoes') ? 'page' : undefined}
+            onClick={closeMenus}
+          >
+            <span className="nav-ico"><Plug size={19} strokeWidth={2} /></span>
+            <span className="nav-label">Integrações</span>
+          </Link>
+          {store.slug && (
+            <a
+              href={`/loja/${store.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="nav-item"
+              onClick={closeMenus}
+            >
+              <span className="nav-ico"><ExternalLink size={19} strokeWidth={2} /></span>
+              <span className="nav-label">Ver meu cardápio</span>
+            </a>
+          )}
+        </div>
+      </nav>
     )
   }
 
@@ -270,37 +340,53 @@ export default function DashboardShell({
 
       {open && <div className="sidebar-overlay" onClick={() => setOpen(false)} />}
 
-      <aside className={`sidebar ${open ? 'open' : ''}`}>
+      <aside
+        className={`sidebar ${open ? 'open' : ''}`}
+        // No desktop o trilho recolhe ao tirar o mouse; o menu da conta fecha junto.
+        onMouseLeave={() => setAccountOpen(false)}
+      >
         <button className="sidebar-close" onClick={() => setOpen(false)} aria-label="Fechar menu">
           <X size={18} strokeWidth={2.4} />
         </button>
-        <div className="sidebar-logo">
-          cardápio<span>ágil</span>
-        </div>
+        <Link href="/dashboard" className="sidebar-logo" aria-label="Cardápio Ágil — início do painel">
+          <span className="sidebar-logo-mark" aria-hidden><UtensilsCrossed size={18} strokeWidth={2.4} /></span>
+          <span className="sidebar-logo-word">cardápio<span>ágil</span></span>
+        </Link>
         <div className="sidebar-store">
           <div className="sidebar-store-row">
-            {store.theme?.logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img className="sidebar-store-avatar" src={store.theme.logoUrl} alt="" />
-            ) : (
-              <span className="sidebar-store-avatar is-letter" aria-hidden>
-                {(store.name || '?').trim().charAt(0).toUpperCase()}
-              </span>
-            )}
+            <span className="sidebar-store-avatar-wrap">
+              {store.theme?.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img className="sidebar-store-avatar" src={store.theme.logoUrl} alt="" />
+              ) : (
+                <span className="sidebar-store-avatar is-letter" aria-hidden>
+                  {(store.name || '?').trim().charAt(0).toUpperCase()}
+                </span>
+              )}
+              {/* No trilho recolhido o selo Aberto/Fechado vira este ponto. */}
+              <span
+                className={`sidebar-store-dot ${storeOpen.open ? '' : 'is-closed'}`}
+                aria-hidden
+              />
+            </span>
             <div className="sidebar-store-id">
               <div className="sidebar-store-name">{store.name}</div>
               <div className="sidebar-store-loc">{store.address || 'Endereço não definido'}</div>
             </div>
           </div>
-          <div className={badgeClass} title={badgeTitle}>{badgeLabel}</div>
-          {storeOpen.reason === 'schedule' && storeOpen.nextLabel && (
-            <div className="sidebar-store-loc">Abre {storeOpen.nextLabel}</div>
-          )}
+          <div className="sidebar-store-more">
+            <div>
+              <div className={badgeClass} title={badgeTitle}>{badgeLabel}</div>
+              {storeOpen.reason === 'schedule' && storeOpen.nextLabel && (
+                <div className="sidebar-store-loc">Abre {storeOpen.nextLabel}</div>
+              )}
+            </div>
+          </div>
         </div>
 
         <NavLinks />
 
-        <div style={{ marginTop: 'auto', padding: '18px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="sidebar-foot">
           {/* Instalação do app desligada por enquanto no painel do lojista — o componente
               fica montado só pra registrar o service worker (offline + push). */}
           <InstallPwaButton
@@ -312,11 +398,68 @@ export default function DashboardShell({
             subtitle="Acesse seus pedidos em um toque, sem precisar buscar o link"
             benefits={DASHBOARD_INSTALL_BENEFITS}
           />
-          <ThemeToggle />
-          <LogoutButton />
+          {/* Menu da conta: abre para cima, dentro do fluxo da sidebar (um
+              popover absoluto seria cortado pelo overflow dela). */}
+          <div
+            id="sidebar-account-menu"
+            className={`account-menu ${accountOpen ? 'open' : ''}`}
+            hidden={!accountOpen}
+          >
+            <ThemeToggle />
+            <Link href="/dashboard/ajuda" className="nav-item" onClick={closeMenus}>
+              <span className="nav-ico"><LifeBuoy size={19} strokeWidth={2} /></span>
+              <span className="nav-label">Ajuda</span>
+            </Link>
+            <LogoutButton />
+          </div>
+          <button
+            type="button"
+            className={`sidebar-account ${accountOpen ? 'open' : ''}`}
+            aria-expanded={accountOpen}
+            aria-controls="sidebar-account-menu"
+            onClick={() => setAccountOpen((v) => !v)}
+            onKeyDown={(e) => { if (e.key === 'Escape') setAccountOpen(false) }}
+            title={account?.email || undefined}
+          >
+            <span className="sidebar-account-avatar" aria-hidden>{accountInitial}</span>
+            <span className="sidebar-account-id">
+              <span className="sidebar-account-name">{accountLabel}</span>
+              <span className="sidebar-account-role">Dono da loja</span>
+            </span>
+            <ChevronsUpDown className="sidebar-account-chev" size={16} strokeWidth={2} aria-hidden />
+          </button>
         </div>
       </aside>
-      <main className="dash-content">{children}</main>
+      <main className={`dash-content ${inSettings ? 'is-settings' : ''} ${onSettingsTabRoot ? 'is-settings-root' : ''}`}>
+        {inSettings && (
+          <div className="settings-head">
+            <div className="dash-header page-head">
+              <span className="page-head-ico" aria-hidden><Settings size={22} strokeWidth={2} /></span>
+              <div>
+                <h1 className="dash-title">Configurações</h1>
+                <div className="dash-subtitle">Dados da loja, links de divulgação, avisos de pedido e o seu plano.</div>
+              </div>
+            </div>
+            <nav className="settings-tabs" aria-label="Seções de configuração">
+              {SETTINGS_TABS.map((t) => {
+                const active = pathname === t.href || pathname.startsWith(t.href + '/')
+                return (
+                  <Link
+                    key={t.href}
+                    href={t.href}
+                    className={`settings-tab ${active ? 'active' : ''}`}
+                    aria-current={active ? 'page' : undefined}
+                  >
+                    <t.Icon size={16} strokeWidth={2} aria-hidden />
+                    {t.label}
+                  </Link>
+                )
+              })}
+            </nav>
+          </div>
+        )}
+        {children}
+      </main>
       <PushNotificationPrompt
         scope="dashboard"
         tags={{ store_id: store.id, role: 'lojista' }}

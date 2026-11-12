@@ -22,6 +22,9 @@ const nextConfig = {
   // `webpack` injetado pelo next-pwa como erro fatal ao rodar `next dev`.
   // Em dev o PWA está desligado, então não há nada de Workbox a migrar.
   turbopack: {},
+  // Esconde o botão "N" do Next no canto da tela em `next dev` — ele cobria
+  // o rodapé da sidebar. Erros de compilação continuam aparecendo na tela.
+  devIndicators: false,
 };
 
 export default withPWA(nextConfig);

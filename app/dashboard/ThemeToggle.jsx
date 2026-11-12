@@ -4,11 +4,6 @@ import { useEffect, useState } from 'react'
 import { Moon, Sun } from 'lucide-react'
 
 
-const THEMES = [
-  { value: 'light', label: 'Claro', Icon: Sun },
-  { value: 'dark', label: 'Escuro', Icon: Moon },
-]
-
 const STORAGE_KEY = 'cardapio-dash-theme'
 
 /*
@@ -52,20 +47,23 @@ export default function ThemeToggle() {
     forceRepaint()
   }
 
+  // Com só dois temas, um interruptor é mais claro que dois botões — e cabe no
+  // trilho recolhido da sidebar como mais um ícone.
+  const isDark = theme === 'dark'
+  const Icon = isDark ? Moon : Sun
   return (
-    <div className="theme-toggle" role="group" aria-label="Tema do painel">
-      {THEMES.map((t) => (
-        <button
-          key={t.value}
-          type="button"
-          className={`theme-toggle-btn ${theme === t.value ? 'active' : ''}`}
-          onClick={() => applyTheme(t.value)}
-          aria-label={t.label}
-          title={t.label}
-        >
-          <t.Icon size={15} strokeWidth={2.2} />
-        </button>
-      ))}
-    </div>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={isDark}
+      className="nav-item nav-item--button theme-switch"
+      onClick={() => applyTheme(isDark ? 'light' : 'dark')}
+    >
+      <span className="nav-ico"><Icon size={19} strokeWidth={2} /></span>
+      <span className="nav-label">Tema escuro</span>
+      <span className={`theme-switch-track ${isDark ? 'on' : ''}`} aria-hidden>
+        <span className="theme-switch-thumb" />
+      </span>
+    </button>
   )
 }

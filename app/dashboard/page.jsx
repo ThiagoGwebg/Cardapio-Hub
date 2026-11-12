@@ -1,4 +1,4 @@
-import { ClipboardList, Lightbulb, Link2, Settings, Utensils } from 'lucide-react'
+import { ClipboardList, LayoutDashboard, Lightbulb, Link2, Settings, Utensils } from 'lucide-react'
 import { getCurrentStore } from '@/lib/store'
 import { fmtCents, fmtSince, spDayStart } from '@/lib/format'
 import { getStoreUsage } from '@/lib/plan'
@@ -48,8 +48,12 @@ export default async function DashboardHomePage() {
   return (
     <>
       <SignupTracker />
-      <div className="dash-header">
-        <div className="dash-title">Início</div>
+      <div className="dash-header page-head">
+        <span className="page-head-ico" aria-hidden><LayoutDashboard size={22} strokeWidth={2} /></span>
+        <div>
+          <h1 className="dash-title">Dashboard</h1>
+          <div className="dash-subtitle">O movimento de hoje e os atalhos do dia a dia da sua loja.</div>
+        </div>
       </div>
 
       {/* Onboarding Checklist */}

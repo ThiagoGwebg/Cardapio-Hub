@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { LogOut } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -25,15 +26,16 @@ export default function LogoutButton() {
   }
 
   return (
-    <button className="advance-btn" onClick={handleLogout} disabled={loading}>
-      {loading ? (
-        <>
-          <span className="btn-spinner" aria-hidden />
-          Saindo…
-        </>
-      ) : (
-        'Sair'
-      )}
+    <button
+      type="button"
+      className="nav-item nav-item--button nav-item--logout"
+      onClick={handleLogout}
+      disabled={loading}
+    >
+      <span className="nav-ico">
+        {loading ? <span className="btn-spinner" aria-hidden /> : <LogOut size={19} strokeWidth={2} />}
+      </span>
+      <span className="nav-label">{loading ? 'Saindo…' : 'Sair'}</span>
     </button>
   )
 }
