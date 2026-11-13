@@ -17,7 +17,7 @@ export async function login(formData) {
   }
 
   // Admin do SaaS cai direto no painel interno; lojista vai pro dashboard da loja
-  if (isAdminEmail(email)) {
+  if (await isAdminEmail(email)) {
     redirect('/admin')
   }
   redirect('/dashboard')

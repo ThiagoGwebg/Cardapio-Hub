@@ -59,6 +59,18 @@ const LINKS = [
       </svg>
     ),
   },
+  {
+    href: '/admin/equipe',
+    label: 'Equipe',
+    exact: false,
+    icon: (
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2l7 3v6c0 4.4-3 8.3-7 9.5-4-1.2-7-5.1-7-9.5V5z" />
+        <circle cx="12" cy="10" r="2.2" />
+        <path d="M8.5 16.2a3.8 3.8 0 0 1 7 0" />
+      </svg>
+    ),
+  },
 ];
 
 export default function AdminNav({ email }) {
