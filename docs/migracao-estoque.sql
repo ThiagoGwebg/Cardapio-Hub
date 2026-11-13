@@ -1,7 +1,8 @@
 -- ============================================================
 -- Migração: ESTOQUE + ENTRADA DE NF-e + FICHA TÉCNICA + INTEGRAÇÕES
 --
--- STATUS: aplicada só no banco de DESENVOLVIMENTO. Produção: pendente.
+-- STATUS: APLICADA em produção (cardapio-agil / pafotbuwpvnpzxdlhzud) em
+-- 2026-11-12, como a migração "estoque_nfe_ficha_tecnica_integracoes".
 -- Só CRIA objetos novos — não altera nenhuma tabela existente. O único
 -- ponto de contato com o fluxo atual é um gatilho novo em `orders`
 -- (baixa automática), que só lê o pedido e escreve em stock_movements.
