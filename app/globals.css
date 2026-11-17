@@ -2294,16 +2294,20 @@ tr:hover td {
 .opt-desc-input { margin-top: 6px; font-size: 13px; padding: 6px 8px; }
 .option-modal-footer { padding: 14px 18px 18px; border-top: 1px solid var(--border); }
 
-/* ===== Acompanhamento do pedido ===== */
-/* ══════════════════════════════════════════
-   ACOMPANHAMENTO DO PEDIDO — tema claro iFood
-   (o wrapper .storefront traz a paleta quente clara)
-══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   ACOMPANHAMENTO DO PEDIDO
+   O cliente abre esta tela pra saber uma coisa: "e aí, vem ou não
+   vem?". Então o painel de status (estado + tempo + trilha) é o
+   elemento dominante e cabe na primeira tela do celular; resumo,
+   chave Pix e ações são consulta, não protagonismo.
+   O wrapper .storefront traz a paleta quente da loja.
+═══════════════════════════════════════════════════════════════ */
 .track-page {
   display: flex;
   justify-content: center;
-  padding: 20px 14px 48px;
+  padding: 18px 14px 40px;
 }
+/* Coluna estreita: telas de pagamento, carregando e erro. */
 .track-shell {
   width: 100%;
   max-width: 440px;
@@ -2311,17 +2315,31 @@ tr:hover td {
   flex-direction: column;
   gap: 14px;
 }
+/* Grade do acompanhamento: uma coluna no celular, duas no desktop
+   (status de um lado; Pix, resumo e ações do outro). */
+.track-layout {
+  width: 100%;
+  max-width: 960px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  /* O .track-page é flex e estica o grid até 100vh; sem isto as linhas
+     repartiriam a sobra e abririam buracos entre os blocos. */
+  align-content: start;
+}
+.track-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 
 /* Cabeçalho da loja */
-.track-top { display: flex; align-items: center; gap: 12px; padding: 4px 2px; }
+.track-top { display: flex; align-items: center; gap: 12px; padding: 2px; }
 .track-store-badge {
-  width: 46px; height: 46px;
+  width: 44px; height: 44px;
   border-radius: 14px;
   background: linear-gradient(135deg, var(--primary), #ff8a5b);
   color: #fff;
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
-  font-size: 20px;
+  font-size: 19px;
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 6px 16px rgba(255, 87, 34, 0.28);
   flex-shrink: 0;
@@ -2342,7 +2360,7 @@ tr:hover td {
 }
 
 .track-top-info { min-width: 0; }
-.track-store { font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+.track-store { font-size: 16.5px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
 .track-order-num { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
 
 /* Card base */
@@ -2350,11 +2368,140 @@ tr:hover td {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 18px;
-  padding: 18px;
+  padding: 16px;
   box-shadow: var(--shadow-sm);
 }
 
-/* HERO de status */
+/* ── PAINEL DE STATUS ────────────────────────────────────────── */
+.track-status {
+  background:
+    radial-gradient(130% 150% at 12% -20%, var(--primary-l), transparent 62%),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+/* Ícone à esquerda e texto à direita: ocupa quase metade da altura do
+   herói centralizado anterior sem perder nada de informação. */
+.track-status-head { display: flex; align-items: center; gap: 13px; }
+.track-status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px; height: 54px;
+  border-radius: 18px;
+  background: var(--primary-l);
+  color: var(--primary);
+  flex-shrink: 0;
+  animation: trackPop 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+@keyframes trackPop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.track-status-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--text);
+  letter-spacing: -0.4px;
+  margin: 0;
+}
+.track-status-sub { font-size: 13px; color: var(--muted); margin: 3px 0 0; line-height: 1.4; }
+
+/* Faixa de tempo: o número é o segundo elemento mais importante da tela. */
+.track-eta {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--primary-l);
+  border-radius: 14px;
+}
+.track-eta-label { font-size: 12px; font-weight: 600; color: var(--primary); opacity: 0.85; display: block; }
+.track-eta-value {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 26px;
+  line-height: 1.05;
+  color: var(--primary);
+  display: block;
+  margin-top: 1px;
+}
+.track-eta-clock {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 600; color: var(--primary); opacity: 0.8;
+  padding-bottom: 3px;
+  white-space: nowrap;
+}
+
+/* ── TRILHA DE ETAPAS (horizontal) ───────────────────────────── */
+.track-rail {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 2px 0 0;
+}
+.track-rail-step {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+/* O traço antes de cada etapa fica verde quando a etapa anterior terminou. */
+.track-rail-step:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  right: 50%;
+  left: -50%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+}
+.track-rail-step.done::before,
+.track-rail-step.current::before { background: var(--green); }
+.track-rail-node {
+  width: 31px; height: 31px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  color: var(--muted2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.track-rail-step.done .track-rail-node { background: var(--green); border-color: var(--green); color: #fff; }
+.track-rail-step.current .track-rail-node {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 0 0 4px var(--primary-l);
+  animation: trackPulse 1.8s ease-in-out infinite;
+}
+@keyframes trackPulse {
+  0%, 100% { box-shadow: 0 0 0 4px var(--primary-l); }
+  50% { box-shadow: 0 0 0 8px var(--primary-l); }
+}
+.track-rail-label {
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--muted2);
+  padding: 0 2px;
+}
+.track-rail-step.done .track-rail-label { color: var(--text2); }
+.track-rail-step.current .track-rail-label { color: var(--primary); font-weight: 800; }
+
+/* Estados de carregamento / erro / cancelado (coluna estreita, centralizado) */
 .track-hero {
   background:
     radial-gradient(120% 140% at 50% -10%, var(--primary-l), transparent 60%),
@@ -2366,7 +2513,6 @@ tr:hover td {
   box-shadow: var(--shadow);
 }
 .track-hero-icon {
-  /* Container de ícone SVG (lucide): centraliza e herda a cor do tema. */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2377,8 +2523,6 @@ tr:hover td {
   color: var(--primary);
   animation: trackPop 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.3);
 }
-.track-hero--canceled .track-hero-icon { background: var(--red-l); color: var(--red); }
-@keyframes trackPop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .track-hero-title {
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
@@ -2388,22 +2532,17 @@ tr:hover td {
   letter-spacing: -0.4px;
 }
 .track-hero-sub { font-size: 13.5px; color: var(--muted); margin-top: 5px; line-height: 1.45; }
-.track-hero--canceled { background: var(--red-l); border-color: transparent; }
-.track-hero--canceled .track-hero-title { color: var(--red); }
 .track-hero--loading { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 40px 20px; }
 
-.track-eta {
-  display: inline-flex;
-  flex-direction: column;
-  gap: 1px;
-  margin-top: 16px;
-  padding: 9px 22px;
-  background: var(--primary-l);
-  border-radius: 14px;
+/* Cancelado: mesmo painel, tom de alerta e sem tempo/trilha. */
+.track-status--canceled {
+  background: var(--red-l);
+  border-color: transparent;
+  box-shadow: none;
 }
-.track-eta-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--primary); opacity: 0.85; }
-.track-eta-value { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 22px; color: var(--primary); }
-.track-eta-clock { font-size: 11.5px; font-weight: 600; color: var(--primary); opacity: 0.75; margin-top: 1px; }
+.track-status--canceled .track-status-icon { background: var(--surface); color: var(--red); }
+.storefront-dark .track-status--canceled .track-status-icon { background: rgba(0, 0, 0, 0.3); }
+.track-status--canceled .track-status-title { color: var(--red); }
 
 .track-spinner {
   width: 34px; height: 34px;
@@ -2414,114 +2553,164 @@ tr:hover td {
 }
 @keyframes trackSpin { to { transform: rotate(360deg); } }
 
-/* STEPPER */
-.track-steps { display: flex; flex-direction: column; gap: 0; }
-.track-step { display: flex; align-items: center; gap: 14px; position: relative; padding: 9px 0; }
-.track-step:not(:last-child)::before {
-  content: '';
-  position: absolute;
-  left: 17px;
-  top: 45px;
-  height: calc(100% - 26px);
-  width: 2.5px;
-  border-radius: 2px;
-  background: var(--border);
-}
-.track-step.done:not(:last-child)::before { background: var(--green); }
-.track-step-icon {
-  width: 36px; height: 36px;
-  border-radius: 50%;
+/* ── CHAVE PIX DA LOJA ───────────────────────────────────────── */
+.track-pix {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  align-items: center;
   background: var(--surface2);
-  border: 1.5px solid var(--border);
-  color: var(--muted2);
-  font-size: 16px;
-  display: flex; align-items: center; justify-content: center;
+  border: 1px dashed var(--primary);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.track-pix-label { font-size: 11.5px; color: var(--muted); display: block; }
+.track-pix-value {
+  font-size: 14.5px; font-weight: 700; color: var(--text);
+  word-break: break-all; line-height: 1.3; display: block; margin-top: 2px;
+}
+.track-pix-copy {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
   flex-shrink: 0;
-  z-index: 1;
-  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 8px 13px;
+  border-radius: 10px;
+  border: 1px solid var(--primary);
+  background: var(--surface);
+  color: var(--primary);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
-.track-step.done .track-step-icon { background: var(--green); border-color: var(--green); color: #fff; font-weight: 800; }
-.track-step.current .track-step-icon {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
-  box-shadow: 0 0 0 5px var(--primary-l);
-  animation: trackPulse 1.8s ease-in-out infinite;
-}
-@keyframes trackPulse {
-  0%, 100% { box-shadow: 0 0 0 4px var(--primary-l); }
-  50% { box-shadow: 0 0 0 8px var(--primary-l); }
-}
-.track-step-body { display: flex; align-items: center; gap: 8px; flex: 1; }
-.track-step-label { font-size: 14.5px; color: var(--muted); }
-.track-step.done .track-step-label { color: var(--text2); font-weight: 600; }
-.track-step.current .track-step-label { color: var(--text); font-weight: 800; }
-.track-step-now {
-  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
-  color: var(--primary); background: var(--primary-l);
-  padding: 2px 8px; border-radius: 999px;
+.track-pix-copy:hover { background: var(--primary); color: #fff; }
+.track-pix-copy:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.track-pix-hint {
+  grid-column: 1 / -1;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin: 4px 0 0;
+  line-height: 1.45;
 }
 
-/* Resumo do pedido */
-.track-section-title {
-  font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px;
-  color: var(--muted2); margin-bottom: 12px;
+/* ── RESUMO DO PEDIDO (recolhível) ───────────────────────────── */
+.track-summary { padding: 0; overflow: hidden; }
+.track-summary-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
 }
-.track-items { display: flex; flex-direction: column; gap: 10px; }
+.track-summary-head::-webkit-details-marker { display: none; }
+.track-summary-head:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; border-radius: 18px; }
+.track-summary-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14.5px; font-weight: 800; color: var(--text);
+  flex: 1; min-width: 0;
+}
+.track-summary-count { font-weight: 600; color: var(--muted); }
+.track-summary-total {
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px; font-weight: 900; color: var(--primary);
+}
+/* Com o resumo aberto, o total já aparece na linha final — some daqui. */
+.track-summary[open] .track-summary-total { display: none; }
+.track-summary-caret { color: var(--muted2); flex-shrink: 0; transition: transform 0.2s; }
+.track-summary[open] .track-summary-caret { transform: rotate(180deg); }
+.track-summary-body { padding: 0 16px 16px; }
+
+.track-items { display: flex; flex-direction: column; gap: 9px; }
 .track-item { display: flex; align-items: baseline; gap: 8px; font-size: 14px; color: var(--text); }
 .track-item-qty { font-weight: 800; color: var(--primary); flex-shrink: 0; font-family: 'Nunito', sans-serif; }
 .track-item-name { flex: 1; min-width: 0; }
 .track-item-opts { display: block; font-size: 12px; color: var(--muted); margin-top: 1px; }
 .track-item-price { font-weight: 700; color: var(--text); flex-shrink: 0; }
 
-.track-totals { border-top: 1px dashed var(--border); margin-top: 14px; padding-top: 12px; display: flex; flex-direction: column; gap: 5px; }
+.track-totals { border-top: 1px dashed var(--border); margin-top: 12px; padding-top: 11px; display: flex; flex-direction: column; gap: 4px; }
 .track-total-row { display: flex; justify-content: space-between; font-size: 13.5px; color: var(--text2); }
 .track-total-discount span:last-child { color: var(--green); font-weight: 600; }
-.track-total-final { font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 900; color: var(--text); margin-top: 4px; }
+.track-total-final { font-family: 'Nunito', sans-serif; font-size: 17px; font-weight: 900; color: var(--text); margin-top: 3px; }
 .track-total-final span:last-child { color: var(--primary); }
 
-.track-meta-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.track-meta-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
 .track-chip {
   font-size: 12px; font-weight: 600;
   padding: 5px 12px; border-radius: 999px;
   background: var(--surface2); color: var(--text2);
 }
 
-/* Ações */
-.track-actions { display: flex; flex-direction: column; gap: 9px; margin-top: 2px; }
-.track-copy-btn {
-  width: 100%;
-  padding: 13px;
+/* ── AÇÕES ───────────────────────────────────────────────────── */
+.track-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 9px;
+}
+.track-copy-btn,
+.track-back-btn {
+  min-height: 46px;
+  padding: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   border-radius: 14px;
-  border: 1.5px solid var(--primary);
-  background: var(--primary-l);
-  color: var(--primary);
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
   font-size: 14.5px;
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.15s;
 }
+.track-copy-btn {
+  border: 1.5px solid var(--primary);
+  background: var(--primary-l);
+  color: var(--primary);
+}
 .track-copy-btn:hover { background: var(--primary); color: #fff; }
+.track-copy-btn:focus-visible,
+.track-back-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .track-back-btn {
-  width: 100%;
-  padding: 13px;
-  border-radius: 14px;
+  border: 1.5px solid var(--text);
   background: var(--text);
   color: var(--surface);
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
-  font-size: 14.5px;
-  text-align: center;
-  text-decoration: none;
-  transition: opacity 0.15s;
 }
 .track-back-btn:hover { opacity: 0.88; }
-.track-hint { font-size: 11.5px; color: var(--muted); text-align: center; line-height: 1.5; padding: 2px 8px; }
+.track-hint { font-size: 11.5px; color: var(--muted); text-align: center; line-height: 1.5; padding: 0 8px; }
+
+/* ── DESKTOP: duas colunas ───────────────────────────────────── */
+@media (min-width: 900px) {
+  .track-page { padding: 26px 20px 40px; }
+  .track-layout {
+    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+    gap: 16px 20px;
+  }
+  .track-top { grid-column: 1 / -1; }
+  .track-status { padding: 20px; gap: 16px; }
+  .track-status-icon { width: 60px; height: 60px; }
+  .track-status-title { font-size: 22px; }
+  .track-eta-value { font-size: 30px; }
+  .track-rail-label { font-size: 11.5px; }
+}
+
+/* Celular estreito: trilha e botões não podem quebrar o layout. */
+@media (max-width: 379px) {
+  .track-rail-label { font-size: 10px; }
+  .track-status-head { gap: 11px; }
+  .track-status-icon { width: 48px; height: 48px; }
+  .track-status-title { font-size: 18.5px; }
+  .track-actions { grid-template-columns: minmax(0, 1fr); }
+  .track-pix { grid-template-columns: minmax(0, 1fr); }
+  .track-pix-copy { grid-column: 1; grid-row: 2; justify-self: start; }
+  .track-pix-hint { margin-top: 8px; }
+}
 
 /* ===== Kanban: tags e endereço no card ===== */
 .order-tags { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
@@ -2785,22 +2974,6 @@ tr:hover td {
   .push-prompt { left: 12px; right: 12px; padding: 12px; }
   .push-prompt-sub { display: none; }
 }
-
-/* ===== Acompanhamento: salvar link ===== */
-.track-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-.track-copy-btn {
-  flex-shrink: 0;
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--primary);
-  background: var(--primary-l);
-  color: var(--primary);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-}
-.track-copy-hint { font-size: 11px; color: var(--muted); margin: 6px 0 0; }
 
 /* ===== Chave Pix no checkout ===== */
 .pix-key-box {

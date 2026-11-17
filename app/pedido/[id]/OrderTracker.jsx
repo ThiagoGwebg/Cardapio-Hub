@@ -7,7 +7,9 @@ import {
   CalendarClock,
   Check,
   ChefHat,
+  ChevronDown,
   CircleCheck,
+  Clock3,
   Copy,
   Link2,
   Lock,
@@ -37,6 +39,17 @@ const STEP_ICON = {
   pronto: Package,
   a_caminho: Bike,
   concluido: PartyPopper,
+}
+
+// Rótulos curtos só da trilha horizontal: em 360px cada etapa tem ~62px, e
+// "Em preparo" quebraria em duas linhas. O estado por extenso continua no
+// título do painel (STATUS_LABEL segue valendo no resto do sistema).
+const STEP_SHORT = {
+  novo: 'Recebido',
+  preparando: 'Preparo',
+  pronto: 'Pronto',
+  a_caminho: 'A caminho',
+  concluido: 'Concluído',
 }
 
 /**
@@ -92,6 +105,9 @@ export default function OrderTracker({ orderId }) {
   const [themeMode, setThemeMode] = useState('light')
   const [payError, setPayError] = useState(false)
   const [retrying, setRetrying] = useState(false)
+  // Resumo recolhido no celular (o status é que importa) e aberto no desktop,
+  // onde ele vive na coluna de apoio e não empurra nada pra baixo.
+  const [summaryOpen, setSummaryOpen] = useState(true)
   // Relógio só pra detectar a expiração do Pix sem chamar Date.now() no render (pureza do React).
   const [now, setNow] = useState(0)
 
@@ -109,6 +125,16 @@ export default function OrderTracker({ orderId }) {
       setThemeMode(isSystemDark ? 'dark' : 'light')
     }
   }, [order?.store_slug])
+
+  // Acompanha a largura: quem gira o celular ou arrasta a janela vê o resumo
+  // seguir o layout, em vez de ficar preso ao estado do primeiro render.
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 900px)')
+    const apply = () => setSummaryOpen(mq.matches)
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
 
   const load = useCallback(async () => {
     const supabase = createClient()
@@ -368,9 +394,19 @@ export default function OrderTracker({ orderId }) {
     minute: '2-digit',
   })
 
+  const itemCount = order.items.reduce((n, it) => n + it.quantity, 0)
+  // Tempo estimado só enquanto há o que esperar: um pedido agendado é pra outro
+  // dia, e um pedido pronto pra retirar/na mesa já chegou — mostrar "~25 min"
+  // nesses casos contradiz o próprio título do painel.
+  const showEta =
+    order.status === 'novo' ||
+    order.status === 'preparando' ||
+    order.status === 'a_caminho' ||
+    (order.status === 'pronto' && order.order_type === 'delivery')
+
   return (
     <div className={`storefront storefront-${themeMode} track-page`}>
-      <div className="track-shell">
+      <div className="track-layout">
         {/* Cabeçalho da loja */}
         <div className="track-top">
           <StoreBadge slug={order.store_slug} letter={initial} />
@@ -382,60 +418,81 @@ export default function OrderTracker({ orderId }) {
           </div>
         </div>
 
-        {/* Hero de status */}
-        {canceled ? (
-          <div className="track-hero track-hero--canceled">
-            <span className="track-hero-icon"><XCircle size={44} strokeWidth={1.6} /></span>
-            <div className="track-hero-title">Pedido cancelado</div>
-            <div className="track-hero-sub">Se ficou alguma dúvida, fale direto com a loja.</div>
-          </div>
-        ) : (
-          <div className="track-hero">
-            <span className="track-hero-icon"><hero.Icon size={44} strokeWidth={1.6} /></span>
-            <div className="track-hero-title">{hero.title}</div>
-            {hero.sub && <div className="track-hero-sub">{hero.sub}</div>}
-            {order.status !== 'concluido' && (
-              <div className="track-eta">
-                <span className="track-eta-label">Tempo estimado</span>
-                <span className="track-eta-value">~{eta} min</span>
-                <span className="track-eta-clock">Previsão: até {estimatedArrival(order.created_at, eta)}</span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Stepper de progresso */}
-        {!canceled && (
-          <div className="track-card track-steps">
-            {flow.map((s, i) => {
-              const done = i < currentIdx
-              const current = i === currentIdx
-              const StepIcon = STEP_ICON[s]
-              return (
-                <div key={s} className={`track-step ${done ? 'done' : ''} ${current ? 'current' : ''}`}>
-                  <div className="track-step-icon">
-                    {done ? <Check size={17} strokeWidth={3} /> : StepIcon && <StepIcon size={17} strokeWidth={2} />}
-                  </div>
-                  <div className="track-step-body">
-                    <span className="track-step-label">{STATUS_LABEL[s]}</span>
-                    {current && <span className="track-step-now">Agora</span>}
-                  </div>
+        {/* Coluna 1: o estado do pedido — o que o cliente abriu a tela pra ver */}
+        <div className="track-col">
+          {canceled ? (
+            <div className="track-status track-status--canceled">
+              <div className="track-status-head">
+                <span className="track-status-icon"><XCircle size={30} strokeWidth={1.8} /></span>
+                <div>
+                  <h1 className="track-status-title">Pedido cancelado</h1>
+                  <p className="track-status-sub">Se ficou alguma dúvida, fale direto com a loja.</p>
                 </div>
-              )
-            })}
-          </div>
-        )}
+              </div>
+            </div>
+          ) : (
+            <div className="track-status">
+              <div className="track-status-head">
+                <span className="track-status-icon"><hero.Icon size={30} strokeWidth={1.8} /></span>
+                <div>
+                  <h1 className="track-status-title">{hero.title}</h1>
+                  {hero.sub && <p className="track-status-sub">{hero.sub}</p>}
+                </div>
+              </div>
 
-        {/* Chave Pix */}
-        {!canceled && order.payment_method === 'pix' && order.pix_key && (
-          <div className="pix-key-box">
-            <span className="pix-key-label">
-              Chave Pix da loja{order.pix_key_type ? ` (${PIX_KEY_TYPE_LABEL[order.pix_key_type]})` : ''}
-            </span>
-            <div className="pix-key-row">
-              <span className="pix-key-value">{order.pix_key}</span>
+              {showEta && (
+                <div className="track-eta">
+                  <div>
+                    <span className="track-eta-label">
+                      {order.order_type === 'delivery' ? 'Chega em' : 'Fica pronto em'}
+                    </span>
+                    <span className="track-eta-value">~{eta} min</span>
+                  </div>
+                  <span className="track-eta-clock">
+                    <Clock3 size={13} strokeWidth={2.4} />
+                    até {estimatedArrival(order.created_at, eta)}
+                  </span>
+                </div>
+              )}
+
+              {/* Trilha horizontal: concluído (verde), atual (laranja pulsando) e
+                  o que ainda vem (apagado) se distinguem sem precisar ler. */}
+              <ol className="track-rail" aria-label="Progresso do pedido">
+                {flow.map((s, i) => {
+                  const done = i < currentIdx
+                  const current = i === currentIdx
+                  const StepIcon = STEP_ICON[s]
+                  return (
+                    <li
+                      key={s}
+                      className={`track-rail-step ${done ? 'done' : ''} ${current ? 'current' : ''}`}
+                      aria-current={current ? 'step' : undefined}
+                    >
+                      <span className="track-rail-node">
+                        {done ? <Check size={15} strokeWidth={3} /> : StepIcon && <StepIcon size={15} strokeWidth={2} />}
+                      </span>
+                      <span className="track-rail-label">{STEP_SHORT[s] || STATUS_LABEL[s]}</span>
+                    </li>
+                  )
+                })}
+              </ol>
+            </div>
+          )}
+        </div>
+
+        {/* Coluna 2: apoio — pagamento, conferência do pedido e ações */}
+        <div className="track-col">
+          {/* Chave Pix */}
+          {!canceled && order.payment_method === 'pix' && order.pix_key && (
+            <div className="track-pix">
+              <div>
+                <span className="track-pix-label">
+                  Chave Pix da loja{order.pix_key_type ? ` (${PIX_KEY_TYPE_LABEL[order.pix_key_type]})` : ''}
+                </span>
+                <span className="track-pix-value">{order.pix_key}</span>
+              </div>
               <button
-                className="pix-copy-btn"
+                className="track-pix-copy"
                 onClick={() => {
                   navigator.clipboard.writeText(order.pix_key)
                   setPixCopied(true)
@@ -445,55 +502,71 @@ export default function OrderTracker({ orderId }) {
                 {pixCopied ? <Check size={14} strokeWidth={3} /> : <Copy size={14} strokeWidth={2.2} />}
                 {pixCopied ? 'Copiado' : 'Copiar'}
               </button>
+              <p className="track-pix-hint">
+                Se ainda não pagou, envie o Pix pra essa chave e mostre o comprovante na retirada/entrega.
+              </p>
             </div>
-            <p className="pix-key-hint">Se ainda não pagou, envie o Pix pra essa chave e mostre o comprovante na retirada/entrega.</p>
-          </div>
-        )}
+          )}
 
-        {/* Resumo do pedido */}
-        <div className="track-card">
-          <div className="track-section-title">Resumo do pedido</div>
-          <div className="track-items">
-            {order.items.map((it, i) => (
-              <div className="track-item" key={i}>
-                <span className="track-item-qty">{it.quantity}×</span>
-                <span className="track-item-name">
-                  {it.name}
-                  {it.options.length > 0 && <span className="track-item-opts">{it.options.join(', ')}</span>}
-                </span>
-                <span className="track-item-price">{fmtCents(it.unit_price_cents * it.quantity)}</span>
+          {/* Resumo do pedido */}
+          <details
+            className="track-card track-summary"
+            open={summaryOpen}
+            onToggle={(e) => setSummaryOpen(e.currentTarget.open)}
+          >
+            <summary className="track-summary-head">
+              <span className="track-summary-title">
+                Resumo do pedido
+                <span className="track-summary-count"> · {itemCount} {itemCount === 1 ? 'item' : 'itens'}</span>
+              </span>
+              <span className="track-summary-total">{fmtCents(order.total_cents)}</span>
+              <ChevronDown className="track-summary-caret" size={16} strokeWidth={2.4} aria-hidden />
+            </summary>
+
+            <div className="track-summary-body">
+              <div className="track-items">
+                {order.items.map((it, i) => (
+                  <div className="track-item" key={i}>
+                    <span className="track-item-qty">{it.quantity}×</span>
+                    <span className="track-item-name">
+                      {it.name}
+                      {it.options.length > 0 && <span className="track-item-opts">{it.options.join(', ')}</span>}
+                    </span>
+                    <span className="track-item-price">{fmtCents(it.unit_price_cents * it.quantity)}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          <div className="track-totals">
-            <div className="track-total-row"><span>Subtotal</span><span>{fmtCents(order.subtotal_cents)}</span></div>
-            {order.delivery_fee_cents > 0 && (
-              <div className="track-total-row"><span>Entrega</span><span>{fmtCents(order.delivery_fee_cents)}</span></div>
-            )}
-            {order.discount_cents > 0 && (
-              <div className="track-total-row track-total-discount"><span>Desconto</span><span>− {fmtCents(order.discount_cents)}</span></div>
-            )}
-            <div className="track-total-row track-total-final"><span>Total</span><span>{fmtCents(order.total_cents)}</span></div>
-          </div>
+              <div className="track-totals">
+                <div className="track-total-row"><span>Subtotal</span><span>{fmtCents(order.subtotal_cents)}</span></div>
+                {order.delivery_fee_cents > 0 && (
+                  <div className="track-total-row"><span>Entrega</span><span>{fmtCents(order.delivery_fee_cents)}</span></div>
+                )}
+                {order.discount_cents > 0 && (
+                  <div className="track-total-row track-total-discount"><span>Desconto</span><span>− {fmtCents(order.discount_cents)}</span></div>
+                )}
+                <div className="track-total-row track-total-final"><span>Total</span><span>{fmtCents(order.total_cents)}</span></div>
+              </div>
 
-          <div className="track-meta-chips">
-            <span className="track-chip">{ORDER_TYPE_LABEL[order.order_type]}</span>
-            {order.payment_method && <span className="track-chip">{PAYMENT_LABEL[order.payment_method]}</span>}
+              <div className="track-meta-chips">
+                <span className="track-chip">{ORDER_TYPE_LABEL[order.order_type]}</span>
+                {order.payment_method && <span className="track-chip">{PAYMENT_LABEL[order.payment_method]}</span>}
+              </div>
+            </div>
+          </details>
+
+          {/* Ações */}
+          <div className="track-actions">
+            <button className="track-copy-btn" onClick={copyLink}>
+              {copied ? <Check size={15} strokeWidth={3} /> : <Link2 size={15} strokeWidth={2.2} />}
+              {copied ? 'Link copiado' : 'Salvar link'}
+            </button>
+            <a className="track-back-btn" href={`/loja/${order.store_slug}`}>Voltar ao cardápio</a>
           </div>
+          <p className="track-hint">
+            Guarde este link pra acompanhar depois — ou toque em <b>“Meus pedidos”</b> no topo do cardápio.
+          </p>
         </div>
-
-        {/* Ações */}
-        <div className="track-actions">
-          <button className="track-copy-btn" onClick={copyLink}>
-            {copied ? <Check size={15} strokeWidth={3} /> : <Link2 size={15} strokeWidth={2.2} />}
-            {copied ? 'Link copiado' : 'Salvar link do pedido'}
-          </button>
-          <a className="track-back-btn" href={`/loja/${order.store_slug}`}>Voltar ao cardápio</a>
-        </div>
-        <p className="track-hint">
-          Guarde este link pra acompanhar depois. No cardápio, toque em <b>“Meus pedidos”</b> no topo pra ver seus pedidos deste navegador.
-        </p>
       </div>
 
       {!canceled && order.status !== 'concluido' && (
