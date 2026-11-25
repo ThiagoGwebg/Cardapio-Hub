@@ -1,0 +1,11 @@
+{
+  "storeId": "c35f09be-3bf0-4868-9406-b6b1a9780c43",
+  "slug": "feira-ciencias",
+  "productId": "fd32ad47-86d2-4957-ac42-cf3522262758",
+  "vistas": {
+    "front": "https://pafotbuwpvnpzxdlhzud.supabase.co/storage/v1/object/public/store-assets/c35f09be-3bf0-4868-9406-b6b1a9780c43/ar-front.jpg",
+    "left": "https://pafotbuwpvnpzxdlhzud.supabase.co/storage/v1/object/public/store-assets/c35f09be-3bf0-4868-9406-b6b1a9780c43/ar-left.jpg",
+    "back": "https://pafotbuwpvnpzxdlhzud.supabase.co/storage/v1/object/public/store-assets/c35f09be-3bf0-4868-9406-b6b1a9780c43/ar-back.jpg",
+    "right": "https://pafotbuwpvnpzxdlhzud.supabase.co/storage/v1/object/public/store-assets/c35f09be-3bf0-4868-9406-b6b1a9780c43/ar-right.jpg"
+  }
+}
