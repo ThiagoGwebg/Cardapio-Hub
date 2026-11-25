@@ -13,9 +13,8 @@ export default async function LojaPage({ params }) {
   const supabase = await createClient()
 
   const { data: store } = await supabase
-    .from('store_public')
+    .rpc('get_store_public', { p_slug: slug })
     .select('*')
-    .eq('slug', slug)
     .maybeSingle()
 
   if (!store) notFound()

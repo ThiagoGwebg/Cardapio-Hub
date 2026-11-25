@@ -15,9 +15,8 @@ export async function GET(_req, { params }) {
   const supabase = await createClient()
 
   const { data: store } = await supabase
-    .from('store_public')
+    .rpc('get_store_public', { p_slug: slug })
     .select('name, theme')
-    .eq('slug', slug)
     .maybeSingle()
 
   const name = store?.name || 'Cardápio'

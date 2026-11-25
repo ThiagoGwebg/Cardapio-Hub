@@ -24,9 +24,8 @@ export default async function Image({ params }) {
   const supabase = await createClient()
 
   const { data } = await supabase
-    .from('store_public')
+    .rpc('get_store_public', { p_slug: slug })
     .select('name, theme, address, delivery_enabled, pickup_enabled, dine_in_enabled')
-    .eq('slug', slug)
     .maybeSingle()
 
   const store = data;

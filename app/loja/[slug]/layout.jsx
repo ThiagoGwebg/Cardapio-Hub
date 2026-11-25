@@ -9,11 +9,10 @@ import { storeIconVersion } from '@/lib/storeTheme'
 const getStoreHead = cache(async (slug) => {
   const supabase = await createClient()
   const { data } = await supabase
-    .from('store_public')
+    .rpc('get_store_public', { p_slug: slug })
     .select(
       'id, name, slug, theme, address, whatsapp_number, delivery_enabled, pickup_enabled, dine_in_enabled, delivery_fee_cents, min_order_cents, accepts_pix, accepts_card, accepts_cash, opening_hours'
     )
-    .eq('slug', slug)
     .maybeSingle()
   return data;
 })
