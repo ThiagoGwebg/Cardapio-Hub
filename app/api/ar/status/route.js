@@ -73,10 +73,12 @@ export async function GET(req) {
 
     // service_role para gravar: a autorização (dono da loja) já foi feita acima
     // e o caminho é forçado para a pasta da própria loja — igual ao /api/upload.
+    // Bucket ar-models e não store-assets: aquele só aceita imagem (5 MB) e
+    // recusaria o model/gltf-binary.
     const admin = createAdminClient()
     const path = `${store.id}/ar/${gen.product_id}-${gen.id}.glb`
     const { error: upErr } = await admin.storage
-      .from('store-assets')
+      .from('ar-models')
       .upload(path, glb, {
         contentType: 'model/gltf-binary',
         upsert: true,
@@ -84,7 +86,7 @@ export async function GET(req) {
       })
     if (upErr) throw upErr
 
-    const { data: pub } = admin.storage.from('store-assets').getPublicUrl(path)
+    const { data: pub } = admin.storage.from('ar-models').getPublicUrl(path)
 
     // preview_url da Tripo expira junto com a task — não serve pra guardar.
     // O painel mostra o preview com o próprio .glb no model-viewer.

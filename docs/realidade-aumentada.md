@@ -35,7 +35,7 @@ A contagem é feita por linhas de `ar_generations` no mês corrente.
 - `POST /api/ar/generate` — gates no servidor (dono, Pro, cota, frente
   obrigatória, fotos só do nosso Storage) e dispara a task.
 - `GET /api/ar/status?id=` — polling; no sucesso baixa o `.glb` dentro da
-  janela de 5 min, processa e grava em `store-assets/<loja>/ar/*.glb`.
+  janela de 5 min, processa e grava em `ar-models/<loja>/ar/*.glb` (o bucket `store-assets` só aceita imagem).
 - `app/dashboard/cardapio/ar-actions.js` — publicar / descartar / tirar do ar.
 - `app/dashboard/cardapio/[id]/ArSection.jsx` — UI no painel.
 - `app/loja/[slug]/ArProductViewer.jsx` — visor no cardápio público (portado
@@ -55,3 +55,24 @@ A contagem é feita por linhas de `ar_generations` no mês corrente.
   folha do próprio cardápio orienta o cliente.
 - Geração presa em "processing": o fechamento acontece no GET /status (o
   painel aberto faz o polling). Abrir a página do produto no painel resolve.
+
+## Modelo feito por código (sem IA)
+
+Quando a conta da Tripo está sem crédito — ou o prato é simples o bastante —
+dá para montar o `.glb` à mão. É o caso do bolo de pote da feira de ciências:
+`scripts/ar/modelar-bolo-de-pote.mjs` gera um sólido de revolução com o perfil
+real do pote (250 ml, 9,6 cm de boca por 7 cm de altura) e usa as fotos do
+próprio doce como textura — faixa lateral com as camadas, aba da tampa e o
+granulado visto de cima. A faixa lateral se repete ao redor com wrap
+espelhado (`33648`), que esconde a emenda em padrões horizontais como esse.
+
+- `scripts/ar/modelar-bolo-de-pote.mjs` — gera `scripts/ar/bolo-de-pote.glb`.
+- `scripts/ar/publicar-glb.mjs [larguraCm]` — passa pela mesma receita do
+  `/api/ar/status` (escala, apoia no chão, comprime) e publica no produto.
+- `scripts/ar/gerar-tripo.mjs [larguraCm]` — o caminho com IA, para quando
+  houver crédito na conta; usa as fotos de vista já no Storage.
+- `scripts/ar/contexto.json` — loja/produto/fotos usados por esses scripts.
+
+A loja de demonstração da feira é `feira-ciencias` ("Doces da Feira"), Pro,
+com conta própria: o painel resolve a loja por `owner_id` com `maybeSingle()`,
+então um mesmo dono não pode ter duas lojas.
