@@ -45,3 +45,6 @@ yarn-error.log*
 /public/worker-*.js
 /public/workbox-*.js
 /public/fallback-*.js
+
+# Playwright MCP (snapshots/saidas de sessao)
+.playwright-mcp/
