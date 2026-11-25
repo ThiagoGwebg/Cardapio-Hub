@@ -1,48 +1,97 @@
 /**
  * Monta o .glb do bolo de pote por código: sólido de revolução com o perfil
- * real do pote (250 ml) e as fotos do próprio doce como textura.
+ * real do pote e as fotos do próprio doce como textura.
  *
- * O pote vai SEM TAMPA: com ela, o plástico leitoso cobre o granulado e o
- * doce fica sem graça no visor. Aberto, o perfil percorre a parede externa,
- * vira no lábio da borda, desce pela parede interna e termina na superfície
- * do granulado, recuada ~0,6 cm da borda — é isso que dá a profundidade de
- * pote cheio.
+ * Fonte: scripts/ar/fonte/grade-pote.webp — grade 3x3 de fotos de estúdio
+ * (fundo branco). Usamos a vista lateral sem tampa (linha 1, coluna 2) para
+ * a parede e a vista de cima (linha 2, coluna 2) para o granulado.
+ *
+ * O pote vai SEM TAMPA: o perfil percorre a parede externa, vira no lábio da
+ * borda, desce pela parede interna e termina na superfície do granulado,
+ * levemente recuada da borda.
  *
  * Saída: scripts/ar/bolo-de-pote.glb
  */
 import fs from 'node:fs'
-import path from 'node:path'
 import sharp from 'sharp'
 import { Document, NodeIO } from '@gltf-transform/core'
 
-const FOTOS = 'C:/Users/jogor/AppData/Local/Temp/claude/389b930032125050/cf75719c-863a-48b4-9d9c-bead2cd905be/images'
+const FONTE = 'scripts/ar/fonte/grade-pote.webp'
 const SEG = 96                 // segmentos ao redor
-const REPETE = 4               // repetições da faixa lateral; PAR fecha o ciclo espelhado sem emenda
+const REPETE = 3               // repetições do ladrilho ao redor do pote
 const cm = v => v / 100        // cm -> metros
 
 // ---------- texturas ----------
-// Faixa lateral: parte central do corpo na foto 6 (menos perspectiva), já
-// sem a tampa em cima nem o reflexo da mesa embaixo.
-const lateral = await sharp(path.join(FOTOS, '6.jpg'))
-  .extract({ left: 585, top: 362, width: 580, height: 596 })
-  .resize(640, 512, { fit: 'fill' }).modulate({ brightness: 1.05, saturation: 1.12 })
-  .jpeg({ quality: 88 }).toBuffer()
+const meta = await sharp(FONTE).metadata()
+const LADO_W = Math.floor(meta.width / 3)
+const LADO_H = Math.floor(meta.height / 3)
+/** Recorta um ladrilho (linha, coluna) da grade. */
+const ladrilho = (linha, coluna) =>
+  sharp(FONTE)
+    .extract({ left: coluna * LADO_W, top: linha * LADO_H, width: LADO_W, height: LADO_H })
+    .png()
+    .toBuffer()
 
-// Granulado: só o miolo da boca do pote na foto 4, sem o aro de plástico.
-// O resize para quadrado desfaz o achatamento da elipse (perspectiva).
-const granulado = await sharp(path.join(FOTOS, '4.jpg'))
-  .extract({ left: 258, top: 106, width: 480, height: 242 })
-  .resize(512, 512, { fit: 'fill' }).modulate({ brightness: 1.04, saturation: 1.1 })
-  .jpeg({ quality: 90 }).toBuffer()
+// Parede: miolo da vista lateral. Cada pote tem só ~170 px de largura na grade,
+// então sobe 4x com Lanczos. NÃO se afia: com tão pouca resolução a nitidez só
+// amplifica os blocos de compressão; suavizar deixa as camadas limpas, que é o
+// que se lê de longe.
+// Em vez de espelhar a faixa (que cria 'carinhas' simétricas nas migalhas), ela
+// vira um ladrilho SEM EMENDA: as bordas são fundidas e a textura simplesmente
+// se repete ao redor do pote.
+const FAIXA_W = 480
+const FUSAO = 64
+const { data: faixa, info: faixaInfo } = await sharp(await ladrilho(0, 1))
+  .extract({ left: 144, top: 143, width: 120, height: 95 })   // pula o reflexo do plástico sob a borda
+  .resize(FAIXA_W, 380, { kernel: 'lanczos3' })
+  .blur(2.2)
+  // Esquenta: a foto de estúdio puxa para o azul e o cacau fica acinzentado.
+  .recomb([[1.03, 0, 0], [0, 1.0, 0], [0, 0, 0.9]])
+  .modulate({ brightness: 0.96, saturation: 1.0 })
+  .raw()
+  .toBuffer({ resolveWithObject: true })
+
+const ch = faixaInfo.channels
+const larg = FAIXA_W - FUSAO
+const ladrilhoSemEmenda = Buffer.alloc(larg * faixaInfo.height * ch)
+for (let y = 0; y < faixaInfo.height; y++) {
+  for (let x = 0; x < larg; x++) {
+    for (let c = 0; c < ch; c++) {
+      const base = faixa[(y * FAIXA_W + x) * ch + c]
+      let v = base
+      if (x < FUSAO) {
+        // início do ladrilho: mistura com o trecho que sobrou no fim da faixa
+        const sobra = faixa[(y * FAIXA_W + (larg + x)) * ch + c]
+        const a = 1 - x / FUSAO
+        v = Math.round(sobra * a + base * (1 - a))
+      }
+      ladrilhoSemEmenda[(y * larg + x) * ch + c] = v
+    }
+  }
+}
+const parede = await sharp(ladrilhoSemEmenda, { raw: { width: larg, height: faixaInfo.height, channels: ch } })
+  .jpeg({ quality: 90 })
+  .toBuffer()
+
+// Granulado: vista de cima, recortada no disco do pote (centro ~ (200,148), ⌀ ~204).
+const granulado = await sharp(await ladrilho(1, 1))
+  .extract({ left: 98, top: 46, width: 204, height: 204 })
+  .resize(768, 768, { kernel: 'lanczos3' })
+  .recomb([[0.94, 0.02, 0], [0, 0.98, 0], [0, 0, 0.92]])
+  .modulate({ brightness: 0.72, saturation: 0.9 })
+  .jpeg({ quality: 90 })
+  .toBuffer()
 
 // ---------- geometria ----------
 // Perfil (raio, altura) em cm. A ordem importa: percorrer a superfície de
 // fora para dentro mantém todas as normais apontando para fora do sólido.
-const CORPO  = [[3.25, 0.05], [3.45, 0.30], [3.62, 1.00], [3.80, 2.20], [3.98, 3.40], [4.16, 4.60], [4.32, 5.50], [4.45, 6.00]]
-const LABIO  = [[4.45, 6.00], [4.48, 6.03], [4.46, 6.05], [4.40, 6.05], [4.34, 6.03]]
-const PAREDE = [[4.34, 6.03], [4.24, 5.78], [4.16, 5.52]]
-const DOCE   = [[4.16, 5.52], [3.90, 5.56], [2.60, 5.60], [1.30, 5.62], [0.00, 5.62]]
-const FUNDO  = [[0.00, 0.00], [1.30, 0.00], [2.60, 0.00], [3.25, 0.05]]
+// Pote cônico: boca ⌀ ~9 cm, base ⌀ ~7 cm, 7 cm de altura (medido nas fotos).
+const CORPO  = [[3.35, 0.02], [3.50, 0.25], [3.62, 1.00], [3.85, 3.00], [4.08, 5.00], [4.28, 6.50], [4.40, 6.95]]
+const LABIO  = [[4.40, 6.95], [4.45, 7.00], [4.44, 7.03], [4.39, 7.03], [4.35, 7.00]]
+const PAREDE = [[4.35, 7.00], [4.27, 6.90], [4.20, 6.72]]
+const DOCE   = [[4.20, 6.72], [3.60, 6.78], [2.40, 6.84], [1.20, 6.87], [0.00, 6.88]]
+// Fundo do CENTRO para fora: a normal do disco aponta para baixo.
+const FUNDO  = [[0.00, 0.00], [1.30, 0.00], [2.60, 0.00], [3.35, 0.02]]
 
 /** Normais do perfil: perpendicular a cada segmento, suavizada por vértice. */
 function normaisPerfil(pts) {
@@ -132,11 +181,11 @@ function primitiva(g, mat) {
     .setMaterial(mat)
 }
 
-// 33648 = espelhado: a faixa se repete ao redor sem emenda dura
-const matCorpo = material('corpo', textura('lateral', lateral), { wrapS: 33648, rough: 0.45 })
+// 10497 = repete; o ladrilho já é sem emenda
+const matCorpo = material('corpo', textura('parede', parede), { wrapS: 10497, rough: 0.4 })
 const matDoce = material('granulado', textura('granulado', granulado), { wrapS: 33071, rough: 0.6 })
-const matLabio = material('borda', null, { cor: [0.58, 0.52, 0.47, 1], rough: 0.35 })
-const matParede = material('parede-interna', null, { cor: [0.26, 0.15, 0.10, 1], rough: 0.5 })
+const matLabio = material('borda', null, { cor: [0.40, 0.34, 0.30, 1], rough: 0.35 })
+const matParede = material('parede-interna', null, { cor: [0.26, 0.16, 0.11, 1], rough: 0.5 })
 const matFundo = material('fundo', null, { cor: [0.21, 0.12, 0.08, 1], rough: 0.7 })
 
 const mesh = doc.createMesh('bolo-de-pote')
@@ -153,4 +202,4 @@ doc.getRoot().setDefaultScene(scene)
 const glb = await new NodeIO().writeBinary(doc)
 fs.writeFileSync('scripts/ar/bolo-de-pote.glb', glb)
 console.log('glb gerado:', Math.round(glb.length / 1024), 'kB')
-console.log('medidas: diâmetro', (4.48 * 2).toFixed(1), 'cm | altura', (6.05).toFixed(1), 'cm | sem tampa')
+console.log('medidas: boca ⌀', (4.5 * 2).toFixed(1), 'cm | base ⌀', (3.35 * 2).toFixed(1), 'cm | altura 7.0 cm | sem tampa')
