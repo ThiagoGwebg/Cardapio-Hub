@@ -91,6 +91,10 @@ export async function updateStore(formData) {
     // Layout do cardápio (grid/list): só no Pro. Valor desconhecido cai no default.
     menuLayout: pro ? sanitizeMenuLayout(String(formData.get('menuLayout') || '')) : current.menuLayout,
 
+    // Skin (identidade visual completa): não tem campo no formulário — sem isto,
+    // salvar a loja reconstruiria o tema do zero e apagaria o valor.
+    skin: current.skin,
+
     // Aviso promocional: só no Pro (string vazia oculta o aviso).
     announcement: pro
       ? String(formData.get('announcement') || '').trim().slice(0, 120) || undefined

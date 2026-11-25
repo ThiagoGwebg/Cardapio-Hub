@@ -1,0 +1,345 @@
+/* ══════════════════════════════════════════════════════════════════
+   SKIN "FAVO"
+   Identidade própria para o cardápio, tirada do objeto real: a toalha
+   de mesa de favos e galinhas onde o bolo de pote foi fotografado.
+
+   · Oliva é a tinta estrutural (o traço do favo). Delivery inteiro é
+     vermelho/laranja — oliva não é de ninguém.
+   · Gema é o único acento: selo de preço, aba ativa, botão do banner.
+   · Fraunces (serifa macia, eixo WONK ligado) faz o papel de letra de
+     etiqueta; Nunito segue no corpo para leitura rápida no celular.
+   · O favo vira textura de fundo; a "costura" tracejada vira o desenho
+     das fichas — papel costurado, não cartão com sombra.
+
+   Tudo escopado em .storefront.skin-favo: lojas sem skin não mudam nada.
+   Os !important em --primary/--accent são de propósito — o JSON de tema
+   da loja injeta essas variáveis inline, e a skin é a identidade inteira.
+══════════════════════════════════════════════════════════════════ */
+
+.storefront.skin-favo {
+  --papel: #F3EEDF;
+  --leite: #FFFDF7;
+  --cacau: #33211A;
+  --oliva: #6B7A3A;
+  --oliva-escuro: #46521F;
+  --gema: #EFA00B;
+  --gema-escuro: #A56E00;
+
+  --bg: var(--papel);
+  --surface: var(--leite);
+  --surface2: #ECE5D0;
+  --surface3: #E0D7BC;
+  --text: var(--cacau);
+  --text2: #5A4538;
+  --muted: #7C6A5A;
+  --muted2: #A69985;
+  --border: #D9CFB4;
+  --border2: #E6DEC6;
+  --discount: #4F6B1F;
+  --warn: #8F5400;
+
+  --primary: #56622B !important;
+  --primary-rgb: 86, 98, 43 !important;
+  --accent: var(--gema) !important;
+  --accent-rgb: 239, 160, 11 !important;
+
+  --radius: 20px;
+  --shadow-sm: 0 1px 0 rgba(51, 33, 26, 0.06);
+  --shadow: 0 2px 0 rgba(51, 33, 26, 0.08);
+  --shadow-lg: 0 14px 30px rgba(51, 33, 26, 0.18);
+
+  background-color: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='96' viewBox='0 0 28 48'%3E%3Cpath d='M14 0 28 8 28 24 14 32 0 24 0 8Z M14 32 14 48' fill='none' stroke='%236B7A3A' stroke-opacity='.14' stroke-width='.8'/%3E%3C/svg%3E");
+  background-size: 56px 96px;
+}
+
+.storefront.skin-favo.storefront-dark {
+  --papel: #1D1610;
+  --leite: #2A2018;
+  --bg: #1D1610;
+  --surface: #2A2018;
+  --surface2: #342A20;
+  --surface3: #3F3327;
+  --text: #F5EBD3;
+  --text2: #DDD0B5;
+  --muted: #A99A83;
+  --muted2: #75685A;
+  --border: #4A3D2F;
+  --border2: #382E23;
+  --discount: #B5C768;
+  --warn: #E9B24A;
+  --primary: #6F7D34 !important;
+  --primary-rgb: 111, 125, 52 !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='96' viewBox='0 0 28 48'%3E%3Cpath d='M14 0 28 8 28 24 14 32 0 24 0 8Z M14 32 14 48' fill='none' stroke='%23B5C768' stroke-opacity='.1' stroke-width='.8'/%3E%3C/svg%3E");
+}
+
+/* ── Barra do topo ── */
+.storefront.skin-favo .storefront-topbar {
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  border-bottom: 2px dashed color-mix(in srgb, var(--oliva) 55%, transparent);
+}
+.storefront.skin-favo .storefront-topbar-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+/* ── Cabeçalho: o nome é a placa da loja ── */
+.storefront.skin-favo .storefront-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-size: clamp(34px, 9vw, 56px);
+  font-weight: 900;
+  letter-spacing: -1.2px;
+  line-height: 0.98;
+  color: var(--text);
+}
+.storefront.skin-favo .storefront-logo {
+  border: 2px dashed var(--oliva);
+  background: color-mix(in srgb, var(--oliva) 14%, var(--surface));
+  outline: 2px solid var(--surface);
+  outline-offset: -7px;
+  color: var(--oliva-escuro) !important;
+}
+.storefront.skin-favo .storefront-status.is-open {
+  background: color-mix(in srgb, var(--oliva) 18%, transparent);
+  color: var(--discount);
+  font-weight: 800;
+}
+
+/* Aviso de retirada vira bilhete costurado */
+.storefront.skin-favo .storefront-fulfillment,
+.storefront.skin-favo .storefront-announce {
+  background: color-mix(in srgb, var(--gema) 16%, var(--surface));
+  border: 1.5px dashed color-mix(in srgb, var(--gema-escuro) 55%, transparent);
+  border-radius: 14px;
+  color: var(--text);
+}
+
+/* ── Busca ── */
+.storefront.skin-favo .storefront-search-row input {
+  background: var(--surface);
+  border: 2px solid var(--text);
+  box-shadow: none;
+}
+.storefront.skin-favo .storefront-search-row input:focus {
+  border-color: var(--oliva);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gema) 55%, transparent);
+}
+
+/* ── Categorias: aba ativa é uma gema ── */
+.storefront.skin-favo .menu-nav {
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+}
+.storefront.skin-favo .menu-nav-item {
+  background: var(--surface);
+  border: 1.5px solid var(--text);
+  color: var(--text);
+  font-weight: 800;
+}
+.storefront.skin-favo .menu-nav-item:hover { background: var(--surface2); }
+.storefront.skin-favo .menu-nav-item.active {
+  background: var(--gema);
+  border-color: var(--text);
+  color: #33211A;
+}
+
+/* ── Título de seção: costura em vez de filete ── */
+.storefront.skin-favo .section-label {
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-style: italic;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 18px;
+}
+.storefront.skin-favo .section-label::after {
+  height: 0;
+  background: none;
+  border-top: 2px dashed color-mix(in srgb, var(--oliva) 60%, transparent);
+  opacity: 1;
+}
+
+/* ── Ficha de produto: papel costurado, foto redonda, preço em selo ── */
+.storefront.skin-favo .product-card {
+  position: relative;
+  background: var(--surface);
+  border: 1.5px solid var(--text);
+  border-radius: 24px;
+  box-shadow: none;
+}
+.storefront.skin-favo .product-card::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1.5px dashed color-mix(in srgb, var(--oliva) 50%, transparent);
+  border-radius: 19px;
+  pointer-events: none;
+}
+.storefront.skin-favo .product-card:not(.out-of-stock):hover {
+  border-color: var(--text);
+  box-shadow: 0 5px 0 var(--oliva);
+  transform: translateY(-3px);
+}
+.storefront.skin-favo .product-img {
+  border-radius: 50%;
+  background: var(--surface2);
+  outline: 2px dashed var(--oliva);
+  outline-offset: 4px;
+  margin: 16px 18px 16px 12px;
+}
+.storefront.skin-favo .ar-badge {
+  top: auto;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--papel);
+}
+.storefront.skin-favo .product-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  line-height: 1.12;
+}
+.storefront.skin-favo .product-desc { font-size: 13px; line-height: 1.4; }
+.storefront.skin-favo .product-price {
+  display: inline-block;
+  padding: 3px 12px 4px;
+  background: var(--gema);
+  color: #33211A;
+  border-radius: 999px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-size: 18px;
+  font-weight: 800;
+  transform: rotate(-2.5deg);
+}
+.storefront.skin-favo .add-btn {
+  background: var(--oliva-escuro);
+  color: #FFF6DC;
+  box-shadow: 0 3px 0 var(--cacau);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.storefront.skin-favo .add-btn:hover:not(:disabled) {
+  background: var(--oliva-escuro);
+  filter: none;
+  box-shadow: 0 3px 0 var(--cacau);
+}
+.storefront.skin-favo .add-btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--cacau);
+}
+
+/* ── Banner 3D: o momento de destaque ──────────────────────────────
+   Painel oliva com o favo em relevo, um sol de gema atrás do pote. */
+.storefront.skin-favo .ar-hero {
+  border: none;
+  border-radius: 30px;
+  background-color: var(--oliva-escuro);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='96' viewBox='0 0 28 48'%3E%3Cpath d='M14 0 28 8 28 24 14 32 0 24 0 8Z M14 32 14 48' fill='none' stroke='%23FFF6DC' stroke-opacity='.11' stroke-width='.8'/%3E%3C/svg%3E");
+  background-size: 56px 96px;
+  box-shadow: 0 8px 0 var(--cacau);
+  margin: 0 16px 26px;
+}
+.storefront.skin-favo .ar-hero-glow {
+  width: 66%;
+  max-width: 250px;
+  background: var(--gema);
+  filter: none;
+  opacity: 1;
+  box-shadow: 0 0 0 9px color-mix(in srgb, var(--gema) 30%, transparent);
+}
+.storefront.skin-favo .ar-hero-tag {
+  background: var(--gema);
+  color: #33211A;
+}
+.storefront.skin-favo .ar-hero-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-weight: 900;
+  font-size: 30px;
+  letter-spacing: -0.8px;
+  line-height: 1.02;
+  color: #FFF6DC;
+}
+.storefront.skin-favo .ar-hero-sub { color: rgba(255, 246, 220, 0.8); }
+.storefront.skin-favo .ar-hero-btn {
+  background: var(--gema);
+  color: #33211A;
+  box-shadow: 0 4px 0 var(--gema-escuro);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.storefront.skin-favo .ar-hero-btn:hover { filter: none; }
+.storefront.skin-favo .ar-hero-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--gema-escuro);
+}
+.storefront.skin-favo .ar-hero-price {
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-size: 22px;
+  font-weight: 800;
+  color: #FFF6DC;
+}
+@media (min-width: 760px) {
+  .storefront.skin-favo .ar-hero-title { font-size: 40px; }
+  .storefront.skin-favo .ar-hero-glow { max-width: 290px; }
+}
+
+/* ── Foco visível ── */
+.storefront.skin-favo :is(button, a, input, textarea, select):focus-visible {
+  outline: 3px solid var(--gema);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storefront.skin-favo .product-card,
+  .storefront.skin-favo .add-btn,
+  .storefront.skin-favo .ar-hero-btn { transition: none; }
+}
+
+/* No escuro o oliva some contra o cacau: o botão passa a ser gema. */
+.storefront.skin-favo.storefront-dark .add-btn,
+.storefront.skin-favo.storefront-dark .add-btn:hover:not(:disabled) {
+  background: var(--gema);
+  color: #33211A;
+  box-shadow: 0 3px 0 var(--gema-escuro);
+}
+.storefront.skin-favo.storefront-dark .add-btn:active:not(:disabled) {
+  box-shadow: 0 0 0 var(--gema-escuro);
+}
+.storefront.skin-favo.storefront-dark .product-card:not(.out-of-stock):hover {
+  box-shadow: 0 5px 0 var(--gema-escuro);
+}
+
+/* ── Modal de produto: mesma letra de etiqueta da ficha ── */
+.storefront.skin-favo .option-modal-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+  line-height: 1.05;
+}
+/* O preço do modal é o irmão logo abaixo do título (estilo inline no JSX). */
+.storefront.skin-favo .option-modal-title + div {
+  display: inline-block;
+  padding: 3px 12px 4px;
+  background: var(--gema);
+  color: #33211A !important;
+  border-radius: 999px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1;
+  font-size: 18px;
+  transform: rotate(-2.5deg);
+  transform-origin: left center;
+}
+.storefront.skin-favo .option-modal-header .cart-close {
+  background: var(--surface2);
+  border: 1.5px solid var(--text);
+}

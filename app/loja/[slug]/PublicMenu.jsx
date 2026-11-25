@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { fmtCents, PIX_KEY_TYPE_LABEL, friendlyOrderError } from '@/lib/format'
 import { googleFontHref } from '@/lib/plan'
-import { buildStorefrontVars, sanitizeLogoShape, sanitizeMenuLayout } from '@/lib/storeTheme'
+import { buildStorefrontVars, sanitizeLogoShape, sanitizeMenuLayout, sanitizeSkin } from '@/lib/storeTheme'
 import { resolveStoreOpen } from '@/lib/openingHours'
 import { IconPin, IconUtensils, IconClose, IconSun, IconMoon } from '@/components/icons'
 import { saveOrderToHistory, getOrderHistoryForStore } from '@/lib/orderHistory'
@@ -28,6 +28,7 @@ import MyOrdersModal from './MyOrdersModal'
 import ArProductViewer from './ArProductViewer'
 import ArBanner from './ArBanner'
 import './loja.css'
+import './skin-favo.css'
 
 
 
@@ -303,6 +304,7 @@ export default function PublicMenu({
   const styleVars = buildStorefrontVars(theme)
   // Layout escolhido no painel Pro (default = 'list', igual ao visual atual).
   const menuLayout = sanitizeMenuLayout(theme.menuLayout)
+  const skin = sanitizeSkin(theme.skin)
   const roundLogo = sanitizeLogoShape(theme.logoShape) === 'round'
 
   // Busca por nome, descrição e categoria: quem procura "sem lactose" ou
@@ -667,9 +669,15 @@ export default function PublicMenu({
   const minToReach = minOrderCents - subtotal
 
   return (
-    <div className={`storefront storefront-${themeMode} menu-layout-${menuLayout}`} style={styleVars}>
+    <div className={`storefront storefront-${themeMode} menu-layout-${menuLayout}${skin ? ` skin-${skin}` : ''}`} style={styleVars}>
       {/* manifest, theme-color e apple-touch-icon agora vêm do layout.jsx (head real, com as tags de iOS). */}
       {storeFont && <link rel="stylesheet" href={googleFontHref(storeFont)} />}
+      {skin === 'favo' && (
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,600..900,0..100,0..1;1,9..144,600..900,0..100,0..1&display=swap"
+        />
+      )}
 
       <div className="storefront-topbar">
         {theme.logoUrl && (
