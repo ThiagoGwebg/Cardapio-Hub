@@ -310,11 +310,15 @@ export default function PublicMenu({
   // Busca por nome, descrição e categoria: quem procura "sem lactose" ou
   // "porção" está descrevendo o item, não digitando o nome exato dele.
   // Categoria que casa com a busca mantém todos os produtos dela.
-  // Prato em destaque do banner 3D: o primeiro com modelo publicado.
-  const arHighlight = useMemo(
-    () => menu.flatMap((c) => c.products).find((p) => p.ar_model_url) ?? null,
-    [menu]
-  )
+  // Prato em destaque do banner: o primeiro com modelo 3D publicado. Sem modelo,
+  // só a skin Favo ganha banner (com a foto do primeiro prato que tem foto) —
+  // as demais lojas não mudam.
+  const arHighlight = useMemo(() => {
+    const todos = menu.flatMap((c) => c.products)
+    const em3d = todos.find((p) => p.ar_model_url)
+    if (em3d) return em3d
+    return skin === 'favo' ? todos.find((p) => p.images.length > 0) ?? null : null
+  }, [menu, skin])
 
   const filteredMenu = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -1220,6 +1224,23 @@ export default function PublicMenu({
                 <img src={modalProduct.image_url} alt={modalProduct.name} />
               ) : (
                 <div style={{ padding: 40, color: 'var(--muted)' }}><IconUtensils size={60} /></div>
+              )}
+              {/* A galeria guarda várias fotos mas o modal nunca teve como trocar entre
+                  elas. Só a skin Favo ganhou as bolinhas, para não mudar as demais lojas. */}
+              {skin === 'favo' && modalProduct.images.length > 1 && !(modalProduct.ar_model_url && modalView === '3d') && (
+                <div className="gallery-dots" role="tablist" aria-label="Fotos do produto">
+                  {modalProduct.images.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      role="tab"
+                      aria-selected={galleryIdx === i}
+                      aria-label={`Foto ${i + 1} de ${modalProduct.images.length}`}
+                      className={galleryIdx === i ? 'active' : ''}
+                      onClick={() => setGalleryIdx(i)}
+                    />
+                  ))}
+                </div>
               )}
               {modalProduct.ar_model_url && (modalProduct.images.length > 0 || modalProduct.image_url) && (
                 <div className="ar-view-toggle" role="tablist" aria-label="Foto ou 3D">

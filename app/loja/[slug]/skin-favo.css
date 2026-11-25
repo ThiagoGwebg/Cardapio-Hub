@@ -343,3 +343,65 @@
   background: var(--surface2);
   border: 1.5px solid var(--text);
 }
+
+/* ── Banner no modo foto: moldura redonda com anel de gema ──
+   Sem modelo 3D, a foto do doce ocupa o lugar do pote. O recorte é circular
+   (pote e prato são redondos) e a foto sobe 22% dentro da moldura, para o
+   doce encher o círculo em vez de nadar no fundo branco do estúdio. */
+.storefront.skin-favo .ar-hero-foto .ar-hero-glow { display: none; }
+.storefront.skin-favo .ar-hero-photo {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: 92%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 7px solid var(--gema);
+  background: #E9E6E1;
+  box-shadow:
+    0 0 0 9px color-mix(in srgb, var(--gema) 30%, transparent),
+    0 14px 26px rgba(0, 0, 0, 0.3);
+}
+.storefront.skin-favo .ar-hero-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.22);
+}
+
+/* ── Bolinhas da galeria no modal (só nesta skin) ── */
+.storefront.skin-favo .gallery-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 78%, transparent);
+  z-index: 3;
+}
+.storefront.skin-favo .gallery-dots button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 1.5px solid var(--papel);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.storefront.skin-favo .gallery-dots button.active { background: var(--gema); border-color: var(--gema); }
+
+/* ── Painel da foto no modal ──
+   Foto de estúdio (4:3, fundo cinza-claro) numa caixa de tamanho fixo sobrava
+   em faixas lisas. A foto continua inteira (contain) e o painel ganha a cor do
+   fundo dela: o topo da foto é #F0EFF5 e a base #E3E2E7–#E8E7EB, então o
+   degradê segura essas duas cores nas pontas e desce suave no meio — nas faixas
+   de cima/baixo (desktop) e nas laterais (celular) a foto some no painel.
+   Calibrado para as fotos de estúdio desta loja. */
+.storefront.skin-favo .option-modal-left:not(.is-3d) {
+  background: linear-gradient(180deg, #F0EFF5 0%, #F0EFF5 34%, #E5E4E9 66%, #E5E4E9 100%);
+}
