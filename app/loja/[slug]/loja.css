@@ -1712,3 +1712,138 @@ body:has(.storefront-dark) {
   color: var(--muted2);
   box-shadow: none;
 }
+
+/* ══════════════════════════════════════════
+   BANNER 3D NO TOPO DO CARDÁPIO
+   O prato modelado vira vitrine: gira sozinho sobre um halo quente, com a
+   chamada e o preço ao lado. Em telas estreitas vira coluna (modelo em cima)
+   — é como a maioria vai ver.
+══════════════════════════════════════════ */
+.storefront .ar-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  margin: 0 0 18px;
+  padding: 6px 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 6px);
+  background:
+    radial-gradient(120% 80% at 50% 8%, rgba(var(--primary-rgb, 255, 87, 34), 0.16), transparent 62%),
+    linear-gradient(180deg, var(--surface2), var(--surface));
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.storefront .ar-hero-stage {
+  position: relative;
+  height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Halo atrás do prato: dá profundidade sem precisar de imagem de fundo. */
+.storefront .ar-hero-glow {
+  position: absolute;
+  width: 72%;
+  max-width: 320px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--primary-rgb, 255, 87, 34), 0.30), transparent 68%);
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+.storefront .ar-hero-stage model-viewer {
+  position: relative;
+  z-index: 1;
+  --poster-color: transparent;
+  /* a barra de carregamento cortaria o banner ao meio — o halo já basta */
+  --progress-bar-height: 0px;
+  --progress-bar-color: transparent;
+}
+
+.storefront .ar-hero-copy {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.storefront .ar-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(var(--primary-rgb, 255, 87, 34), 0.14);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.storefront .ar-hero-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.15;
+  color: var(--text);
+}
+
+.storefront .ar-hero-sub {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.storefront .ar-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 5px;
+}
+
+.storefront .ar-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 22px;
+  border: none;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(var(--primary-rgb, 255, 87, 34), 0.38);
+  transition: transform 0.15s, filter 0.15s;
+}
+.storefront .ar-hero-btn:hover { filter: brightness(1.06); }
+.storefront .ar-hero-btn:active { transform: scale(0.97); }
+
+.storefront .ar-hero-price {
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--text);
+}
+
+@media (min-width: 760px) {
+  .storefront .ar-hero {
+    grid-template-columns: 1.05fr 1fr;
+    align-items: center;
+    gap: 18px;
+    padding: 14px 28px 14px 14px;
+  }
+  .storefront .ar-hero-stage { height: 300px; }
+  .storefront .ar-hero-copy { text-align: left; align-items: flex-start; }
+  .storefront .ar-hero-title { font-size: 27px; }
+  .storefront .ar-hero-sub { font-size: 13.5px; }
+}

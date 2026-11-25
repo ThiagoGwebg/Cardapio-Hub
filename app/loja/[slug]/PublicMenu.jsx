@@ -26,6 +26,7 @@ import { loadCart, saveCart, clearCart, loadCustomer, saveCustomer } from '@/lib
 import InstallPwaButton from '@/components/InstallPwaButton'
 import MyOrdersModal from './MyOrdersModal'
 import ArProductViewer from './ArProductViewer'
+import ArBanner from './ArBanner'
 import './loja.css'
 
 
@@ -307,6 +308,12 @@ export default function PublicMenu({
   // Busca por nome, descrição e categoria: quem procura "sem lactose" ou
   // "porção" está descrevendo o item, não digitando o nome exato dele.
   // Categoria que casa com a busca mantém todos os produtos dela.
+  // Prato em destaque do banner 3D: o primeiro com modelo publicado.
+  const arHighlight = useMemo(
+    () => menu.flatMap((c) => c.products).find((p) => p.ar_model_url) ?? null,
+    [menu]
+  )
+
   const filteredMenu = useMemo(() => {
     const q = search.trim().toLowerCase()
     if (!q) return menu
@@ -756,6 +763,10 @@ export default function PublicMenu({
             Esta loja trabalha {store.pickup_enabled ? 'com retirada no local' : 'para consumo no local'} — <b>sem entrega</b>
           </span>
         </div>
+      )}
+
+      {arHighlight && !search && (
+        <ArBanner product={arHighlight} onOpen={openProduct} />
       )}
 
       <div className="storefront-search-row">

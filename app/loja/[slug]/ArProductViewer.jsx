@@ -15,6 +15,10 @@ import ModelViewer from '@/components/ModelViewer'
  *     "sem AR" explica o que instalar.
  *  5. Aparelho sem RA (computador/tablet): mostra um QR que abre este produto
  *     direto no celular.
+ *
+ * A elevação da câmera é travada (58°-86°): o prato fica em pé como na mesa
+ * e ninguém cai embaixo do modelo, onde um prato modelado a partir de fotos
+ * parece mais pobre. Vale só para o visor — a RA não é afetada.
  */
 
 const SINAL_SEM_AR = '#model-viewer-no-ar-fallback'
@@ -159,7 +163,9 @@ export default function ArProductViewer({ src, alt, sizeCm, productId }) {
         auto-rotate="true"
         auto-rotate-delay="1800"
         rotation-per-second="14deg"
-        camera-orbit="30deg 65deg auto"
+        camera-orbit="20deg 72deg 105%"
+        min-camera-orbit="auto 58deg auto"
+        max-camera-orbit="auto 86deg auto"
         shadow-intensity="1"
         shadow-softness="0.7"
         environment-image="neutral"
