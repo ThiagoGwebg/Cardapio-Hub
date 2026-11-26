@@ -30,7 +30,7 @@ a volta de 30 segundos, a ordem de vocês fica de pé **e** o encaixe acontece.
 
 O grupo passou a ser de três. A parte que era dele foi dividida assim: o **Gustavo**
 assume o estoque ao vivo (7:00 – 10:00), e o **Thiago** assume o banco — a decisão 01,
-o slide 7 e toda pergunta de banco, RLS e segurança na arguição.
+o slide 8 e toda pergunta de banco, RLS e segurança na arguição.
 
 A ordem e os tempos não mudaram. O que mudou é que o Gustavo agora tem dois blocos
 seguidos, das 7:00 às 14:30: estoque primeiro, cardápio depois. São sete minutos e
@@ -103,13 +103,13 @@ recebe."*
 
 ## Bloco 2 — Fechamento (18:00 – 20:00)
 
-### Slide 8 — Modelo de negócio
+### Slide 9 — Modelo de negócio
 
 > "São três planos: 29, 69 e 149 reais por mês, por loja. O ponto não é a tabela, é a
 > estrutura: a nossa receita é fixa e previsível, e não cresce quando o restaurante
 > vende mais. A margem do crescimento dele fica com ele."
 
-### Slide 9 — Validação
+### Slide 10 — Validação
 
 > "Isso não é um protótipo de laboratório. Está no ar, com domínio próprio, pagamento
 > integrado e uma rotina diária que gera as cobranças sozinha. Tem painel
@@ -120,14 +120,14 @@ Sobre os próximos passos, seja direto: importação automática de notas fiscai
 programa de entregadores — **já implementado e fechado por uma chave de recurso** — e
 aplicativo nativo.
 
-### Slide 10 — Encerramento
+### Slide 11 — Encerramento
 
 > "A gente fecha voltando para onde começou: o canal de venda é do lojista, não do
 > intermediário. Obrigado."
 
 O slide traz Provérbios 16:9 acima de "Quem responde o quê": leia o versículo em voz alta antes do "Obrigado".
 
-Deixe o slide 10 na tela durante a arguição: os papéis de cada um ficam à vista.
+Deixe o slide 11 na tela durante a arguição: os papéis de cada um ficam à vista.
 
 ## Na arguição, você responde
 
@@ -206,7 +206,15 @@ vez**.
 
 ## Bloco 3 — Arquitetura (15:00 – 18:00)
 
-### Slide 6 — Arquitetura (você)
+### Slide 6 — Tecnologias (você)
+
+Não leia os quatro cartões. Diga em uma frase:
+
+> "O sistema todo é JavaScript. Next.js e React na interface e no servidor, hospedado na Vercel. O banco é PostgreSQL pelo Supabase, que também cuida do login e do tempo real. Pagamento, cobrança e notificação vêm de serviços externos: Mercado Pago, Stripe e OneSignal."
+
+Se perguntarem *por que PostgreSQL*: as regras de segurança por loja moram nele (a decisão 01, abaixo).
+
+### Slide 7 — Arquitetura (você)
 
 Não leia as quatro camadas uma por uma.
 
@@ -217,7 +225,7 @@ Não leia as quatro camadas uma por uma.
 
 ### As três decisões (sem slide próprio)
 
-O deck não tem slide só para as decisões. Conte a 01 durante o slide 6 (Arquitetura), com calma, e resuma a 02 e a 03. As falas abaixo servem também de resposta se a banca pedir mais.
+O deck não tem slide só para as decisões. Conte a 01 durante o slide 7 (Arquitetura), com calma, e resuma a 02 e a 03. As falas abaixo servem também de resposta se a banca pedir mais.
 
 A **decisão 01 é a pergunta mais provável da banca**. Apresente e já responda antes de
 perguntarem:
@@ -240,7 +248,7 @@ perguntarem:
 > achado no Google. HTML pronto, em vez de uma tela em branco esperando o JavaScript
 > baixar."
 
-### Slide 7 — O estoque, por baixo (você)
+### Slide 8 — O estoque, por baixo (você)
 
 Retome o que o Gustavo mostrou ao vivo, agora pelo lado técnico:
 
