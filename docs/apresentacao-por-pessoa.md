@@ -51,8 +51,8 @@ aparece como próximo passo, no slide de Validação. Se a banca perguntar, a re
 Apresente os três pelo nome e diga o que cada um fez, em uma frase. Depois:
 
 > "O Cardápio Hub é uma plataforma onde o restaurante vende pelo próprio link, com a
-> própria marca, sem pagar comissão por pedido. É um sistema em produção, no ar, e é
-> ele que a gente vai mostrar funcionando hoje."
+> própria marca, sem pagar comissão por pedido. É um sistema já publicado na internet, e
+> é ele que a gente vai mostrar funcionando hoje."
 
 ### Slide 2 — O problema
 
@@ -108,15 +108,18 @@ recebe."*
 
 ### Slide 9 — Validação
 
-> "Isso não é um protótipo de laboratório. Está no ar, com domínio próprio, pagamento
-> integrado e uma rotina diária que gera as cobranças sozinha. Tem painel
-> administrativo, controle de acesso por papel e um processo de onboarding
-> documentado."
+> "Aqui é onde o projeto está hoje. O sistema está publicado em domínio próprio e o
+> fluxo completo funciona na loja de demonstração, que é fictícia: pedido, painel,
+> caixa e relatórios. Tem painel administrativo com controle de acesso por papel,
+> pagamento online e cobrança de assinatura já desenvolvidos, e um processo de
+> implantação documentado. O que falta é abrir as primeiras lojas reais."
 
-Sobre os próximos passos, seja direto: trazer o controle de estoque para a
-demonstração, programa de entregadores — **já implementado e fechado por uma chave de
-recurso** — e aplicativo nativo. Sobre o estoque, diga que ainda não faz parte do que
-vocês mostram hoje; **não diga que o sistema não tem**, porque ele existe em produção.
+Sobre os próximos passos, seja direto: abrir as primeiras lojas reais, trazer o
+controle de estoque para a demonstração, programa de entregadores — **já implementado
+e fechado por uma chave de recurso** — e aplicativo nativo. **Não diga "em produção
+com clientes"**: ainda não há lojas reais usando. Sobre o estoque, diga que ainda não
+faz parte do que vocês mostram hoje; **não diga que o sistema não tem**, porque ele
+existe e está publicado.
 
 ### Slide 10 — Encerramento
 

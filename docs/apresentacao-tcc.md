@@ -1,6 +1,7 @@
 # Roteiro da apresentação do TCC — Cardápio Hub
 
-Apresentação com demonstração **ao vivo em produção** (https://www.cardapiohub.com).
+Apresentação com demonstração **ao vivo no site publicado** (https://www.cardapiohub.com),
+usando a loja de demonstração.
 Montado para **17 minutos + arguição**; cada bloco tem o tempo e o que cortar primeiro
 se o relógio apertar.
 
@@ -158,7 +159,7 @@ plano é validado lá dentro, não no cliente — duas abas abertas não burlam.
 
 **"E o estoque?"** (só se perguntarem)
 Ainda não faz parte do que mostramos hoje. O próximo passo é trazer o controle de
-estoque para a demonstração. (Não diga que o sistema não tem: ele existe em produção.)
+estoque para a demonstração. (Não diga que o sistema não tem: ele existe e está publicado.)
 
 **"Qual o modelo de negócio?"**
 Assinatura mensal por loja — Lite R$ 29, Plus R$ 69, Pro R$ 149 — **sem comissão
@@ -170,7 +171,9 @@ cardápio em link levam o pedido para o WhatsApp e param aí. Aqui o pedido entr
 sistema e segue até caixa e relatório — é operação, não só vitrine.
 
 **"É um protótipo ou está em uso?"**
-Está em produção, com domínio próprio, pagamento e cobrança recorrente automatizada.
+Está publicado em domínio próprio, e o fluxo completo funciona na loja de demonstração:
+pedido, painel, caixa e relatórios. Ainda não temos lojas reais usando; abrir as
+primeiras é o próximo passo. (Não diga "em produção com clientes".)
 
 **"O que vocês fariam diferente?"**
 Resposta honesta vale mais que defesa: o modelo 3D depender de um domínio externo
