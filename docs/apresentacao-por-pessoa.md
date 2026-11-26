@@ -9,11 +9,13 @@ continua em `docs/apresentacao-tcc.md`.
 |---|---|---|
 | 0:00 – 4:00 | **Marcos** | Abertura, problema, solução e a tela inicial ao vivo |
 | 4:00 – 7:00 | **Thiago** | Painel do lojista: pedidos, caixa, desempenho, clientes |
-| 7:00 – 10:00 | **Igor** | Painel do lojista: estoque, ficha técnica e entrada de NF-e |
-| 10:00 – 14:30 | **Gustavo** | Cardápio, montagem do pedido e pagamento |
-| 14:30 – 15:00 | **Thiago** | Volta ao painel: o pedido do Gustavo chegou |
-| 15:00 – 18:00 | **Thiago e Igor** | Arquitetura e decisões técnicas |
-| 18:00 – 20:00 | **Marcos** | Modelo de negócio, validação e encerramento |
+| 7:00 – 11:30 | **Gustavo** | Cardápio, montagem do pedido e pagamento |
+| 11:30 – 12:00 | **Thiago** | Volta ao painel: o pedido do Gustavo chegou |
+| 12:00 – 15:00 | **Thiago** | Tecnologias e arquitetura |
+| 15:00 – 17:00 | **Marcos** | Modelo de negócio, validação e encerramento |
+
+O estoque ficou fora da apresentação, então o roteiro dura uns **17 minutos**, não 20.
+Os três que sobram podem ir para a demonstração ao vivo ou para a arguição.
 
 ## Um ajuste no plano, e por quê
 
@@ -26,23 +28,31 @@ e caindo no painel na frente da banca. Mostrando o painel antes e o cardápio de
 esse momento se perde — a banca vê os pedidos já lá, sem ligar uma coisa à outra. Com
 a volta de 30 segundos, a ordem de vocês fica de pé **e** o encaixe acontece.
 
+## A saída do Igor e o estoque
+
+O grupo passou a ser de três, e o **Thiago** assume o banco: a decisão 01 e toda
+pergunta de banco, RLS e segurança na arguição.
+
+O **estoque ficou de fora da apresentação**: não tem slide nem demonstração ao vivo e só
+aparece como próximo passo, no slide de Validação. Se a banca perguntar, a resposta curta está na seção do Thiago, na arguição.
+
 ---
 
 # MARCOS — abertura e fechamento
 
 > **Seu papel:** você abre e você fecha. É o fio da narrativa: a banca entende o
 > problema por você e sai com a conclusão por você. Você não precisa explicar código
-> em nenhum momento — se vier pergunta técnica, passe para o Igor.
+> em nenhum momento — se vier pergunta técnica, passe para o Thiago.
 
 ## Bloco 1 — Abertura (0:00 – 4:00)
 
 ### Slide 1 — Capa
 
-Apresente os quatro pelo nome e diga o que cada um fez, em uma frase. Depois:
+Apresente os três pelo nome e diga o que cada um fez, em uma frase. Depois:
 
 > "O Cardápio Hub é uma plataforma onde o restaurante vende pelo próprio link, com a
-> própria marca, sem pagar comissão por pedido. É um sistema em produção, no ar, e é
-> ele que a gente vai mostrar funcionando hoje."
+> própria marca, sem pagar comissão por pedido. É um sistema já publicado na internet, e
+> é ele que a gente vai mostrar funcionando hoje."
 
 ### Slide 2 — O problema
 
@@ -50,8 +60,7 @@ Apresente os quatro pelo nome e diga o que cada um fez, em uma frase. Depois:
 > são ruins. Na primeira, ele entra num marketplace: o pedido chega, mas uma fatia
 > grande do valor fica com a plataforma, e o cliente passa a ser da plataforma, não
 > dele. Na segunda, ele vende pelo WhatsApp: não paga comissão, mas também não tem
-> sistema nenhum — é pedido no bloquinho, erro de anotação, nenhum controle de caixa
-> ou de estoque."
+> sistema nenhum — é pedido no bloquinho, erro de anotação, nenhum controle de caixa."
 
 ### Slide 3 — 12% a 30%
 
@@ -65,8 +74,8 @@ Deixe o número na tela e fale devagar:
 ### Slide 4 — A solução
 
 > "O que a gente construiu não é só um cardápio bonito. É a operação inteira do
-> restaurante: a vitrine que o cliente vê, o painel onde o pedido entra, o caixa, o
-> estoque e os relatórios."
+> restaurante: a vitrine que o cliente vê, o painel onde o pedido entra, o caixa e os
+> relatórios."
 
 ### Slide 5 — A tese
 
@@ -89,31 +98,37 @@ Abra `cardapiohub.com` e mostre, sem pressa:
 **Passe a bola em voz alta:** *"Agora o Thiago vai mostrar o painel que esse lojista
 recebe."*
 
-## Bloco 2 — Fechamento (18:00 – 20:00)
+## Bloco 2 — Fechamento (15:00 – 17:00)
 
-### Slide 10 — Modelo de negócio
+### Slide 8 — Modelo de negócio
 
 > "São três planos: 29, 69 e 149 reais por mês, por loja. O ponto não é a tabela, é a
 > estrutura: a nossa receita é fixa e previsível, e não cresce quando o restaurante
 > vende mais. A margem do crescimento dele fica com ele."
 
-### Slide 11 — Validação
+### Slide 9 — Validação
 
-> "Isso não é um protótipo de laboratório. Está no ar, com domínio próprio, pagamento
-> integrado e uma rotina diária que gera as cobranças sozinha. Tem painel
-> administrativo, controle de acesso por papel e um processo de onboarding
-> documentado."
+> "Aqui é onde o projeto está hoje. O sistema está publicado em domínio próprio e o
+> fluxo completo funciona na loja de demonstração, que é fictícia: pedido, painel,
+> caixa e relatórios. Tem painel administrativo com controle de acesso por papel,
+> pagamento online e cobrança de assinatura já desenvolvidos, e um processo de
+> implantação documentado. O que falta é abrir as primeiras lojas reais."
 
-Sobre os próximos passos, seja direto: importação automática de notas fiscais,
-programa de entregadores — **já implementado e fechado por uma chave de recurso** — e
-aplicativo nativo.
+Sobre os próximos passos, seja direto: abrir as primeiras lojas reais, trazer o
+controle de estoque para a demonstração, programa de entregadores — **já implementado
+e fechado por uma chave de recurso** — e aplicativo nativo. **Não diga "em produção
+com clientes"**: ainda não há lojas reais usando. Sobre o estoque, diga que ainda não
+faz parte do que vocês mostram hoje; **não diga que o sistema não tem**, porque ele
+existe e está publicado.
 
-### Slide 12 — Encerramento
+### Slide 10 — Encerramento
 
 > "A gente fecha voltando para onde começou: o canal de venda é do lojista, não do
 > intermediário. Obrigado."
 
-Deixe o slide 12 na tela durante a arguição: os papéis de cada um ficam à vista.
+O slide traz Provérbios 16:9 acima de "Quem responde o quê": leia o versículo em voz alta antes do "Obrigado".
+
+Deixe o slide 10 na tela durante a arguição: os papéis de cada um ficam à vista.
 
 ## Na arguição, você responde
 
@@ -123,10 +138,10 @@ Escopo, metodologia, pesquisa, modelo de negócio, concorrência, próximos pass
 
 > "Marketplaces como iFood cobram comissão e ficam com o cliente. Geradores de
 > cardápio em link levam o pedido para o WhatsApp e param aí. O nosso vai até o
-> fim: caixa, estoque e relatório. É operação, não só vitrine."
+> fim: caixa e relatório. É operação, não só vitrine."
 
 **Se vier pergunta de banco de dados, segurança ou código:** não arrisque. Diga
-*"o Igor trabalhou nessa parte"* e passe. Isso não pega mal — pega mal é responder
+*"o Thiago trabalhou nessa parte"* e passe. Isso não pega mal — pega mal é responder
 errado.
 
 ---
@@ -134,15 +149,16 @@ errado.
 # THIAGO — painel do lojista e arquitetura
 
 > **Seu papel:** você mostra o que o lojista ganha no dia a dia e, no fim, explica
-> como o sistema é montado. Você é o segundo mais forte tecnicamente: o Igor pega o
-> banco, você pega o resto.
+> como o sistema é montado. Com a saída do Igor, você é o mais forte tecnicamente do
+> grupo: o banco é seu, e é para você que os outros dois vão empurrar qualquer
+> pergunta pesada da banca.
 
 ## Bloco 1 — O painel (4:00 – 7:00) · aba 2
 
 Comece dizendo onde a banca está:
 
-> "Esse é o painel que o dono do restaurante recebe. Tudo que eu vou mostrar aqui é
-> uma loja real em produção, com 105 pedidos dos últimos 35 dias."
+> "Esse é o painel que o dono do restaurante recebe. Esta é a nossa loja de
+> demonstração, com 35 dias de histórico gerado por script, para vocês verem os relatórios."
 
 ### Pedidos (1,5 min)
 
@@ -172,10 +188,9 @@ mais vendidos.
 > "O sistema identifica quem já pediu antes e marca os recorrentes. São 31 clientes
 > aqui, 8 deles com selo de recorrente e link direto do WhatsApp."
 
-**Passe a bola:** *"O Igor vai mostrar a parte que nenhum concorrente de cardápio
-digital tem."*
+**Passe a bola:** *"O Gustavo vai mostrar o lado de quem pede."*
 
-## Bloco 2 — O pedido do Gustavo chegou (14:30 – 15:00) · aba 2
+## Bloco 2 — O pedido do Gustavo chegou (11:30 – 12:00) · aba 2
 
 Assim que o Gustavo finalizar o pedido, **volte para a aba do painel e recarregue uma
 vez**.
@@ -189,95 +204,30 @@ vez**.
 > ⚠️ Se o pedido não aparecer, recarregue **uma vez só**. Se ainda assim não vier,
 > não insista: *"a rede aqui está lenta"*, mostre o quadro que já tem pedidos e siga.
 
-## Bloco 3 — Arquitetura (15:00 – 18:00, dividido com o Igor)
+## Bloco 3 — Tecnologias e arquitetura (12:00 – 15:00)
+
+### Slide 6 — Tecnologias (você)
+
+Não leia os quatro cartões. Diga em uma frase:
+
+> "O sistema todo é JavaScript. Next.js e React na interface e no servidor, hospedado na Vercel. O banco é PostgreSQL pelo Supabase, que também cuida do login e do tempo real. Pagamento, cobrança e notificação vêm de serviços externos: Mercado Pago e OneSignal."
+
+Se perguntarem *por que PostgreSQL*: as regras de segurança por loja moram nele (a decisão 01, abaixo).
 
 ### Slide 7 — Arquitetura (você)
 
 Não leia as quatro camadas uma por uma.
 
 > "São quatro camadas, mas a decisão que importa está na de baixo. Em cima, o cardápio
-> do cliente, renderizado no servidor. No meio, o painel do lojista, que instala como
-> aplicativo no celular e recebe notificação de pedido novo. Embaixo, o banco — e é
-> sobre ele que o Igor vai falar."
+> do cliente, renderizado no servidor. No meio, o painel do lojista, que recebe cada
+> pedido novo na hora, com notificação. Embaixo, o banco — e é dele que eu vou falar
+> agora."
 
-### Slide 8 — Decisões 02 e 03 (você; a 01 é do Igor)
+### As três decisões (sem slide próprio)
 
-> "A segunda decisão: criar pedido e baixar estoque não são código da aplicação, são
-> funções e gatilhos dentro do banco, transacionais e idempotentes. O saldo do estoque
-> só muda por movimentação registrada, e o livro-razão sempre fecha com ele."
+O deck não tem slide só para as decisões. Conte a 01 durante o slide 7 (Arquitetura), com calma, e resuma a 02 e a 03. As falas abaixo servem também de resposta se a banca pedir mais.
 
-> "A terceira: o cardápio é renderizado no servidor. Ele é a vitrine do restaurante —
-> precisa abrir rápido no celular do cliente, muitas vezes em rede ruim, e precisa ser
-> achado no Google. HTML pronto, em vez de uma tela em branco esperando o JavaScript
-> baixar."
-
-## Na arguição, você responde
-
-Arquitetura geral, integrações, pagamento, deploy, PWA e notificações.
-
-**Pergunta provável:** *"Por que não usar só um framework de frontend?"* — a resposta
-é a decisão 03, acima.
-
----
-
-# IGOR — estoque e o banco de dados
-
-> **Seu papel:** você é o mais forte tecnicamente do grupo, então você fica com as
-> duas partes mais difíceis: o estoque ao vivo e o isolamento entre lojas. É também
-> para você que os outros três vão empurrar qualquer pergunta pesada da banca.
-
-## Bloco 1 — Estoque (7:00 – 10:00) · aba 3
-
-Abra dizendo o que torna isso diferente:
-
-> "Essa é a parte que nenhum concorrente de cardápio digital tem. Os outros param no
-> pedido. Aqui o pedido mexe no estoque."
-
-### Ficha técnica (1 min)
-
-1. Abra **Ficha técnica** e escolha um produto — o Smash Clássico.
-2. Mostre a composição: quanto de blend, de queijo e de pão sai por unidade vendida.
-
-> "Isso é a ficha técnica: quanto de cada insumo sai quando esse produto é vendido.
-> Ela vale para o produto e para cada adicional — se o cliente pede bacon extra, o
-> bacon extra também baixa."
-
-3. Mostre o custo e a margem calculados.
-
-> "Com isso o sistema sabe o custo real do prato, não o chute. Ele mostra o CMV e a
-> margem de cada item."
-
-### Movimentações (1 min)
-
-1. Abra **Movimentações**.
-2. Aponte uma saída ligada a um pedido.
-
-> "Esse é o livro-razão do estoque. Toda entrada e toda saída está aqui, com link para
-> o pedido ou a nota que a originou. O lojista não consegue editar nem apagar uma
-> movimentação — o saldo só muda por movimentação registrada, e é por isso que o
-> livro-razão sempre fecha com o saldo."
-
-### Entrada de NF-e (1 min)
-
-1. Abra **Entrada NF-e**.
-
-> "A entrada vem da nota do fornecedor. O lojista sobe o XML da NF-e, o sistema lê os
-> itens e ele liga cada item da nota a um insumo, com conversão de unidade — uma caixa
-> com doze unidades vira doze. Na próxima nota do mesmo fornecedor, isso já vem ligado
-> sozinho."
-
-> "E o sistema guarda o custo médio ponderado. Se o preço de um insumo subir mais de
-> 10% em relação à última compra, ele avisa no topo da tela até alguém marcar que
-> está ciente."
-
-**Passe a bola:** *"Agora o Gustavo vai mostrar como o cliente final faz um pedido —
-e esse pedido vai voltar aqui."*
-
-## Bloco 2 — Arquitetura: a decisão 01 (dentro dos 15:00 – 18:00)
-
-### Slide 8 — Decisão 01, isolamento entre lojas
-
-Essa é **a pergunta mais provável da banca**. Você apresenta e já responde antes de
+A **decisão 01 é a pergunta mais provável da banca**. Apresente e já responda antes de
 perguntarem:
 
 > "A primeira decisão é a mais importante: o isolamento entre lojas não está no
@@ -289,34 +239,30 @@ perguntarem:
 > Como a regra está no banco, ela vale para qualquer caminho de acesso — inclusive
 > para um código que ainda não existe."
 
-### Slide 9 — Estoque e realidade aumentada (você)
+> "A segunda: criar o pedido não é código da aplicação, é uma função dentro do
+> banco, transacional: o limite do plano é validado lá dentro, e duas abas abertas
+> não burlam."
 
-> "Esses são os dois recursos que saem do cardápio e entram na operação. O estoque
-> vocês acabaram de ver. O outro é realidade aumentada: no plano Pro, o lojista manda
-> até quatro fotos do prato, uma IA gera o modelo 3D, ele revisa no painel e publica —
-> e o cliente coloca o prato na própria mesa pela câmera do celular. Sem precisar de
-> um modelador 3D."
-
-> ⚠️ **Não prometa mostrar o 3D.** A loja de demonstração está sem modelo publicado.
-> Se pedirem para ver: *"cada geração consome crédito da IA, então a loja de
-> demonstração está sem modelo publicado no momento; o fluxo de geração fica no
-> painel."* Não abra o painel para procurar.
+> "A terceira: o cardápio é renderizado no servidor. Ele é a vitrine do restaurante —
+> precisa abrir rápido no celular do cliente, muitas vezes em rede ruim, e precisa ser
+> achado no Google. HTML pronto, em vez de uma tela em branco esperando o JavaScript
+> baixar."
 
 ## Na arguição, você responde
 
-Banco de dados, RLS, transações, gatilhos, estoque, concorrência de pedidos,
-segurança. Tudo que os outros três passarem para você.
+Arquitetura geral, integrações, pagamento, deploy e notificações — **e tudo que
+era do Igor**: banco de dados, RLS, transações, gatilhos, concorrência de
+pedidos e segurança. Os outros dois vão passar essas perguntas para você.
 
-**As três que mais caem:**
+**As quatro que mais caem:**
 
+- *"Por que não usar só um framework de frontend?"* → a decisão 03, acima.
 - *"Como garantem que uma loja não vê o dado de outra?"* → a decisão 01, acima.
 - *"E se dois pedidos chegarem ao mesmo tempo?"* → "A criação do pedido é uma função
   transacional no banco, e o limite de pedidos do plano é validado lá dentro. Duas
   abas abertas não burlam."
-- *"O estoque pode ficar negativo. Isso não é um bug?"* → "É uma decisão de produto.
-  Bloquear a venda por falta de insumo cadastrado faria o restaurante perder venda
-  real por erro de cadastro. O sistema registra e alerta, mas nunca impede o pedido —
-  quem decide é o lojista."
+- *"E o estoque?"* (só se perguntarem) → "Ainda não faz parte do que mostramos hoje.
+  O próximo passo é trazer o controle de estoque para a demonstração."
 
 ---
 
@@ -326,23 +272,14 @@ segurança. Tudo que os outros três passarem para você.
 > entende, porque todo mundo já pediu comida pelo celular — e é a interface que você
 > construiu. Termine fazendo um pedido de verdade: ele vai aparecer no painel logo
 > depois.
+>
+> Pergunta de banco, RLS, gatilho ou transação vai para o Thiago.
 
-## Bloco único (10:00 – 14:30) · aba 1 e celular
+## O cardápio e o pedido (7:00 – 11:30) · aba 1 e celular
 
-### Primeiro, o slide 6 — o QR Code (30 s)
+Comece situando a banca:
 
-**O slide do QR Code é seu, e é aqui que ele entra** — não no início da apresentação.
-Volte o projetor para o deck, no slide 6, e convide a banca:
-
-> "Até agora vocês viram o lado do restaurante. Agora o lado de quem pede. E vocês
-> podem acompanhar daí mesmo: apontem a câmera do celular para esse código, que o
-> cardápio abre no aparelho de vocês."
-
-Dê uns segundos para escanearem. A banca com o cardápio aberto no próprio celular
-vale mais que qualquer slide — e a partir daqui cada coisa que você mostrar, eles
-conseguem repetir na mão.
-
-Depois volte o projetor para a aba do cardápio.
+> "Até agora vocês viram o lado do restaurante. Agora o lado de quem pede."
 
 ### O cardápio (1 min)
 
@@ -432,16 +369,16 @@ Depois volte o projetor para a aba do cardápio.
 
 ## Na arguição, você responde
 
-Interface, responsividade, experiência do cliente, acessibilidade, PWA.
+Interface, responsividade, experiência do cliente e acessibilidade.
 
 **Pergunta provável:** *"Funciona bem no celular?"*
 
-> "Foi feito primeiro para o celular — é onde o cliente de delivery está. A banca
-> inteira abriu no próprio aparelho no começo da apresentação."
+> "Foi feito primeiro para o celular — é onde o cliente de delivery está. O pedido
+> que eu acabei de fazer saiu do celular e caiu direto no painel do Thiago."
 
 ---
 
-## Combinados entre os quatro
+## Combinados entre os três
 
 - **Passem a bola em voz alta**, pelo nome, como está escrito em cada bloco. Troca
   silenciosa deixa a banca sem saber para onde olhar.
