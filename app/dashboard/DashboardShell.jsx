@@ -55,9 +55,9 @@ const THEME_INIT_SCRIPT = `
 // (Operação), o que se olha depois (Gestão) e o que se ajusta de vez em
 // quando (Configurações, uma entrada só com sub-abas na própria página).
 // Itens do menu escondidos em lojas especificas (por slug). Hoje so a loja de
-// demonstracao: na apresentacao do TCC o estoque nao entra, e um menu menor fica
+// demonstracao: na apresentacao do TCC estoque e integracoes nao entram, e um menu menor fica
 // mais facil de mostrar. A pagina continua existindo, so some do menu.
-const HIDDEN_NAV_BY_SLUG = { demo: ['/dashboard/estoque'] }
+const HIDDEN_NAV_BY_SLUG = { demo: ['/dashboard/estoque', '/dashboard/integracoes'] }
 
 const NAV_GROUPS = [
   {
@@ -304,15 +304,17 @@ export default function DashboardShell({
             <span className="nav-ico"><Settings size={19} strokeWidth={2} /></span>
             <span className="nav-label">Configurações</span>
           </Link>
-          <Link
-            href="/dashboard/integracoes"
-            className={`nav-item ${isActive('/dashboard/integracoes') ? 'active' : ''}`}
-            aria-current={isActive('/dashboard/integracoes') ? 'page' : undefined}
-            onClick={closeMenus}
-          >
-            <span className="nav-ico"><Plug size={19} strokeWidth={2} /></span>
-            <span className="nav-label">Integrações</span>
-          </Link>
+          {!hiddenNav.includes('/dashboard/integracoes') && (
+            <Link
+              href="/dashboard/integracoes"
+              className={`nav-item ${isActive('/dashboard/integracoes') ? 'active' : ''}`}
+              aria-current={isActive('/dashboard/integracoes') ? 'page' : undefined}
+              onClick={closeMenus}
+            >
+              <span className="nav-ico"><Plug size={19} strokeWidth={2} /></span>
+              <span className="nav-label">Integrações</span>
+            </Link>
+          )}
           {store.slug && (
             <a
               href={`/loja/${store.slug}`}
