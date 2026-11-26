@@ -6,7 +6,7 @@ se o relógio apertar.
 
 Loja de demonstração, credenciais e como resetar: `docs/loja-demo.md`.
 
-Os **11 slides** da banca estão em:
+Os **10 slides** da banca estão em:
 <https://claude.ai/artifact/DbpGy7Ed3peLsVyvwHmW6Q>
 Cada slide traz a fala correspondente nas notas do apresentador. Baixe o PDF pela
 própria página **antes do dia** e leve no computador — a aba 5 do pré-voo é esse
@@ -133,7 +133,7 @@ Este é o diferencial que os concorrentes de cardápio digital não têm. Dê te
 
 ### 3.5 — Realidade aumentada — **fora do escopo**
 
-A realidade aumentada não entra nesta apresentação. O slide 8 é só o estoque, e não
+A realidade aumentada não entra nesta apresentação. O slide 7 é só o estoque, e não
 há prato 3D publicado na loja demo.
 
 Se a banca perguntar, a resposta é curta: *"existe no plano Pro — o lojista manda até
