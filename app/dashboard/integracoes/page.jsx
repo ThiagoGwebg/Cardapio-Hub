@@ -25,39 +25,44 @@ export default async function IntegracoesPage() {
         </div>
       </div>
 
-      <h2 className="int-section">Notas fiscais e estoque</h2>
-      <div className="int-grid">
-        <FocusNfeCard integration={focus} />
+      {/* Na loja de demonstracao (TCC) esta parte fica oculta: ela e do estoque. */}
+      {store.slug !== 'demo' && (
+        <>
+          <h2 className="int-section">Notas fiscais e estoque</h2>
+          <div className="int-grid">
+            <FocusNfeCard integration={focus} />
 
-        <article className="int-card">
-          <header className="int-card-head">
-            <span className="int-logo" aria-hidden><FileCode2 size={20} strokeWidth={2} /></span>
-            <div>
-              <h3 className="int-name">Nota fiscal por XML</h3>
-              <p className="int-by">Incluído no painel</p>
-            </div>
-            <span className="stk-chip is-ok">Ativo</span>
-          </header>
-          <p className="int-desc">
-            Envie o arquivo .xml que o fornecedor manda por e-mail. O painel lê fornecedor, itens e valores e dá entrada nos insumos.
-          </p>
-          <footer className="int-card-foot">
-            <Link href="/dashboard/estoque?tab=notas" className="stk-btn">Importar uma nota</Link>
-          </footer>
-        </article>
+            <article className="int-card">
+              <header className="int-card-head">
+                <span className="int-logo" aria-hidden><FileCode2 size={20} strokeWidth={2} /></span>
+                <div>
+                  <h3 className="int-name">Nota fiscal por XML</h3>
+                  <p className="int-by">Incluído no painel</p>
+                </div>
+                <span className="stk-chip is-ok">Ativo</span>
+              </header>
+              <p className="int-desc">
+                Envie o arquivo .xml que o fornecedor manda por e-mail. O painel lê fornecedor, itens e valores e dá entrada nos insumos.
+              </p>
+              <footer className="int-card-foot">
+                <Link href="/dashboard/estoque?tab=notas" className="stk-btn">Importar uma nota</Link>
+              </footer>
+            </article>
 
-        <article className="int-card is-soon">
-          <header className="int-card-head">
-            <span className="int-logo" aria-hidden><Calculator size={20} strokeWidth={2} /></span>
-            <div>
-              <h3 className="int-name">Contabilidade</h3>
-              <p className="int-by">Envio dos XMLs do mês</p>
-            </div>
-            <span className="stk-chip">Em breve</span>
-          </header>
-          <p className="int-desc">Mande as notas de entrada do mês para o seu contador com um clique.</p>
-        </article>
-      </div>
+            <article className="int-card is-soon">
+              <header className="int-card-head">
+                <span className="int-logo" aria-hidden><Calculator size={20} strokeWidth={2} /></span>
+                <div>
+                  <h3 className="int-name">Contabilidade</h3>
+                  <p className="int-by">Envio dos XMLs do mês</p>
+                </div>
+                <span className="stk-chip">Em breve</span>
+              </header>
+              <p className="int-desc">Mande as notas de entrada do mês para o seu contador com um clique.</p>
+            </article>
+          </div>
+        </>
+      )}
 
       <h2 className="int-section">Vendas e pagamentos</h2>
       <div className="int-grid">
