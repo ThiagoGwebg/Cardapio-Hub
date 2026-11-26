@@ -30,7 +30,7 @@ a volta de 30 segundos, a ordem de vocês fica de pé **e** o encaixe acontece.
 
 O grupo passou a ser de três. A parte que era dele foi dividida assim: o **Gustavo**
 assume o estoque ao vivo (7:00 – 10:00), e o **Thiago** assume o banco — a decisão 01,
-o slide 9 e toda pergunta de banco, RLS e segurança na arguição.
+o slide 8 e toda pergunta de banco, RLS e segurança na arguição.
 
 A ordem e os tempos não mudaram. O que mudou é que o Gustavo agora tem dois blocos
 seguidos, das 7:00 às 14:30: estoque primeiro, cardápio depois. São sete minutos e
@@ -103,13 +103,13 @@ recebe."*
 
 ## Bloco 2 — Fechamento (18:00 – 20:00)
 
-### Slide 10 — Modelo de negócio
+### Slide 9 — Modelo de negócio
 
 > "São três planos: 29, 69 e 149 reais por mês, por loja. O ponto não é a tabela, é a
 > estrutura: a nossa receita é fixa e previsível, e não cresce quando o restaurante
 > vende mais. A margem do crescimento dele fica com ele."
 
-### Slide 11 — Validação
+### Slide 10 — Validação
 
 > "Isso não é um protótipo de laboratório. Está no ar, com domínio próprio, pagamento
 > integrado e uma rotina diária que gera as cobranças sozinha. Tem painel
@@ -120,12 +120,12 @@ Sobre os próximos passos, seja direto: importação automática de notas fiscai
 programa de entregadores — **já implementado e fechado por uma chave de recurso** — e
 aplicativo nativo.
 
-### Slide 12 — Encerramento
+### Slide 11 — Encerramento
 
 > "A gente fecha voltando para onde começou: o canal de venda é do lojista, não do
 > intermediário. Obrigado."
 
-Deixe o slide 12 na tela durante a arguição: os papéis de cada um ficam à vista.
+Deixe o slide 11 na tela durante a arguição: os papéis de cada um ficam à vista.
 
 ## Na arguição, você responde
 
@@ -204,7 +204,7 @@ vez**.
 
 ## Bloco 3 — Arquitetura (15:00 – 18:00)
 
-### Slide 7 — Arquitetura (você)
+### Slide 6 — Arquitetura (você)
 
 Não leia as quatro camadas uma por uma.
 
@@ -213,7 +213,7 @@ Não leia as quatro camadas uma por uma.
 > aplicativo no celular e recebe notificação de pedido novo. Embaixo, o banco — e é
 > dele que eu vou falar agora."
 
-### Slide 8 — As três decisões (todas suas)
+### Slide 7 — As três decisões (todas suas)
 
 A **decisão 01 é a pergunta mais provável da banca**. Apresente e já responda antes de
 perguntarem:
@@ -236,7 +236,7 @@ perguntarem:
 > achado no Google. HTML pronto, em vez de uma tela em branco esperando o JavaScript
 > baixar."
 
-### Slide 9 — O estoque, por baixo (você)
+### Slide 8 — O estoque, por baixo (você)
 
 Retome o que o Gustavo mostrou ao vivo, agora pelo lado técnico:
 
@@ -331,21 +331,6 @@ troca de assunto em voz alta, para a banca mudar de lugar junto com você.
 
 ## Bloco 2 — O cardápio e o pedido (10:00 – 14:30) · aba 1 e celular
 
-### Primeiro, o slide 6 — o QR Code (30 s)
-
-**O slide do QR Code é seu, e é aqui que ele entra** — não no início da apresentação.
-Volte o projetor para o deck, no slide 6, e convide a banca:
-
-> "Até agora vocês viram o lado do restaurante. Agora o lado de quem pede. E vocês
-> podem acompanhar daí mesmo: apontem a câmera do celular para esse código, que o
-> cardápio abre no aparelho de vocês."
-
-Dê uns segundos para escanearem. A banca com o cardápio aberto no próprio celular
-vale mais que qualquer slide — e a partir daqui cada coisa que você mostrar, eles
-conseguem repetir na mão.
-
-Depois volte o projetor para a aba do cardápio.
-
 ### O cardápio (1 min)
 
 1. Mostre o topo: logo, banner, nome da loja e **"Aberto agora"**.
@@ -439,8 +424,8 @@ telas de estoque **fazem**. Como elas funcionam por dentro é do Thiago.
 
 **Pergunta provável:** *"Funciona bem no celular?"*
 
-> "Foi feito primeiro para o celular — é onde o cliente de delivery está. A banca
-> inteira abriu no próprio aparelho no começo da apresentação."
+> "Foi feito primeiro para o celular — é onde o cliente de delivery está. O pedido
+> que eu acabei de fazer saiu do celular e caiu direto no painel do Thiago."
 
 ---
 

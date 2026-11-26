@@ -6,7 +6,7 @@ se o relógio apertar.
 
 Loja de demonstração, credenciais e como resetar: `docs/loja-demo.md`.
 
-Os **12 slides** da banca estão em:
+Os **11 slides** da banca estão em:
 <https://claude.ai/artifact/DbpGy7Ed3peLsVyvwHmW6Q>
 Cada slide traz a fala correspondente nas notas do apresentador. Baixe o PDF pela
 própria página **antes do dia** e leve no computador — a aba 5 do pré-voo é esse
@@ -49,7 +49,7 @@ na frente da banca é lento e dá erro de digitação.
 
 ### Checklist da máquina
 
-- [ ] **Celular no 4G** (não no Wi-Fi do campus) com a câmera pronta pro QR Code
+- [ ] **Celular no 4G** (não no Wi-Fi do campus) com o cardápio da demo já aberto
 - [ ] Notificações do sistema **silenciadas** (Windows: Assistente de Foco)
 - [ ] Zoom do navegador em **110–125%** — a banca lê de longe
 - [ ] Bateria no carregador, protetor de tela desligado
@@ -96,9 +96,8 @@ sistema funcionando, não do diagrama.
 
 ### 3.1 — O cliente pede (2 min) · aba 1 + celular
 
-1. Mostre o **QR Code** no slide e peça: *"podem apontar a câmera, o cardápio abre no
-   celular de vocês agora."* — a banca interagindo vale mais que qualquer slide.
-2. No seu celular, abra **Smash Clássico**.
+1. Abra o cardápio da loja demo (`/loja/demo`) no celular, já aquecido.
+2. Abra o **Smash Clássico**.
 3. Mostre os **grupos de opção**: "Ponto da carne" é obrigatório, adicionais são
    pagos e recalculam o preço na hora.
    > "Isso é o que evita a ligação de volta perguntando o ponto da carne."
@@ -134,7 +133,7 @@ Este é o diferencial que os concorrentes de cardápio digital não têm. Dê te
 
 ### 3.5 — Realidade aumentada — **fora do escopo**
 
-A realidade aumentada não entra nesta apresentação. O slide 9 é só o estoque, e não
+A realidade aumentada não entra nesta apresentação. O slide 8 é só o estoque, e não
 há prato 3D publicado na loja demo.
 
 Se a banca perguntar, a resposta é curta: *"existe no plano Pro — o lojista manda até
