@@ -154,8 +154,8 @@ errado.
 
 Comece dizendo onde a banca está:
 
-> "Esse é o painel que o dono do restaurante recebe. Tudo que eu vou mostrar aqui é
-> uma loja real em produção, com 105 pedidos dos últimos 35 dias."
+> "Esse é o painel que o dono do restaurante recebe. Esta é a nossa loja de
+> demonstração, com 35 dias de histórico gerado por script, para vocês verem os relatórios."
 
 ### Pedidos (1,5 min)
 

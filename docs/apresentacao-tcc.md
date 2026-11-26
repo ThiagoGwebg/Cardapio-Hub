@@ -130,7 +130,7 @@ Este é o diferencial que os concorrentes de cardápio digital não têm. Dê te
 
 - **Caixa**: entradas do dia separadas por dinheiro, Pix e cartão, com exportação CSV.
 - **Desempenho**: faturamento por dia da semana, top produtos, horário de pico.
-  > "105 pedidos reais nos últimos 35 dias — por isso tem gráfico e não tela vazia."
+  > "É uma loja de demonstração, com 35 dias de histórico gerado por script — por isso tem gráfico e não tela vazia."
 
 ### 3.5 — Realidade aumentada — **fora do escopo**
 
