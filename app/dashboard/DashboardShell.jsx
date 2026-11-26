@@ -54,6 +54,11 @@ const THEME_INIT_SCRIPT = `
 // Menu organizado pelo ritmo do restaurante: o que se usa com a loja aberta
 // (Operação), o que se olha depois (Gestão) e o que se ajusta de vez em
 // quando (Configurações, uma entrada só com sub-abas na própria página).
+// Itens do menu escondidos em lojas especificas (por slug). Hoje so a loja de
+// demonstracao: na apresentacao do TCC o estoque nao entra, e um menu menor fica
+// mais facil de mostrar. A pagina continua existindo, so some do menu.
+const HIDDEN_NAV_BY_SLUG = { demo: ['/dashboard/estoque'] }
+
 const NAV_GROUPS = [
   {
     title: 'Operação',
@@ -259,12 +264,13 @@ export default function DashboardShell({
   // mouse (ou ao focar com Tab). O rótulo continua no DOM o tempo todo — só
   // fica invisível no trilho —, então leitor de tela e busca da página o veem.
   function NavLinks() {
+    const hiddenNav = HIDDEN_NAV_BY_SLUG[store.slug] ?? []
     return (
       <nav className="sidebar-nav" aria-label="Menu do painel">
         {NAV_GROUPS.map((group) => (
           <div key={group.title} className="nav-group">
             <div className="nav-section-title"><span>{group.title}</span></div>
-            {group.items.map((item) => (
+            {group.items.filter((item) => !hiddenNav.includes(item.href)).map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
