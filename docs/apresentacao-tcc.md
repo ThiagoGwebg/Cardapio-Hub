@@ -157,8 +157,8 @@ A criação do pedido é uma função transacional no banco. O limite de pedidos
 plano é validado lá dentro, não no cliente — duas abas abertas não burlam.
 
 **"E o estoque?"** (só se perguntarem)
-Existe no sistema, mas escolhemos mostrar o fluxo do pedido do começo ao fim. O
-estoque nunca bloqueia a venda: registra e avisa, e quem decide é o lojista.
+Ainda não faz parte do que mostramos hoje. O próximo passo é trazer o controle de
+estoque para a demonstração. (Não diga que o sistema não tem: ele existe em produção.)
 
 **"Qual o modelo de negócio?"**
 Assinatura mensal por loja — Lite R$ 29, Plus R$ 69, Pro R$ 149 — **sem comissão

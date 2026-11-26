@@ -33,8 +33,8 @@ a volta de 30 segundos, a ordem de vocês fica de pé **e** o encaixe acontece.
 O grupo passou a ser de três, e o **Thiago** assume o banco: a decisão 01 e toda
 pergunta de banco, RLS e segurança na arguição.
 
-O **estoque ficou de fora da apresentação**: não tem slide nem demonstração ao vivo.
-Se a banca perguntar, a resposta curta está na seção do Thiago, na arguição.
+O **estoque ficou de fora da apresentação**: não tem slide nem demonstração ao vivo e só
+aparece como próximo passo, no slide de Validação. Se a banca perguntar, a resposta curta está na seção do Thiago, na arguição.
 
 ---
 
@@ -113,8 +113,10 @@ recebe."*
 > administrativo, controle de acesso por papel e um processo de onboarding
 > documentado."
 
-Sobre os próximos passos, seja direto: programa de entregadores — **já implementado
-e fechado por uma chave de recurso** — e aplicativo nativo.
+Sobre os próximos passos, seja direto: trazer o controle de estoque para a
+demonstração, programa de entregadores — **já implementado e fechado por uma chave de
+recurso** — e aplicativo nativo. Sobre o estoque, diga que ainda não faz parte do que
+vocês mostram hoje; **não diga que o sistema não tem**, porque ele existe em produção.
 
 ### Slide 10 — Encerramento
 
@@ -256,9 +258,8 @@ pedidos e segurança. Os outros dois vão passar essas perguntas para você.
 - *"E se dois pedidos chegarem ao mesmo tempo?"* → "A criação do pedido é uma função
   transacional no banco, e o limite de pedidos do plano é validado lá dentro. Duas
   abas abertas não burlam."
-- *"E o estoque?"* (só se perguntarem) → "Existe no sistema, mas escolhemos mostrar o
-  fluxo do pedido do começo ao fim. O estoque nunca bloqueia a venda: registra e
-  avisa, e quem decide é o lojista."
+- *"E o estoque?"* (só se perguntarem) → "Ainda não faz parte do que mostramos hoje.
+  O próximo passo é trazer o controle de estoque para a demonstração."
 
 ---
 
