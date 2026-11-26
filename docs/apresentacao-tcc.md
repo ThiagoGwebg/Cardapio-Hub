@@ -1,15 +1,15 @@
 # Roteiro da apresentação do TCC — Cardápio Hub
 
 Apresentação com demonstração **ao vivo em produção** (https://www.cardapiohub.com).
-Montado para **20 minutos + arguição**; cada bloco tem o tempo e o que cortar primeiro
+Montado para **17 minutos + arguição**; cada bloco tem o tempo e o que cortar primeiro
 se o relógio apertar.
 
 Loja de demonstração, credenciais e como resetar: `docs/loja-demo.md`.
 
-Os **11 slides** da banca estão em:
+Os **10 slides** da banca estão em:
 <https://claude.ai/artifact/DbpGy7Ed3peLsVyvwHmW6Q>
 Cada slide traz a fala correspondente nas notas do apresentador. Baixe o PDF pela
-própria página **antes do dia** e leve no computador — a aba 5 do pré-voo é esse
+própria página **antes do dia** e leve no computador — a aba 4 do pré-voo é esse
 arquivo local, não o link.
 
 ---
@@ -34,7 +34,7 @@ antes de subir no palco, e **não feche o navegador**:
 - [ ] https://www.cardapiohub.com/loja/demo
 - [ ] Abrir um produto com grupos de opção (**Smash Clássico**) e fechar
 - [ ] https://www.cardapiohub.com/login → entrar no painel da demo
-- [ ] Clicar uma vez em cada aba que vai mostrar: Pedidos, Estoque, Caixa, Desempenho
+- [ ] Clicar uma vez em cada aba que vai mostrar: Pedidos, Caixa, Desempenho
 
 ### Preparar as abas
 
@@ -43,9 +43,8 @@ na frente da banca é lento e dá erro de digitação.
 
 1. Aba 1 — cardápio `/loja/demo`
 2. Aba 2 — painel, em **Pedidos**
-3. Aba 3 — painel, em **Estoque**
-4. Aba 4 — painel, em **Desempenho**
-5. Aba 5 — os slides
+3. Aba 3 — painel, em **Desempenho**
+4. Aba 4 — os slides
 
 ### Checklist da máquina
 
@@ -73,11 +72,10 @@ Cada um lê só a própria seção lá; este arquivo guarda o que é do grupo in
 |---|---|---|
 | 0:00 – 4:00 | Marcos | Abertura, problema, solução e a tela inicial ao vivo |
 | 4:00 – 7:00 | Thiago | Painel: pedidos, caixa, desempenho, clientes |
-| 7:00 – 10:00 | Gustavo | Painel: estoque, ficha técnica e entrada de NF-e |
-| 10:00 – 14:30 | Gustavo | Cardápio, montagem do pedido e pagamento |
-| 14:30 – 15:00 | Thiago | Volta ao painel: o pedido do Gustavo chegou |
-| 15:00 – 18:00 | Thiago | Arquitetura e as três decisões técnicas |
-| 18:00 – 20:00 | Marcos | Modelo de negócio, validação e encerramento |
+| 7:00 – 11:30 | Gustavo | Cardápio, montagem do pedido e pagamento |
+| 11:30 – 12:00 | Thiago | Volta ao painel: o pedido do Gustavo chegou |
+| 12:00 – 15:00 | Thiago | Tecnologias e arquitetura |
+| 15:00 – 17:00 | Marcos | Modelo de negócio, validação e encerramento |
 
 Se o relógio apertar, **corte arquitetura, nunca a demonstração**. A banca lembra do
 sistema funcionando, não do diagrama.
@@ -112,29 +110,16 @@ sistema funcionando, não do diagrama.
    e o cliente acompanha pela página do pedido.
 3. Mostre o quadro cheio: pedidos em cada coluna e um agendado para amanhã.
 
-### 3.3 — O estoque baixa sozinho (2 min) · aba 3 — **o momento mais forte**
-
-Este é o diferencial que os concorrentes de cardápio digital não têm. Dê tempo a ele.
-
-1. Abra **Ficha técnica** e mostre a composição do Smash Clássico: quanto de blend,
-   queijo e pão sai por unidade vendida.
-2. Abra **Movimentações**: a saída dos insumos do pedido que você acabou de fazer
-   está lá, ligada ao pedido de origem.
-3. Frase: *"ele vendeu um hambúrguer e o estoque de blend baixou sozinho. Ninguém
-   digitou nada."*
-4. Se sobrar fôlego, mostre **Entrada NF-e**: importa o XML da nota do fornecedor,
-   liga cada item a um insumo, e na próxima nota do mesmo fornecedor já vem ligado.
-
-### 3.4 — A gestão (1,5 min) · abas 2 e 4
+### 3.3 — A gestão (1,5 min) · abas 2 e 3
 
 - **Caixa**: entradas do dia separadas por dinheiro, Pix e cartão, com exportação CSV.
 - **Desempenho**: faturamento por dia da semana, top produtos, horário de pico.
   > "É uma loja de demonstração, com 35 dias de histórico gerado por script — por isso tem gráfico e não tela vazia."
 
-### 3.5 — Realidade aumentada — **fora do escopo**
+### 3.4 — Realidade aumentada — **fora do escopo**
 
-A realidade aumentada não entra nesta apresentação. O slide 8 é só o estoque, e não
-há prato 3D publicado na loja demo.
+A realidade aumentada não entra nesta apresentação, e não há prato 3D publicado
+na loja demo.
 
 Se a banca perguntar, a resposta é curta: *"existe no plano Pro — o lojista manda até
 quatro fotos do prato, a IA gera o modelo 3D e ele publica. Não faz parte do que a
@@ -171,10 +156,9 @@ uma SPA entregaria tela em branco até o JavaScript baixar.
 A criação do pedido é uma função transacional no banco. O limite de pedidos do
 plano é validado lá dentro, não no cliente — duas abas abertas não burlam.
 
-**"O estoque pode ficar negativo. Isso não é um bug?"**
-É uma decisão de produto. Bloquear a venda por falta de insumo cadastrado faria o
-restaurante perder venda real por erro de cadastro. O sistema registra e alerta,
-mas nunca impede o pedido — quem decide é o lojista.
+**"E o estoque?"** (só se perguntarem)
+Existe no sistema, mas escolhemos mostrar o fluxo do pedido do começo ao fim. O
+estoque nunca bloqueia a venda: registra e avisa, e quem decide é o lojista.
 
 **"Qual o modelo de negócio?"**
 Assinatura mensal por loja — Lite R$ 29, Plus R$ 69, Pro R$ 149 — **sem comissão
@@ -183,7 +167,7 @@ por pedido**. A receita não cresce às custas da margem do restaurante.
 **"Quem são os concorrentes?"**
 Marketplaces (iFood, Rappi) cobram comissão e ficam com o cliente. Geradores de
 cardápio em link levam o pedido para o WhatsApp e param aí. Aqui o pedido entra no
-sistema e segue até caixa, estoque e relatório — é operação, não só vitrine.
+sistema e segue até caixa e relatório — é operação, não só vitrine.
 
 **"É um protótipo ou está em uso?"**
 Está em produção, com domínio próprio, pagamento e cobrança recorrente automatizada.
@@ -198,8 +182,8 @@ projeto. Mostrar que se sabe onde o sistema está frágil impressiona mais que n
 ## 6. Divisão entre os apresentadores
 
 O grupo são três: **Thiago** (full-stack, puxado para o back-end), **Gustavo**
-(front-end) e **Marcos** (documentação). O Igor saiu do grupo: o estoque passou para
-o Gustavo e o banco para o Thiago.
+(front-end) e **Marcos** (documentação). O Igor saiu do grupo: o banco passou para o
+Thiago, e o estoque ficou fora da apresentação.
 
 **O roteiro de fala de cada um está em `docs/apresentacao-por-pessoa.md`** — abra lá
 e leia só a sua seção. O resumo:
@@ -208,7 +192,7 @@ e leia só a sua seção. O resumo:
 |---|---|---|
 | **Marcos** | Abertura, problema, solução, tela inicial, modelo de negócio e fecho | Escopo, metodologia, pesquisa, negócio, concorrência |
 | **Thiago** | Painel do lojista, o pedido chegando, arquitetura e as três decisões | Arquitetura, integrações, pagamento, deploy, PWA, banco, RLS, transações, gatilhos e segurança |
-| **Gustavo** | Estoque e ficha técnica, cardápio, montagem do pedido e pagamento | Interface, responsividade, experiência, acessibilidade |
+| **Gustavo** | Cardápio, montagem do pedido e pagamento | Interface, responsividade, experiência, acessibilidade |
 
 Quem apresentou um bloco **não** é obrigado a responder a pergunta dele: na arguição
 responde quem domina o assunto. Pergunta de banco vai para o Thiago, mesmo que tenha
