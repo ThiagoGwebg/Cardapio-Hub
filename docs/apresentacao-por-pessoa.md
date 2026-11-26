@@ -207,7 +207,7 @@ vez**.
 
 Não leia os quatro cartões. Diga em uma frase:
 
-> "O sistema todo é JavaScript. Next.js e React na interface e no servidor, hospedado na Vercel. O banco é PostgreSQL pelo Supabase, que também cuida do login e do tempo real. Pagamento, cobrança e notificação vêm de serviços externos: Mercado Pago, Stripe e OneSignal."
+> "O sistema todo é JavaScript. Next.js e React na interface e no servidor, hospedado na Vercel. O banco é PostgreSQL pelo Supabase, que também cuida do login e do tempo real. Pagamento, cobrança e notificação vêm de serviços externos: Mercado Pago e OneSignal."
 
 Se perguntarem *por que PostgreSQL*: as regras de segurança por loja moram nele (a decisão 01, abaixo).
 
