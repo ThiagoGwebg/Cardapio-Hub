@@ -6,7 +6,7 @@ se o relógio apertar.
 
 Loja de demonstração, credenciais e como resetar: `docs/loja-demo.md`.
 
-Os **11 slides** da banca estão em:
+Os **12 slides** da banca estão em:
 <https://claude.ai/artifact/DbpGy7Ed3peLsVyvwHmW6Q>
 Cada slide traz a fala correspondente nas notas do apresentador. Baixe o PDF pela
 própria página **antes do dia** e leve no computador — a aba 5 do pré-voo é esse

@@ -120,12 +120,18 @@ Sobre os próximos passos, seja direto: importação automática de notas fiscai
 programa de entregadores — **já implementado e fechado por uma chave de recurso** — e
 aplicativo nativo.
 
-### Slide 11 — Encerramento
+### Slide 11 — Agradecimentos (30 s)
+
+Leia o rótulo, o nome completo e a frase de cada cartão, sem pressa. O texto dos cartões é do grupo: preencham antes da banca (o slide sai com campos entre colchetes).
+
+### Slide 12 — Encerramento
 
 > "A gente fecha voltando para onde começou: o canal de venda é do lojista, não do
 > intermediário. Obrigado."
 
-Deixe o slide 11 na tela durante a arguição: os papéis de cada um ficam à vista.
+Se o grupo escolher um versículo, ele fica acima de "Quem responde o quê": leia em voz alta antes do "Obrigado".
+
+Deixe o slide 12 na tela durante a arguição: os papéis de cada um ficam à vista.
 
 ## Na arguição, você responde
 
