@@ -9,10 +9,10 @@ continua em `docs/apresentacao-tcc.md`.
 |---|---|---|
 | 0:00 – 4:00 | **Marcos** | Abertura, problema, solução e a tela inicial ao vivo |
 | 4:00 – 7:00 | **Thiago** | Painel do lojista: pedidos, caixa, desempenho, clientes |
-| 7:00 – 10:00 | **Igor** | Painel do lojista: estoque, ficha técnica e entrada de NF-e |
+| 7:00 – 10:00 | **Gustavo** | Painel do lojista: estoque, ficha técnica e entrada de NF-e |
 | 10:00 – 14:30 | **Gustavo** | Cardápio, montagem do pedido e pagamento |
 | 14:30 – 15:00 | **Thiago** | Volta ao painel: o pedido do Gustavo chegou |
-| 15:00 – 18:00 | **Thiago e Igor** | Arquitetura e decisões técnicas |
+| 15:00 – 18:00 | **Thiago** | Arquitetura e as três decisões técnicas |
 | 18:00 – 20:00 | **Marcos** | Modelo de negócio, validação e encerramento |
 
 ## Um ajuste no plano, e por quê
@@ -26,19 +26,31 @@ e caindo no painel na frente da banca. Mostrando o painel antes e o cardápio de
 esse momento se perde — a banca vê os pedidos já lá, sem ligar uma coisa à outra. Com
 a volta de 30 segundos, a ordem de vocês fica de pé **e** o encaixe acontece.
 
+## A saída do Igor
+
+O grupo passou a ser de três. A parte que era dele foi dividida assim: o **Gustavo**
+assume o estoque ao vivo (7:00 – 10:00), e o **Thiago** assume o banco — a decisão 01,
+o slide 9 e toda pergunta de banco, RLS e segurança na arguição.
+
+A ordem e os tempos não mudaram. O que mudou é que o Gustavo agora tem dois blocos
+seguidos, das 7:00 às 14:30: estoque primeiro, cardápio depois. São sete minutos e
+meio falando sozinho — **é o trecho que mais precisa de ensaio**, porque é onde o
+cansaço aparece e onde a banca pode perder o fio entre um assunto e outro. Marque uma
+pausa clara entre os dois blocos.
+
 ---
 
 # MARCOS — abertura e fechamento
 
 > **Seu papel:** você abre e você fecha. É o fio da narrativa: a banca entende o
 > problema por você e sai com a conclusão por você. Você não precisa explicar código
-> em nenhum momento — se vier pergunta técnica, passe para o Igor.
+> em nenhum momento — se vier pergunta técnica, passe para o Thiago.
 
 ## Bloco 1 — Abertura (0:00 – 4:00)
 
 ### Slide 1 — Capa
 
-Apresente os quatro pelo nome e diga o que cada um fez, em uma frase. Depois:
+Apresente os três pelo nome e diga o que cada um fez, em uma frase. Depois:
 
 > "O Cardápio Hub é uma plataforma onde o restaurante vende pelo próprio link, com a
 > própria marca, sem pagar comissão por pedido. É um sistema em produção, no ar, e é
@@ -126,7 +138,7 @@ Escopo, metodologia, pesquisa, modelo de negócio, concorrência, próximos pass
 > fim: caixa, estoque e relatório. É operação, não só vitrine."
 
 **Se vier pergunta de banco de dados, segurança ou código:** não arrisque. Diga
-*"o Igor trabalhou nessa parte"* e passe. Isso não pega mal — pega mal é responder
+*"o Thiago trabalhou nessa parte"* e passe. Isso não pega mal — pega mal é responder
 errado.
 
 ---
@@ -134,8 +146,9 @@ errado.
 # THIAGO — painel do lojista e arquitetura
 
 > **Seu papel:** você mostra o que o lojista ganha no dia a dia e, no fim, explica
-> como o sistema é montado. Você é o segundo mais forte tecnicamente: o Igor pega o
-> banco, você pega o resto.
+> como o sistema é montado. Com a saída do Igor, você é o mais forte tecnicamente do
+> grupo: o banco é seu, e é para você que os outros dois vão empurrar qualquer
+> pergunta pesada da banca.
 
 ## Bloco 1 — O painel (4:00 – 7:00) · aba 2
 
@@ -172,7 +185,7 @@ mais vendidos.
 > "O sistema identifica quem já pediu antes e marca os recorrentes. São 31 clientes
 > aqui, 8 deles com selo de recorrente e link direto do WhatsApp."
 
-**Passe a bola:** *"O Igor vai mostrar a parte que nenhum concorrente de cardápio
+**Passe a bola:** *"O Gustavo vai mostrar a parte que nenhum concorrente de cardápio
 digital tem."*
 
 ## Bloco 2 — O pedido do Gustavo chegou (14:30 – 15:00) · aba 2
@@ -189,7 +202,7 @@ vez**.
 > ⚠️ Se o pedido não aparecer, recarregue **uma vez só**. Se ainda assim não vier,
 > não insista: *"a rede aqui está lenta"*, mostre o quadro que já tem pedidos e siga.
 
-## Bloco 3 — Arquitetura (15:00 – 18:00, dividido com o Igor)
+## Bloco 3 — Arquitetura (15:00 – 18:00)
 
 ### Slide 7 — Arquitetura (você)
 
@@ -198,11 +211,23 @@ Não leia as quatro camadas uma por uma.
 > "São quatro camadas, mas a decisão que importa está na de baixo. Em cima, o cardápio
 > do cliente, renderizado no servidor. No meio, o painel do lojista, que instala como
 > aplicativo no celular e recebe notificação de pedido novo. Embaixo, o banco — e é
-> sobre ele que o Igor vai falar."
+> dele que eu vou falar agora."
 
-### Slide 8 — Decisões 02 e 03 (você; a 01 é do Igor)
+### Slide 8 — As três decisões (todas suas)
 
-> "A segunda decisão: criar pedido e baixar estoque não são código da aplicação, são
+A **decisão 01 é a pergunta mais provável da banca**. Apresente e já responda antes de
+perguntarem:
+
+> "A primeira decisão é a mais importante: o isolamento entre lojas não está no
+> código, está no banco. Cada loja só enxerga os próprios dados por uma política de
+> Row Level Security do PostgreSQL, aplicada linha a linha."
+
+> "A diferença é grande. Se o filtro estivesse na aplicação, bastaria alguém escrever
+> uma consulta nova amanhã e esquecer o `where` para vazar dado de uma loja na outra.
+> Como a regra está no banco, ela vale para qualquer caminho de acesso — inclusive
+> para um código que ainda não existe."
+
+> "A segunda: criar pedido e baixar estoque não são código da aplicação, são
 > funções e gatilhos dentro do banco, transacionais e idempotentes. O saldo do estoque
 > só muda por movimentação registrada, e o livro-razão sempre fecha com ele."
 
@@ -211,20 +236,44 @@ Não leia as quatro camadas uma por uma.
 > achado no Google. HTML pronto, em vez de uma tela em branco esperando o JavaScript
 > baixar."
 
+### Slide 9 — O estoque, por baixo (você)
+
+Retome o que o Gustavo mostrou ao vivo, agora pelo lado técnico:
+
+> "Esse é o estoque que o Gustavo mostrou funcionando. Por baixo é a decisão 02: a
+> ficha técnica diz o que sai por unidade vendida, o gatilho baixa na hora do pedido,
+> e o livro-razão é imutável — é isso que faz o saldo sempre fechar."
+
 ## Na arguição, você responde
 
-Arquitetura geral, integrações, pagamento, deploy, PWA e notificações.
+Arquitetura geral, integrações, pagamento, deploy, PWA e notificações — **e tudo que
+era do Igor**: banco de dados, RLS, transações, gatilhos, estoque, concorrência de
+pedidos e segurança. Os outros dois vão passar essas perguntas para você.
 
-**Pergunta provável:** *"Por que não usar só um framework de frontend?"* — a resposta
-é a decisão 03, acima.
+**As quatro que mais caem:**
+
+- *"Por que não usar só um framework de frontend?"* → a decisão 03, acima.
+- *"Como garantem que uma loja não vê o dado de outra?"* → a decisão 01, acima.
+- *"E se dois pedidos chegarem ao mesmo tempo?"* → "A criação do pedido é uma função
+  transacional no banco, e o limite de pedidos do plano é validado lá dentro. Duas
+  abas abertas não burlam."
+- *"O estoque pode ficar negativo. Isso não é um bug?"* → "É uma decisão de produto.
+  Bloquear a venda por falta de insumo cadastrado faria o restaurante perder venda
+  real por erro de cadastro. O sistema registra e alerta, mas nunca impede o pedido —
+  quem decide é o lojista."
 
 ---
 
-# IGOR — estoque e o banco de dados
+# GUSTAVO — o estoque, o cardápio e o pedido
 
-> **Seu papel:** você é o mais forte tecnicamente do grupo, então você fica com as
-> duas partes mais difíceis: o estoque ao vivo e o isolamento entre lojas. É também
-> para você que os outros três vão empurrar qualquer pergunta pesada da banca.
+> **Seu papel:** com a saída do Igor, você ficou com dois blocos seguidos. Primeiro o
+> estoque, que é o diferencial do trabalho; depois o lado de quem compra, que é a
+> interface que você construiu. Termine fazendo um pedido de verdade: ele vai
+> aparecer no painel logo depois.
+>
+> Você **apresenta** o estoque, mas não precisa **defender** o banco: pergunta de RLS,
+> gatilho ou transação vai para o Thiago. Mostrar e explicar o que a tela faz é seu;
+> o que acontece por baixo é dele.
 
 ## Bloco 1 — Estoque (7:00 – 10:00) · aba 3
 
@@ -270,64 +319,17 @@ Abra dizendo o que torna isso diferente:
 > 10% em relação à última compra, ele avisa no topo da tela até alguém marcar que
 > está ciente."
 
-**Passe a bola:** *"Agora o Gustavo vai mostrar como o cliente final faz um pedido —
-e esse pedido vai voltar aqui."*
+### A virada para o seu segundo bloco
 
-## Bloco 2 — Arquitetura: a decisão 01 (dentro dos 15:00 – 18:00)
+Este é o único ponto da apresentação em que **você passa a bola para você mesmo**.
+Não emende os dois blocos como se fosse um só: faça uma pausa, respire, e anuncie a
+troca de assunto em voz alta, para a banca mudar de lugar junto com você.
 
-### Slide 8 — Decisão 01, isolamento entre lojas
+> "Vocês acabaram de ver o estoque mexendo sozinho a partir de um pedido. Agora eu
+> vou mostrar de onde esse pedido vem — e o pedido que eu fizer daqui a pouco vai
+> voltar nessa tela."
 
-Essa é **a pergunta mais provável da banca**. Você apresenta e já responde antes de
-perguntarem:
-
-> "A primeira decisão é a mais importante: o isolamento entre lojas não está no
-> código, está no banco. Cada loja só enxerga os próprios dados por uma política de
-> Row Level Security do PostgreSQL, aplicada linha a linha."
-
-> "A diferença é grande. Se o filtro estivesse na aplicação, bastaria alguém escrever
-> uma consulta nova amanhã e esquecer o `where` para vazar dado de uma loja na outra.
-> Como a regra está no banco, ela vale para qualquer caminho de acesso — inclusive
-> para um código que ainda não existe."
-
-### Slide 9 — Estoque e realidade aumentada (você)
-
-> "Esses são os dois recursos que saem do cardápio e entram na operação. O estoque
-> vocês acabaram de ver. O outro é realidade aumentada: no plano Pro, o lojista manda
-> até quatro fotos do prato, uma IA gera o modelo 3D, ele revisa no painel e publica —
-> e o cliente coloca o prato na própria mesa pela câmera do celular. Sem precisar de
-> um modelador 3D."
-
-> ⚠️ **Não prometa mostrar o 3D.** A loja de demonstração está sem modelo publicado.
-> Se pedirem para ver: *"cada geração consome crédito da IA, então a loja de
-> demonstração está sem modelo publicado no momento; o fluxo de geração fica no
-> painel."* Não abra o painel para procurar.
-
-## Na arguição, você responde
-
-Banco de dados, RLS, transações, gatilhos, estoque, concorrência de pedidos,
-segurança. Tudo que os outros três passarem para você.
-
-**As três que mais caem:**
-
-- *"Como garantem que uma loja não vê o dado de outra?"* → a decisão 01, acima.
-- *"E se dois pedidos chegarem ao mesmo tempo?"* → "A criação do pedido é uma função
-  transacional no banco, e o limite de pedidos do plano é validado lá dentro. Duas
-  abas abertas não burlam."
-- *"O estoque pode ficar negativo. Isso não é um bug?"* → "É uma decisão de produto.
-  Bloquear a venda por falta de insumo cadastrado faria o restaurante perder venda
-  real por erro de cadastro. O sistema registra e alerta, mas nunca impede o pedido —
-  quem decide é o lojista."
-
----
-
-# GUSTAVO — o cardápio e o pedido
-
-> **Seu papel:** você mostra o lado de quem compra. É a parte que a banca mais
-> entende, porque todo mundo já pediu comida pelo celular — e é a interface que você
-> construiu. Termine fazendo um pedido de verdade: ele vai aparecer no painel logo
-> depois.
-
-## Bloco único (10:00 – 14:30) · aba 1 e celular
+## Bloco 2 — O cardápio e o pedido (10:00 – 14:30) · aba 1 e celular
 
 ### Primeiro, o slide 6 — o QR Code (30 s)
 
@@ -432,7 +434,8 @@ Depois volte o projetor para a aba do cardápio.
 
 ## Na arguição, você responde
 
-Interface, responsividade, experiência do cliente, acessibilidade, PWA.
+Interface, responsividade, experiência do cliente, acessibilidade, PWA — e o que as
+telas de estoque **fazem**. Como elas funcionam por dentro é do Thiago.
 
 **Pergunta provável:** *"Funciona bem no celular?"*
 
@@ -441,7 +444,7 @@ Interface, responsividade, experiência do cliente, acessibilidade, PWA.
 
 ---
 
-## Combinados entre os quatro
+## Combinados entre os três
 
 - **Passem a bola em voz alta**, pelo nome, como está escrito em cada bloco. Troca
   silenciosa deixa a banca sem saber para onde olhar.

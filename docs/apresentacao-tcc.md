@@ -6,6 +6,12 @@ se o relógio apertar.
 
 Loja de demonstração, credenciais e como resetar: `docs/loja-demo.md`.
 
+Os **12 slides** da banca estão em:
+<https://claude.ai/artifact/DbpGy7Ed3peLsVyvwHmW6Q>
+Cada slide traz a fala correspondente nas notas do apresentador. Baixe o PDF pela
+própria página **antes do dia** e leve no computador — a aba 5 do pré-voo é esse
+arquivo local, não o link.
+
 ---
 
 ## 1. Pré-voo — 30 minutos antes
@@ -67,10 +73,10 @@ Cada um lê só a própria seção lá; este arquivo guarda o que é do grupo in
 |---|---|---|
 | 0:00 – 4:00 | Marcos | Abertura, problema, solução e a tela inicial ao vivo |
 | 4:00 – 7:00 | Thiago | Painel: pedidos, caixa, desempenho, clientes |
-| 7:00 – 10:00 | Igor | Painel: estoque, ficha técnica e entrada de NF-e |
+| 7:00 – 10:00 | Gustavo | Painel: estoque, ficha técnica e entrada de NF-e |
 | 10:00 – 14:30 | Gustavo | Cardápio, montagem do pedido e pagamento |
 | 14:30 – 15:00 | Thiago | Volta ao painel: o pedido do Gustavo chegou |
-| 15:00 – 18:00 | Thiago e Igor | Arquitetura e decisões técnicas |
+| 15:00 – 18:00 | Thiago | Arquitetura e as três decisões técnicas |
 | 18:00 – 20:00 | Marcos | Modelo de negócio, validação e encerramento |
 
 Se o relógio apertar, **corte arquitetura, nunca a demonstração**. A banca lembra do
@@ -126,26 +132,14 @@ Este é o diferencial que os concorrentes de cardápio digital não têm. Dê te
 - **Desempenho**: faturamento por dia da semana, top produtos, horário de pico.
   > "105 pedidos reais nos últimos 35 dias — por isso tem gráfico e não tela vazia."
 
-### 3.5 — Realidade aumentada — **não demonstrar**
+### 3.5 — Realidade aumentada — **fora do escopo**
 
-⚠️ **Não há nenhum prato 3D publicado na loja demo.** O reset da demo em 16/11/2026
-recriou os produtos a partir do `demo-menu.mjs`, que não tem campo de realidade
-aumentada, e o modelo que existia no Brownie com sorvete foi junto.
+A realidade aumentada não entra nesta apresentação. O slide 9 é só o estoque, e não
+há prato 3D publicado na loja demo.
 
-Então, no slide 9, **fale do recurso sem prometer mostrar**:
-
-> "O plano Pro tem realidade aumentada: o lojista manda até quatro fotos do prato,
-> a IA gera o modelo 3D, ele revisa no painel e publica — e o cliente coloca o prato
-> na própria mesa pela câmera do celular. Não precisa de modelador 3D."
-
-Se alguém da banca pedir para ver, a resposta honesta é curta: *"cada geração consome
-crédito da IA, então a loja de demonstração está sem modelo publicado no momento; o
-fluxo de geração está no painel."* Não improvise abrindo o painel para procurar.
-
-**Para ter o 3D de volta na nova data:** publiquem um modelo pelo painel, em
-Cardápio → produto → realidade aumentada (precisa de `TRIPO_API_KEY` configurada e
-consome cota mensal). Feito isso, volte este bloco para o fim da demo — é o recurso
-mais impressionante do trabalho, e vale o esforço de ter de volta.
+Se a banca perguntar, a resposta é curta: *"existe no plano Pro — o lojista manda até
+quatro fotos do prato, a IA gera o modelo 3D e ele publica. Não faz parte do que a
+gente escolheu mostrar hoje."* **Não abra o painel para procurar.**
 
 ---
 
@@ -155,7 +149,7 @@ mais impressionante do trabalho, e vale o esforço de ter de volta.
 |---|---|
 | Internet do campus caiu | Abra o **vídeo gravado**. Narre por cima dele, mesmo roteiro. |
 | Cardápio demorando a abrir | Não fique em silêncio: *"está subindo o servidor, enquanto isso…"* e fale do problema. Nunca recarregue duas vezes seguidas. |
-| Pedem para ver o 3D | Não há modelo publicado: explique o fluxo pelo slide 9 e siga. **Não abra o painel para procurar.** |
+| Pedem para ver o 3D | Está fora do escopo: diga que o recurso existe no plano Pro e siga. **Não abra o painel para procurar.** |
 | Alguém zerou a demo | `node scripts/seed-demo.mjs` (precisa de internet e do terminal aberto). |
 | Projetor lavou as cores | O cardápio tem botão de tema — troque para o claro. |
 | Pedido de teste não aparece | Recarregue a aba do painel uma vez. Se não vier, siga pelo quadro que já tem pedidos. |
@@ -204,8 +198,9 @@ projeto. Mostrar que se sabe onde o sistema está frágil impressiona mais que n
 
 ## 6. Divisão entre os apresentadores
 
-O grupo são quatro: **Igor** e **Thiago** (full-stack, mais puxados para o back-end),
-**Gustavo** (front-end) e **Marcos** (documentação).
+O grupo são três: **Thiago** (full-stack, puxado para o back-end), **Gustavo**
+(front-end) e **Marcos** (documentação). O Igor saiu do grupo: o estoque passou para
+o Gustavo e o banco para o Thiago.
 
 **O roteiro de fala de cada um está em `docs/apresentacao-por-pessoa.md`** — abra lá
 e leia só a sua seção. O resumo:
@@ -213,13 +208,12 @@ e leia só a sua seção. O resumo:
 | Quem | Apresenta | Responde na arguição |
 |---|---|---|
 | **Marcos** | Abertura, problema, solução, tela inicial, modelo de negócio e fecho | Escopo, metodologia, pesquisa, negócio, concorrência |
-| **Thiago** | Painel do lojista, o pedido chegando, arquitetura | Arquitetura geral, integrações, pagamento, deploy, PWA |
-| **Igor** | Estoque e ficha técnica, isolamento entre lojas | Banco, RLS, transações, gatilhos, concorrência, segurança |
-| **Gustavo** | Cardápio, montagem do pedido e pagamento | Interface, responsividade, experiência, acessibilidade |
+| **Thiago** | Painel do lojista, o pedido chegando, arquitetura e as três decisões | Arquitetura, integrações, pagamento, deploy, PWA, banco, RLS, transações, gatilhos e segurança |
+| **Gustavo** | Estoque e ficha técnica, cardápio, montagem do pedido e pagamento | Interface, responsividade, experiência, acessibilidade |
 
 Quem apresentou um bloco **não** é obrigado a responder a pergunta dele: na arguição
-responde quem domina o assunto. Pergunta de banco vai para o Igor, mesmo que tenha
-nascido do slide do Thiago.
+responde quem domina o assunto. Pergunta de banco vai para o Thiago, mesmo que tenha
+nascido da tela que o Gustavo mostrou.
 
 Combinem um sinal para quando alguém travar — basta o colega assumir com
 *"complementando…"*. Travar acontece; silêncio de dez segundos é que pesa.
