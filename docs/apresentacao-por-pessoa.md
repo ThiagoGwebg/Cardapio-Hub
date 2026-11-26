@@ -216,9 +216,9 @@ Se perguntarem *por que PostgreSQL*: as regras de segurança por loja moram nele
 Não leia as quatro camadas uma por uma.
 
 > "São quatro camadas, mas a decisão que importa está na de baixo. Em cima, o cardápio
-> do cliente, renderizado no servidor. No meio, o painel do lojista, que instala como
-> aplicativo no celular e recebe notificação de pedido novo. Embaixo, o banco — e é
-> dele que eu vou falar agora."
+> do cliente, renderizado no servidor. No meio, o painel do lojista, que recebe cada
+> pedido novo na hora, com notificação. Embaixo, o banco — e é dele que eu vou falar
+> agora."
 
 ### As três decisões (sem slide próprio)
 
@@ -247,7 +247,7 @@ perguntarem:
 
 ## Na arguição, você responde
 
-Arquitetura geral, integrações, pagamento, deploy, PWA e notificações — **e tudo que
+Arquitetura geral, integrações, pagamento, deploy e notificações — **e tudo que
 era do Igor**: banco de dados, RLS, transações, gatilhos, concorrência de
 pedidos e segurança. Os outros dois vão passar essas perguntas para você.
 
@@ -366,7 +366,7 @@ Comece situando a banca:
 
 ## Na arguição, você responde
 
-Interface, responsividade, experiência do cliente, acessibilidade, PWA.
+Interface, responsividade, experiência do cliente e acessibilidade.
 
 **Pergunta provável:** *"Funciona bem no celular?"*
 

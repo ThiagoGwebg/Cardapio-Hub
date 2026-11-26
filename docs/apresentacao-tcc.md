@@ -191,7 +191,7 @@ e leia só a sua seção. O resumo:
 | Quem | Apresenta | Responde na arguição |
 |---|---|---|
 | **Marcos** | Abertura, problema, solução, tela inicial, modelo de negócio e fecho | Escopo, metodologia, pesquisa, negócio, concorrência |
-| **Thiago** | Painel do lojista, o pedido chegando, arquitetura e as três decisões | Arquitetura, integrações, pagamento, deploy, PWA, banco, RLS, transações, gatilhos e segurança |
+| **Thiago** | Painel do lojista, o pedido chegando, arquitetura e as três decisões | Arquitetura, integrações, pagamento, deploy, banco, RLS, transações, gatilhos e segurança |
 | **Gustavo** | Cardápio, montagem do pedido e pagamento | Interface, responsividade, experiência, acessibilidade |
 
 Quem apresentou um bloco **não** é obrigado a responder a pergunta dele: na arguição
